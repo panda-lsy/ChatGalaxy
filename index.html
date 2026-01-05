@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGalaxy - 聊天星系可视化</title>
+    <!-- Load Three.js (r149 - Stable for 3d-force-graph) -->
+    <script src="https://unpkg.com/three@0.149.0/build/three.min.js" defer></script>
+    <!-- Load D3.js -->
+    <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js" defer></script>
+    <!-- Load 3D Force Graph -->
+    <script src="https://unpkg.com/3d-force-graph@1.73.1/dist/3d-force-graph.min.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/roam.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/emoji.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+</head>
+<body data-theme="light">
+
+<div id="intro-overlay" class="experience-overlay hidden">
+    <div class="overlay-inner">
+        <div class="eyebrow">序幕</div>
+        <h1>把碎片点成星海</h1>
+        <p class="subtext">每一条消息都是一粒星沙。让我们一起把它们撒向夜空，拼成只属于你们的银河。</p>
+        <div class="overlay-actions">
+            <button id="start-experience-btn" class="primary">开启回忆</button>
+        </div>
+    </div>
+    <div class="overlay-glow"></div>
+</div>
+
+<div id="outro-overlay" class="experience-overlay hidden">
+    <div class="overlay-inner">
+        <div class="eyebrow">收束</div>
+        <h1>银河仍在发光</h1>
+        <p class="subtext">旅程不会结束，光点会一直守在这里。回来的时候，它们仍会为你点亮。</p>
+        <div class="overlay-actions">
+            <button id="stay-btn">再停留一会</button>
+            <button id="return-btn" class="primary">返回星海</button>
+        </div>
+    </div>
+    <div class="overlay-glow"></div>
+</div>
+
+<div id="loading">
+    <div class="spinner"></div>
+    <p>正在加载数据...</p>
+</div>
+
+<!-- 左侧侧边栏展开按钮（折叠时显示） -->
+<button id="message-sidebar-toggle-fixed" title="展开侧边栏">
+    <i class="ri-menu-unfold-line"></i>
+</button>
+
+<div id="message-sidebar">
+    <div id="sidebar-header">
+        <button id="message-sidebar-toggle" class="sidebar-collapse-btn" title="折叠/展开">
+            <i class="ri-menu-fold-line"></i>
+        </button>
+        <div class="app-title"><i class="ri-space-line"></i> ChatGalaxy</div>
+        <div id="stats-bar">
+            <div class="stat-item">
+                <span class="stat-val" id="stat-total">0</span>
+                <span class="stat-label">消息</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val" id="stat-users">0</span>
+                <span class="stat-label">用户</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val" id="stat-days">0</span>
+                <span class="stat-label">天数</span>
+            </div>
+        </div>
+    </div>
+    <div id="controls">
+        <div class="control-group">
+            <div class="search-box">
+                <i class="ri-search-line"></i>
+                <input type="text" id="search-input" placeholder="搜索聊天内容..." oninput="handleSearch(this.value)">
+            </div>
+        </div>
+        <div class="control-group">
+            <div id="sidebar-tabs">
+                <button class="tab-btn active" onclick="switchTab('messages')">消息列表</button>
+                <button class="tab-btn" onclick="switchTab('keywords')">关键词榜</button>
+            </div>
+            <div id="sentiment-filters" class="filter-group">
+                <button class="filter-btn active" onclick="filterSentiment('all')" title="全部"><i class="ri-apps-line"></i></button>
+                <button class="filter-btn happy" onclick="filterSentiment('happy')" title="开心"><i class="ri-emotion-happy-line"></i></button>
+                <button class="filter-btn sad" onclick="filterSentiment('sad')" title="难过"><i class="ri-emotion-sad-line"></i></button>
+                <button class="filter-btn question" onclick="filterSentiment('question')" title="疑问"><i class="ri-question-mark"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="tab-content-messages" class="tab-content active">
+        <div id="chat-list-container">
+            <div id="chat-list-content">
+                <!-- Messages will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="tab-content-keywords" class="tab-content" style="display:none; flex: 1; overflow-y: auto;">
+        <div id="keyword-ranking-list">
+            <!-- Keywords will be injected here -->
+        </div>
+    </div>
+</div>
+
+<div id="main-view">
+    <div id="graph-container"></div>
+    
+    <div id="info-overlay">
+        <h3></h3>
+        <p></p>
+    </div>
+    <div id="subtitle-overlay"></div>
+    <div id="toast-container"></div>
+</div>
+
+<!-- Time Travel Slider -->
+<div id="time-travel-container">
+    <div class="time-label">
+        <i class="ri-time-line"></i>
+        <span id="current-date">2024-01-01</span>
+    </div>
+    <input type="range" id="time-slider" min="0" max="100" value="100" step="0.1">
+    <div class="time-controls">
+        <button id="play-btn" title="播放回忆"><i class="ri-play-fill"></i></button>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>设置</h2>
+            <button id="close-settings" class="icon-btn"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="modal-body">
+            <!-- Audio -->
+            <div class="setting-group">
+                <h3>音频设置</h3>
+                <div class="setting-item checkbox-row">
+                    <input type="checkbox" id="sfx-enabled" checked>
+                    <label for="sfx-enabled">开启交互音效</label>
+                </div>
+                <div class="setting-item">
+                    <label>背景音乐音量 <span id="bgm-vol-val">50%</span></label>
+                    <input type="range" id="bgm-vol" min="0" max="100" value="50">
+                </div>
+                <div class="setting-item">
+                    <label>音效音量 <span id="sfx-vol-val">50%</span></label>
+                    <input type="range" id="sfx-vol" min="0" max="100" value="50">
+                </div>
+            </div>
+            <!-- Appearance -->
+            <div class="setting-group">
+                <h3>界面个性化</h3>
+                <div class="setting-item">
+                    <label>界面配色</label>
+                    <select id="color-scheme-select">
+                        <option value="deepspace">🌌 深空蓝 (默认)</option>
+                        <option value="romantic">💖 浪漫粉</option>
+                        <option value="nebula">💜 星云紫</option>
+                        <option value="midnight">🌑 午夜黑</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>界面透明度 <span id="ui-transparency-val">0.95</span></label>
+                    <input type="range" id="ui-transparency" min="0.1" max="1.0" step="0.05" value="0.95">
+                </div>
+                <div class="setting-item">
+                    <label>网页标题</label>
+                    <input type="text" id="page-title-input" value="ChatGalaxy">
+                </div>
+                <div class="setting-item">
+                    <label>网页图标 (Emoji)</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="page-icon-input" value="🌌" maxlength="2">
+                        <button class="emoji-btn" data-target="page-icon-input">😊</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>侧边栏标题</label>
+                    <input type="text" id="sidebar-title-input" value="ChatGalaxy">
+                </div>
+                <div class="setting-item">
+                    <label>侧边栏图标 (Emoji)</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="sidebar-icon-input" value="💬" maxlength="2">
+                        <button class="emoji-btn" data-target="sidebar-icon-input">😊</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Features -->
+            <div class="setting-group">
+                <h3>星语设置</h3>
+                <div class="setting-item checkbox-row">
+                    <input type="checkbox" id="show-subtitles" checked>
+                    <label for="show-subtitles">开启星语 (漫游字幕)</label>
+                </div>
+                <div class="setting-item checkbox-row">
+                    <input type="checkbox" id="loop-subtitles">
+                    <label for="loop-subtitles">循环播放 (同一星球多句回忆)</label>
+                </div>
+                <div class="setting-item">
+                    <label>单句停留时间 <span id="subtitle-duration-val">8s</span></label>
+                    <input type="range" id="subtitle-duration" min="3" max="15" value="8">
+                </div>
+                <div class="setting-item">
+                    <label>淡入时间 <span id="subtitle-fadein-val">1.0s</span></label>
+                    <input type="range" id="subtitle-fadein" min="0.1" max="3.0" step="0.1" value="1.0">
+                </div>
+                <div class="setting-item">
+                    <label>淡出时间 <span id="subtitle-fadeout-val">1.0s</span></label>
+                    <input type="range" id="subtitle-fadeout" min="0.1" max="3.0" step="0.1" value="1.0">
+                </div>
+            </div>
+            <!-- Animation -->
+            <div class="setting-group">
+                <h3>动画设置</h3>
+                <div class="setting-item">
+                    <label>漫游速度 (秒/跳) <span id="roam-speed-val">12s</span></label>
+                    <input type="range" id="roam-speed" min="4" max="20" value="12">
+                </div>
+                <div class="setting-item">
+                    <label>基础自转速度 <span id="rotate-speed-val">0.4</span></label>
+                    <input type="range" id="rotate-speed" min="0" max="2" step="0.1" value="0.4">
+                </div>
+                <div class="setting-item checkbox-row">
+                    <input type="checkbox" id="idle-rotation-enabled" checked>
+                    <label for="idle-rotation-enabled">开启闲置自动旋转</label>
+                </div>
+                <div class="setting-item">
+                    <label>闲置自动旋转检测 (秒) <span id="idle-time-val">10s</span></label>
+                    <input type="range" id="idle-time" min="5" max="60" value="10">
+                </div>
+                <div class="setting-item">
+                    <label>闲置旋转速度 <span id="idle-speed-val">0.2</span></label>
+                    <input type="range" id="idle-speed" min="0.1" max="2.0" step="0.1" value="0.2">
+                </div>
+            </div>
+            <!-- Interaction -->
+            <div class="setting-group">
+                <h3>交互设置</h3>
+                <div class="setting-item checkbox-row">
+                    <input type="checkbox" id="hover-highlight-enabled">
+                    <label for="hover-highlight-enabled">开启鼠标悬停高亮</label>
+                </div>
+                <div class="setting-item">
+                    <label>点击高亮持续时间 (秒) <span id="highlight-duration-val">5s</span></label>
+                    <input type="range" id="highlight-duration" min="0" max="20" step="1" value="5">
+                    <div style="font-size: 10px; color: #999; margin-top: 2px;">0 表示无限持续</div>
+                </div>
+                <div class="setting-item">
+                    <label>连线不透明度 <span id="link-opacity-val">0.05</span></label>
+                    <input type="range" id="link-opacity" min="0.01" max="1.0" step="0.01" value="0.05">
+                </div>
+                <div class="setting-item">
+                    <label>连线粗细 <span id="link-width-val">0.2</span></label>
+                    <input type="range" id="link-width" min="0.05" max="3.0" step="0.05" value="0.2">
+                </div>
+            </div>
+            <!-- Layout -->
+            <div class="setting-group">
+                <h3>星系分布 (Layout)</h3>
+                <div class="setting-item" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="layout-sphere-btn" style="padding: 5px 10px; cursor: pointer;">🔮 球体分布</button>
+                    <button id="layout-flower-btn" style="padding: 5px 10px; cursor: pointer;">🌸 花朵分布</button>
+                    <button id="layout-helix-btn" style="padding: 5px 10px; cursor: pointer;">🧬 螺旋分布</button>
+                    <button id="layout-grid-btn" style="padding: 5px 10px; cursor: pointer;">🧊 立方分布</button>
+                    <button id="layout-torus-btn" style="padding: 5px 10px; cursor: pointer;">🍩 环面分布</button>
+                    <button id="layout-reset-btn" style="padding: 5px 10px; cursor: pointer;">🌌 物理重置</button>
+                </div>
+                <div class="setting-item" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    <button id="layout-export-btn" style="padding: 5px 10px; cursor: pointer;">💾 导出分布</button>
+                    <button id="layout-import-btn" style="padding: 5px 10px; cursor: pointer;">📂 导入模板</button>
+                    <input type="file" id="layout-file-input" style="display: none;" accept=".json">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Data -->
+<script src="js/data.js" defer></script>
+<script src="js/app.js" defer></script>
+
+<!-- Unified Sidebar -->
+<button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="ri-apps-2-line"></i>
+</button>
+
+<div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2><i class="ri-planet-line"></i> ChatGalaxy</h2>
+        <button class="sidebar-close" onclick="closeSidebar()">
+            <i class="ri-close-line"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-content">
+        <!-- 3D控制 -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">3D控制</div>
+            <div class="sidebar-grid">
+                <button class="sidebar-btn" onclick="startRoaming()" title="第一人称漫游">
+                    <i class="ri-flight-takeoff-line"></i>
+                    <span>漫游</span>
+                </button>
+                <button class="sidebar-btn" onclick="takePolaroid()" title="拍立得留念">
+                    <i class="ri-camera-lens-line"></i>
+                    <span>拍照</span>
+                </button>
+                <button class="sidebar-btn" onclick="coalesceNodes()" title="凝聚回忆">
+                    <i class="ri-contract-left-line"></i>
+                    <span>凝聚</span>
+                </button>
+                <button class="sidebar-btn" onclick="toggleTimeTravelPlay()" title="播放回忆">
+                    <i class="ri-play-fill"></i>
+                    <span>播放</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 功能控制 -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">功能控制</div>
+            <div class="sidebar-list">
+                <div class="sidebar-item" onclick="startRevisitMode()" title="回访模式 - 跳转到随机节点">
+                    <i class="ri-flight-land-line"></i>
+                    <span>回访模式</span>
+                </div>
+                <div class="sidebar-item" onclick="initSettings(true)" title="打开设置面板">
+                    <i class="ri-settings-3-line"></i>
+                    <span>设置</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分析功能 -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">数据分析</div>
+            <div class="sidebar-list">
+                <div class="sidebar-item" onclick="showInsights()">
+                    <i class="ri-lightbulb-flash-line"></i>
+                    <span>洞察报告</span>
+                </div>
+                <div class="sidebar-item" onclick="showDataManager()">
+                    <i class="ri-database-2-line"></i>
+                    <span>数据管理</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 视图设置 -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">视图设置</div>
+            <div class="sidebar-switch">
+                <div class="switch-label">
+                    <i class="ri-music-2-line"></i>
+                    <span>氛围音效</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="music-toggle" onchange="toggleMusic()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-info">
+            <strong>ChatGalaxy</strong>
+            深山有密林团队 © 2026
+        </div>
+    </div>
+</aside>
+
+<!-- Embedded Content Containers -->
+<div id="embedded-insights" class="embedded-content">
+    <button class="close-btn" onclick="closeEmbedded('insights')">×</button>
+    <iframe src="insights.html"></iframe>
+</div>
+
+<div id="embedded-data-manager" class="embedded-content">
+    <button class="close-btn" onclick="closeEmbedded('data-manager')">×</button>
+    <iframe src="data-manager.html"></iframe>
+</div>
+
+<!-- Web Vitals 性能监控 -->
+<script>
+(function() {
+  if ('PerformanceObserver' in window) {
+    // 监控 Largest Contentful Paint (LCP)
+    const lcpObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        console.log('[Web Vitals] LCP:', Math.round(entry.startTime), 'ms');
+        // 可选：发送到分析服务
+        // navigator.sendBeacon('/api/analytics', JSON.stringify({
+        //   metric: 'LCP',
+        //   value: entry.startTime
+        // }));
+      }
+    });
+    lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+
+    // 监控 First Input Delay (FID)
+    const fidObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        console.log('[Web Vitals] FID:', Math.round(entry.processingStart - entry.startTime), 'ms');
+      }
+    });
+    fidObserver.observe({ entryTypes: ['first-input'] });
+
+    // 监控 Cumulative Layout Shift (CLS)
+    let clsScore = 0;
+    const clsObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!entry.hadRecentInput) {
+          clsScore += entry.value;
+          console.log('[Web Vitals] CLS:', clsScore.toFixed(3));
+        }
+      }
+    });
+    clsObserver.observe({ entryTypes: ['layout-shift'] });
+
+    // 监控 First Contentful Paint (FCP)
+    const fcpObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.name === 'first-contentful-paint') {
+          console.log('[Web Vitals] FCP:', Math.round(entry.startTime), 'ms');
+        }
+      }
+    });
+    fcpObserver.observe({ entryTypes: ['paint'] });
+
+    console.log('[Web Vitals] 监控已启动');
+  } else {
+    console.warn('[Web Vitals] 浏览器不支持 PerformanceObserver');
+  }
+
+  // 监控资源加载时间
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const perfData = performance.getEntriesByType('navigation')[0];
+      if (perfData) {
+        console.log('[Performance] 页面加载性能:', {
+          DNS查询: Math.round(perfData.domainLookupEnd - perfData.domainLookupStart) + 'ms',
+          TCP连接: Math.round(perfData.connectEnd - perfData.connectStart) + 'ms',
+          请求响应: Math.round(perfData.responseEnd - perfData.requestStart) + 'ms',
+          DOM解析: Math.round(perfData.domContentLoadedEventEnd - perfData.domInteractive) + 'ms',
+          总加载时间: Math.round(perfData.loadEventEnd - perfData.fetchStart) + 'ms'
+        });
+      }
+    }, 0);
+  });
+})();
+</script>
+
+<script>
+// ==================== 侧边栏控制 ====================
+let isSidebarOpen = false;
+let isMessageSidebarCollapsed = false;
+
+// 左侧消息列表侧边栏折叠/展开
+function toggleMessageSidebar() {
+    const sidebar = document.getElementById('message-sidebar');
+    if (!sidebar) return;
+
+    isMessageSidebarCollapsed = !isMessageSidebarCollapsed;
+
+    if (isMessageSidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+        document.body.classList.add('message-sidebar-collapsed');
+    } else {
+        sidebar.classList.remove('collapsed');
+        document.body.classList.remove('message-sidebar-collapsed');
+    }
+
+    console.log(`📂 ${isMessageSidebarCollapsed ? '折叠' : '展开'}左侧侧边栏`);
+}
+
+// 初始化左侧侧边栏折叠按钮
+document.addEventListener('DOMContentLoaded', () => {
+    const collapseBtn = document.getElementById('message-sidebar-toggle');
+    const fixedToggleBtn = document.getElementById('message-sidebar-toggle-fixed');
+
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', toggleMessageSidebar);
+    }
+
+    if (fixedToggleBtn) {
+        fixedToggleBtn.addEventListener('click', toggleMessageSidebar);
+    }
+});
+
+function toggleSidebar() {
+    console.log('🔄 [DEBUG] toggleSidebar called');
+
+    // 🔧 强制隐藏所有覆盖层，确保侧边栏不被遮挡
+    const overlays = document.querySelectorAll('.experience-overlay, #loading');
+    overlays.forEach(overlay => {
+        if (overlay.classList.contains('visible')) {
+            overlay.classList.remove('visible');
+            overlay.classList.add('hidden', 'fade-out');
+            overlay.style.display = 'none';
+            console.log('✅ [DEBUG] Hidden overlay:', overlay.id);
+        }
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    if (!sidebar) {
+        console.error('❌ [DEBUG] Sidebar element not found!');
+        return;
+    }
+
+    // 🔧 同步状态：根据侧边栏实际DOM状态更新 isSidebarOpen
+    const actuallyOpen = sidebar.classList.contains('active');
+    if (actuallyOpen !== isSidebarOpen) {
+        console.log('⚠️ [DEBUG] State mismatch detected! Syncing...');
+        isSidebarOpen = actuallyOpen;
+    }
+
+    console.log('📊 [DEBUG] Before toggle:', {
+        isSidebarOpen: isSidebarOpen,
+        actuallyOpen: actuallyOpen,
+        sidebarClasses: sidebar.className,
+        sidebarRight: window.getComputedStyle(sidebar).right
+    });
+
+    isSidebarOpen = !isSidebarOpen;
+    sidebar.classList.toggle('active', isSidebarOpen);
+    overlay.classList.toggle('active', isSidebarOpen);
+
+    // 🔧 显示/隐藏功能按钮
+    const toggleBtn = document.querySelector('.sidebar-toggle');
+    if (toggleBtn) {
+        toggleBtn.style.display = isSidebarOpen ? 'none' : 'flex';
+    }
+
+    // 🔧 强制设置样式确保可见
+    if (isSidebarOpen) {
+        sidebar.style.position = 'fixed';
+        sidebar.style.right = '0';
+        sidebar.style.display = 'block';
+        sidebar.style.visibility = 'visible';
+        sidebar.style.opacity = '1';
+        // 🔧 不再设置 background，使用 CSS 变量 --sidebar-bg
+        console.log('✅ [DEBUG] Sidebar opened');
+    } else {
+        sidebar.style.right = '-280px'; // 🔴 修复：关闭时移到右侧外部
+        sidebar.style.border = 'none';
+        console.log('✅ [DEBUG] Sidebar closed');
+    }
+
+    console.log('📊 [DEBUG] After toggle:', {
+        isSidebarOpen: isSidebarOpen,
+        sidebarClasses: sidebar.className,
+        sidebarRight: window.getComputedStyle(sidebar).right,
+        sidebarBackground: window.getComputedStyle(sidebar).background
+    });
+}
+
+function closeSidebar() {
+    console.log('🔒 [DEBUG] closeSidebar called');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    if (!sidebar) {
+        console.error('❌ [DEBUG] Sidebar element not found!');
+        return;
+    }
+
+    isSidebarOpen = false;
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+
+    // 🔧 显示功能按钮
+    const toggleBtn = document.querySelector('.sidebar-toggle');
+    if (toggleBtn) {
+        toggleBtn.style.display = 'flex';
+    }
+
+    // 🔧 强制设置样式确保侧边栏隐藏
+    sidebar.style.right = '-280px';
+    sidebar.style.border = 'none';
+
+    console.log('✅ [DEBUG] Sidebar closed via closeSidebar()');
+}
+
+// ==================== 功能导航 ====================
+function showInsights() {
+    document.getElementById('embedded-insights').classList.add('active');
+    closeSidebar();
+}
+
+function showDataManager() {
+    document.getElementById('embedded-data-manager').classList.add('active');
+    closeSidebar();
+}
+
+// ==================== 内嵌内容控制 ====================
+function closeEmbedded(type) {
+    if (type === 'insights') {
+        document.getElementById('embedded-insights').classList.remove('active');
+    } else if (type === 'data-manager') {
+        document.getElementById('embedded-data-manager').classList.remove('active');
+        // 刷新页面以应用数据集切换
+        setTimeout(() => location.reload(), 300);
+    }
+}
+
+// ==================== ESC键关闭侧边栏 ====================
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (isSidebarOpen) {
+            closeSidebar();
+        }
+    }
+});
+</script>
+
+</body>
+</html>

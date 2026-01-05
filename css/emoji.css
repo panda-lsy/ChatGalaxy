@@ -1,0 +1,79 @@
+
+/* Input with Button */
+.input-with-btn {
+    display: flex;
+    gap: 10px;
+}
+
+.input-with-btn input {
+    flex: 1;
+}
+
+.emoji-btn {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0 10px;
+    font-size: 16px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.emoji-btn:hover {
+    background: #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* Emoji Picker Popover */
+.emoji-picker-popover {
+    position: fixed; /* 🔧 改为fixed定位，独立于父元素的层叠上下文 */
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    z-index: 99999 !important; /* 🔧 确保在所有元素之上（侧边栏: 5000, modal: 3000） */
+    width: 200px;
+}
+
+.emoji-item {
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.emoji-item:hover {
+    background: #f0f0f0;
+}
+
+/* Transparent UI Inversion */
+body.transparent-ui .emoji-btn,
+body.transparent-ui #settings-modal .emoji-btn {
+    background: rgba(30, 30, 40, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ff9a9e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+body.transparent-ui .emoji-btn:hover,
+body.transparent-ui #settings-modal .emoji-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.transparent-ui .emoji-picker-popover {
+    background: rgba(30, 30, 40, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    color: #fff;
+}
+
+body.transparent-ui .emoji-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+}

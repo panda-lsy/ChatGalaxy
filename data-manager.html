@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据管理 - ChatGalaxy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .dataset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dataset-card {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .dataset-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .dataset-card.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .dataset-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .dataset-info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 数据集管理</h1>
+
+        <div id="datasetList" class="dataset-list">
+            <div class="empty-state">
+                加载中...
+            </div>
+        </div>
+
+        <button class="btn" onclick="useSelectedDataset()">
+            使用选中的数据集 →
+        </button>
+
+        <div class="back-link">
+            <a href="#" onclick="parent.closeEmbedded('data-manager'); return false;">← 返回首页</a>
+        </div>
+    </div>
+
+    <script src="js/datasets.js"></script>
+    <script>
+        // 当前选中的数据集文件路径
+        let selectedDatasetFile = null;
+
+        // 检测可用的数据集
+        async function checkDatasets() {
+            const datasets = [];
+
+            // 检查不同的数据文件
+            const files = [
+                { name: '海师电竞沙盒群', path: 'js/data.js', description: '23447条消息，93人' },
+                { name: '自定义数据集', path: 'js/custom_data.js', description: '用户导入的自定义数据' },
+                { name: '群组1数据', path: 'js/data_group1.js', description: '其他群组数据' },
+                { name: '群组2数据', path: 'js/data_group2.js', description: '其他群组数据' }
+            ];
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(file.path);
+                    if (response.ok) {
+                        datasets.push(file);
+                    }
+                } catch (e) {
+                    // 文件不存在
+                }
+            }
+
+            return datasets;
+        }
+
+        // 渲染数据集列表
+        async function renderDatasets() {
+            const container = document.getElementById('datasetList');
+            const datasets = await checkDatasets();
+
+            // 获取当前选中的数据集
+            const currentDataset = localStorage.getItem('chatgalaxy_dataset_file') || 'js/data.js';
+
+            if (datasets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>未找到可用数据集</p>
+                        <p style="font-size: 12px; margin-top: 10px;">请先运行数据处理脚本</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = datasets.map((ds, index) => `
+                <div class="dataset-card ${ds.path === currentDataset ? 'active' : ''}"
+                     onclick="selectDataset('${ds.path}', ${index})"
+                     data-index="${index}">
+                    <div class="dataset-name">${ds.name}</div>
+                    <div class="dataset-info">${ds.description}</div>
+                    ${ds.path === currentDataset ? '<div style="color: #667eea; font-size: 12px; margin-top: 5px;">当前使用中 ✓</div>' : ''}
+                </div>
+            `).join('');
+
+            // 默认选中当前数据集
+            const currentIndex = datasets.findIndex(ds => ds.path === currentDataset);
+            if (currentIndex >= 0) {
+                selectedDatasetFile = currentDataset;
+            }
+        }
+
+        // 选中数据集
+        function selectDataset(filePath, index) {
+            const cards = document.querySelectorAll('.dataset-card');
+            cards.forEach(card => card.classList.remove('active'));
+
+            cards[index].classList.add('active');
+            selectedDatasetFile = filePath;
+        }
+
+        // 使用选中的数据集
+        async function useSelectedDataset() {
+            if (selectedDatasetFile === null) {
+                alert('请先选择一个数据集');
+                return;
+            }
+
+            // 保存到localStorage
+            localStorage.setItem('chatgalaxy_dataset_file', selectedDatasetFile);
+
+            // 🔧 尝试自动生成洞察报告
+            try {
+                console.log('🔄 正在自动生成洞察报告...');
+
+                const response = await fetch('/api/generate-insights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log('✅ 洞察报告生成成功');
+                    alert('✅ 数据集已切换！\n\n✨ 洞察报告已自动更新！\n\n页面即将重新加载...');
+                } else {
+                    console.warn('⚠️ 生成失败:', result.error);
+                    alert('✅ 数据集已切换！\n\n⚠️ 洞察报告生成失败\n\n💡 请确保 API 服务器正在运行：\npython api_server.py\n\n或者手动运行：\ncd chat_viz && python generate_insights.py\n\n页面即将重新加载...');
+                }
+            } catch (error) {
+                console.warn('⚠️ API 服务器未响应:', error);
+                alert('✅ 数据集已切换！\n\n💡 提示：如需自动生成洞察报告，请先启动 API 服务器：\npython api_server.py\n\n或者手动运行：\ncd chat_viz && python generate_insights.py\n\n页面即将重新加载...');
+            }
+
+            // 🔧 关闭 iframe 并刷新父页面
+            parent.closeEmbedded('data-manager');
+            parent.location.reload();
+        }
+
+        // 页面加载时渲染
+        window.addEventListener('load', renderDatasets);
+    </script>
+</body>
+</html>

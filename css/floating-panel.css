@@ -1,0 +1,157 @@
+/**
+ * ChatGalaxy 浮动面板样式
+ * 在3D星系可视化中集成其他功能
+ */
+
+.floating-panel {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.toggle-btn {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.panel-content {
+    position: absolute;
+    right: 70px;
+    top: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+}
+
+.panel-content.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.panel-content h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.panel-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.panel-content li {
+    margin-bottom: 10px;
+}
+
+.panel-content a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.panel-content a i {
+    font-size: 20px;
+}
+
+.panel-content a:hover {
+    background: #667eea;
+    color: white;
+    transform: translateX(-5px);
+}
+
+.panel-content .dataset-info {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f0f4ff;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.panel-content .dataset-info strong {
+    color: #667eea;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* iframe容器样式 */
+.embedded-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 2000;
+    display: none;
+}
+
+.embedded-content.active {
+    display: block;
+}
+
+.embedded-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.embedded-content .close-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: #ff4757;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 2001;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    transition: all 0.3s;
+}
+
+.embedded-content .close-btn:hover {
+    transform: scale(1.1);
+    background: #ff3344;
+}

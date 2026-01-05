@@ -1,0 +1,269 @@
+
+/* Settings Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, var(--glass-opacity));
+    backdrop-filter: blur(10px);
+    width: 400px;
+    max-width: 90%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transform: scale(0.9);
+    animation: scaleIn 0.3s forwards;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
+.modal-header {
+    padding: 15px 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #ffffff;  /* 🔧 纯白色文字 */
+    font-weight: 700;  /* 🔧 更粗的字体 */
+    text-shadow:
+        0 0 1px rgba(0, 0, 0, 0.5),     /* 🔧 清晰度增强 */
+        0 2px 4px rgba(0, 0, 0, 0.4),     /* 🔧 加强阴影 */
+        0 0 8px rgba(0, 0, 0, 0.3);      /* 🔧 发光效果 */
+    -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.3);  /* 🔧 文字描边 */
+}
+
+.modal-header .icon-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.modal-header .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Settings modal scrollbar styling */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #ffc2d1;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+body.transparent-ui .modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+body.transparent-ui .modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 154, 158, 0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.setting-group {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.setting-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.setting-group h3 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.setting-item {
+    margin-bottom: 15px;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: var(--text-main);
+    display: flex;
+    justify-content: space-between;
+}
+
+.setting-item input[type="range"],
+#settings-modal input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    margin-top: 5px;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.setting-item input[type="range"]::-webkit-slider-thumb,
+#settings-modal input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ff9a9e;
+    box-shadow: 0 0 10px rgba(255, 154, 158, 0.8);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.setting-item input[type="range"]::-webkit-slider-thumb:hover,
+#settings-modal input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 14px rgba(255, 154, 158, 0.9);
+}
+
+.setting-item input[type="range"]::-moz-range-track,
+#settings-modal input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.setting-item input[type="range"]::-moz-range-thumb,
+#settings-modal input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ff9a9e;
+    box-shadow: 0 0 10px rgba(255, 154, 158, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.setting-item input[type="range"]::-moz-range-thumb:hover,
+#settings-modal input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 14px rgba(255, 154, 158, 0.9);
+}
+
+/* Transparent UI Mode for Settings */
+body.transparent-ui .setting-item input[type="range"],
+body.transparent-ui #settings-modal input[type="range"] {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+body.transparent-ui .setting-item input[type="range"]::-webkit-slider-thumb,
+body.transparent-ui #settings-modal input[type="range"]::-webkit-slider-thumb,
+body.transparent-ui .setting-item input[type="range"]::-moz-range-thumb,
+body.transparent-ui #settings-modal input[type="range"]::-moz-range-thumb {
+    box-shadow: 0 0 12px rgba(255, 154, 158, 0.9);
+    background: #ff9a9e;
+}
+
+/* Layout buttons inside settings */
+#settings-modal .setting-item button {
+    background: #fff;
+    border: 1px solid #ffd6e7;
+    border-radius: 12px;
+    color: #ff758c;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#settings-modal .setting-item button:hover {
+    background: #fff0f3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 117, 140, 0.25);
+}
+
+body.transparent-ui #settings-modal .setting-item button {
+    background: rgba(30,30,40,0.85);
+    border-color: rgba(255,255,255,0.2);
+    color: #ff9a9e;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+
+body.transparent-ui #settings-modal .setting-item button:hover {
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+}
+
+.setting-item input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.setting-item input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+.checkbox-row label {
+    margin-bottom: 0;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    to { transform: scale(1); }
+}
