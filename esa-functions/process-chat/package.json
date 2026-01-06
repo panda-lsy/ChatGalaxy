@@ -1,0 +1,25 @@
+{
+  "name": "chatgalaxy-process-chat",
+  "version": "1.0.0",
+  "description": "ChatGalaxy 聊天数据处理边缘函数 - Node.js 版本",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "chatgalaxy",
+    "edge-function",
+    "nlp",
+    "chinese-segmentation",
+    "sentiment-analysis"
+  ],
+  "author": "ChatGalaxy Team",
+  "license": "MIT",
+  "dependencies": {
+    "nodejieba": "^2.6.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
