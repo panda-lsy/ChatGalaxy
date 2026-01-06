@@ -1,0 +1,43 @@
+{
+  "name": "chatgalaxy-process-chat",
+  "version": "1.0.0",
+  "description": "ChatGalaxy 聊天数据处理函数 - jieba分词 + SnowNLP情感分析",
+
+  "runtime": {
+    "type": "python",
+    "version": "3.9"
+  },
+
+  "handler": "index.handler",
+  "timeout": 300,
+  "memorySize": 512,
+
+  "environment": {
+    "PYTHONPATH": "./",
+    "JIEBA_DATA_DIR": "./jieba_data"
+  },
+
+  "triggers": [
+    {
+      "type": "http",
+      "properties": {
+        "methods": ["POST"],
+        "path": "/process",
+        "authType": "anonymous"
+      }
+    }
+  ],
+
+  "layers": [],
+
+  "customDomains": {
+    "enabled": false,
+    "domain": ""
+  },
+
+  "logs": {
+    "enabled": true,
+    "logstore": "chatgalaxy-esa-logs",
+    "project": "chatgalaxy-esa-project"
+  }
+}

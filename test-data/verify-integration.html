@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3.1 集成验证 - ChatGalaxy</title>
+
+    <!-- RemixIcon -->
+    <link href="../js/lib/remixicon/remixicon.css" rel="stylesheet">
+
+    <!-- 样式 -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/data-manager.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-color, #1a1a2e);
+            color: var(--text-color, #b8c1ec);
+        }
+
+        .test-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .test-header h1 {
+            color: var(--accent-color, #667eea);
+            margin-bottom: 8px;
+        }
+
+        .test-section {
+            background: var(--bg-secondary, #16213e);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            margin-top: 0;
+            color: var(--text-color, #b8c1ec);
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            padding-bottom: 12px;
+        }
+
+        .test-btn {
+            padding: 12px 24px;
+            margin: 8px 8px 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            background: var(--accent-color, #667eea);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-btn:hover {
+            background: var(--accent-hover, #5568d3);
+            transform: translateY(-2px);
+        }
+
+        .test-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .test-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .test-result {
+            margin-top: 16px;
+            padding: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            color: var(--text-color, #b8c1ec);
+            background: var(--bg-color, #1a1a2e);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 6px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .test-result.error {
+            border-color: var(--danger-color, #ef4444);
+            color: var(--danger-color, #ef4444);
+        }
+
+        .test-result.success {
+            border-color: var(--success-color, #10b981);
+            color: var(--success-color, #10b981);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            margin: 8px 0;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 16px;
+        }
+
+        .status-badge.ready {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-badge.not-ready {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checklist li i {
+            font-size: 18px;
+        }
+
+        .checklist li i.ri-checkbox-circle-fill {
+            color: #10b981;
+        }
+
+        .checklist li i.ri-close-circle-fill {
+            color: #ef4444;
+        }
+
+        .checklist li i.ri-loader-4-line {
+            color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+
+        .info-box p {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- 页头 -->
+        <div class="test-header">
+            <h1>🧪 Phase 3.1 集成验证</h1>
+            <p>验证边缘函数集成的代码正确性</p>
+            <div id="statusBadge" class="status-badge not-ready">
+                <i class="ri-close-circle-fill"></i> 等待测试
+            </div>
+        </div>
+
+        <!-- 测试说明 -->
+        <div class="test-section">
+            <h2>📋 测试说明</h2>
+            <p style="color: var(--text-secondary, rgba(184, 193, 236, 0.7));">
+                本页面将自动验证 Phase 3.1 的代码集成，包括：
+            </p>
+            <ul class="checklist">
+                <li><i class="ri-checkbox-circle-line"></i> EdgeFunctionConfig 配置管理器</li>
+                <li><i class="ri-checkbox-circle-line"></i> data-import.js 边缘函数集成</li>
+                <li><i class="ri-checkbox-circle-line"></i> data-manager.html 模式选择器UI</li>
+                <li><i class="ri-checkbox-circle-line"></i> data-manager-ui.js 事件处理</li>
+                <li><i class="ri-checkbox-circle-line"></i> 事件监听器配置</li>
+            </ul>
+            <div class="info-box">
+                <p><i class="ri-information-line"></i> <strong>提示</strong></p>
+                <p>测试会在页面加载后自动运行，或点击下方按钮手动运行</p>
+            </div>
+        </div>
+
+        <!-- 测试控制 -->
+        <div class="test-section">
+            <h2>🚀 测试控制</h2>
+            <button class="test-btn" id="runTestBtn" onclick="runVerification()">
+                <i class="ri-play-line"></i> 运行验证测试
+            </button>
+            <button class="test-btn secondary" onclick="clearConsole()">
+                <i class="ri-delete-bin-line"></i> 清空控制台
+            </button>
+            <button class="test-btn secondary" onclick="location.reload()">
+                <i class="ri-refresh-line"></i> 刷新页面
+            </button>
+            <div id="testResult" class="test-result" style="display: none;"></div>
+        </div>
+
+        <!-- 测试结果 -->
+        <div class="test-section">
+            <h2>📊 测试结果</h2>
+            <div id="testSummary"></div>
+        </div>
+
+        <!-- 快速测试 -->
+        <div class="test-section">
+            <h2>⚡ 快速功能测试</h2>
+            <p style="color: var(--text-secondary, rgba(184, 193, 236, 0.7));">
+                快速测试边缘函数配置的核心功能
+            </p>
+            <button class="test-btn" onclick="testConfigManager()">
+                <i class="ri-settings-3-line"></i> 测试配置管理器
+            </button>
+            <button class="test-btn" onclick="testModeSelector()">
+                <i class="ri-toggle-line"></i> 测试模式选择器
+            </button>
+            <button class="test-btn" onclick="simulateEdgeFunction()">
+                <i class="ri-cloud-line"></i> 模拟边缘函数调用
+            </button>
+            <div id="quickTestResult" class="test-result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 加载所有必要的脚本 -->
+    <script src="../js/config.js"></script>
+    <script src="../js/utils/logger.js"></script>
+    <script src="../js/data/data-manager.js"></script>
+    <script src="../js/data/data-batch-operations.js"></script>
+    <script src="../js/processors/text-processor.js"></script>
+    <script src="../js/edge-function-config.js"></script>
+    <script src="../js/data-import.js"></script>
+    <script src="../js/data-manager-ui.js"></script>
+
+    <!-- 加载验证脚本 -->
+    <script src="verify-phase3-integration.js"></script>
+
+    <script>
+        // 页面加载完成后自动运行测试
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('ready', '就绪');
+
+            // 延迟自动运行测试（2秒后）
+            setTimeout(() => {
+                if (window.verifyPhase3Integration) {
+                    console.log('%c🚀 自动运行验证测试...', 'color: #667eea; font-weight: bold;');
+                    runVerification();
+                }
+            }, 2000);
+        });
+
+        // 运行验证测试
+        function runVerification() {
+            const btn = document.getElementById('runTestBtn');
+            const resultDiv = document.getElementById('testResult');
+            const summaryDiv = document.getElementById('testSummary');
+            const statusBadge = document.getElementById('statusBadge');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 测试中...';
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '⏳ 正在运行验证测试...\n\n请查看浏览器控制台（F12）查看详细结果。';
+            updateStatus('testing', '测试中...');
+
+            // 运行测试
+            if (window.verifyPhase3Integration) {
+                setTimeout(() => {
+                    const result = window.verifyPhase3Integration();
+
+                    // 显示结果
+                    const summaryHTML = `
+                        <div style="padding: 16px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: var(--accent-color);">
+                                测试完成！
+                            </h3>
+                            <p style="font-size: 16px;">
+                                总计: <strong>${result.total}</strong> 个测试 |
+                                通过: <strong style="color: #10b981;">${result.passed}</strong> 个 |
+                                失败: <strong style="color: #ef4444;">${result.failed}</strong> 个
+                            </p>
+                            <p style="font-size: 20px; font-weight: bold; color: ${result.passRate === 100 ? '#10b981' : result.passRate >= 80 ? '#f59e0b' : '#ef4444'};">
+                                通过率: ${result.passRate}%
+                            </p>
+                            ${result.passRate === 100 ? '<p style="color: #10b981;">🎉 所有测试通过！</p>' : ''}
+                        </div>
+                    `;
+
+                    summaryDiv.innerHTML = summaryHTML;
+
+                    resultDiv.textContent = `✅ 测试完成！\n\n总计: ${result.total} 个\n通过: ${result.passed} 个\n失败: ${result.failed} 个\n通过率: ${result.passRate}%\n\n详细结果请查看控制台。`;
+                    resultDiv.className = 'test-result success';
+
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="ri-refresh-line"></i> 重新运行';
+
+                    const status = result.passRate === 100 ? 'all-pass' : result.passRate >= 80 ? 'partial-pass' : 'failed';
+                    const statusText = result.passRate === 100 ? '全部通过 ✅' : result.passRate >= 80 ? '部分通过 ⚠️' : '测试失败 ❌';
+                    updateStatus(status, statusText);
+
+                }, 500);
+            } else {
+                resultDiv.textContent = '❌ 验证脚本未加载';
+                resultDiv.className = 'test-result error';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-play-line"></i> 运行验证测试';
+            }
+        }
+
+        // 测试配置管理器
+        function testConfigManager() {
+            const resultDiv = document.getElementById('quickTestResult');
+            resultDiv.style.display = 'block';
+
+            try {
+                // 测试 1：设置 URL
+                window.EdgeFunctionConfig.setUrl('processChat', 'https://test.example.com/process');
+                const getUrl = window.EdgeFunctionConfig.getUrl('processChat');
+
+                // 测试 2：检查可用性
+                const isAvailable = window.EdgeFunctionConfig.isAvailable('processChat');
+
+                // 测试 3：清除配置
+                window.EdgeFunctionConfig.clearUrls();
+                const afterClear = window.EdgeFunctionConfig.isAvailable('processChat');
+
+                // 显示结果
+                const results = [
+                    `✅ URL 设置: ${getUrl === 'https://test.example.com/process' ? '通过' : '失败'}`,
+                    `✅ 可用性检查: ${isAvailable ? '通过' : '失败'}`,
+                    `✅ 配置清除: ${!afterClear ? '通过' : '失败'}`
+                ];
+
+                resultDiv.textContent = '配置管理器测试结果:\n\n' + results.join('\n');
+                resultDiv.className = 'test-result success';
+
+            } catch (error) {
+                resultDiv.textContent = '❌ 测试失败: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        // 测试模式选择器
+        function testModeSelector() {
+            const resultDiv = document.getElementById('quickTestResult');
+            resultDiv.style.display = 'block';
+
+            try {
+                // 获取模式选项
+                const fastMode = document.querySelector('input[name="processingMode"][value="fast"]');
+                const preciseMode = document.querySelector('input[name="processingMode"][value="precise"]');
+
+                if (!fastMode || !preciseMode) {
+                    throw new Error('模式选择器未找到（请确保在 data-manager.html 中运行）');
+                }
+
+                // 测试默认状态
+                const defaultFast = fastMode.checked;
+
+                // 模拟切换
+                preciseMode.click();
+                const preciseSelected = preciseMode.checked;
+
+                fastMode.click();
+                const fastSelected = fastMode.checked;
+
+                // 显示结果
+                const results = [
+                    `✅ 快速模式选项: ${fastMode ? '存在' : '不存在'}`,
+                    `✅ 精确模式选项: ${preciseMode ? '存在' : '不存在'}`,
+                    `✅ 默认选中快速: ${defaultFast ? '通过' : '失败'}`,
+                    `✅ 切换到精确模式: ${preciseSelected ? '通过' : '失败'}`,
+                    `✅ 切换回快速模式: ${fastSelected ? '通过' : '失败'}`
+                ];
+
+                resultDiv.textContent = '模式选择器测试结果:\n\n' + results.join('\n');
+                resultDiv.className = 'test result success';
+
+            } catch (error) {
+                resultDiv.textContent = '❌ 测试失败: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        // 模拟边缘函数调用
+        function simulateEdgeFunction() {
+            const resultDiv = document.getElementById('quickTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '⏳ 正在模拟边缘函数调用...';
+            resultDiv.className = 'test-result';
+
+            // 配置模拟 URL
+            window.EdgeFunctionConfig.setUrl('processChat', 'mock://edge-function');
+
+            setTimeout(() => {
+                // 模拟调用
+                const mockMessages = [
+                    { id: 'test_1', senderName: '张三', text: '测试消息1', timestamp: Date.now() / 1000 },
+                    { id: 'test_2', senderName: '李四', text: '测试消息2', timestamp: Date.now() / 1000 }
+                ];
+
+                // 模拟返回结果
+                const mockResult = {
+                    success: true,
+                    results: [
+                        { id: 'test_1', sentiment: 1, keywords: ['测试', '消息'] },
+                        { id: 'test_2', sentiment: 2, keywords: ['测试', '消息'] }
+                    ],
+                    stats: { total: 2, processed: 2, failed: 0 }
+                };
+
+                resultDiv.textContent = '✅ 模拟调用成功！\n\n' +
+                    '请求数据:\n' + JSON.stringify({ messages: mockMessages }, null, 2) + '\n\n' +
+                    '模拟返回:\n' + JSON.stringify(mockResult, null, 2);
+                resultDiv.className = 'test-result success';
+
+            }, 1000);
+        }
+
+        // 清空控制台
+        function clearConsole() {
+            console.clear();
+            console.log('%c🧹 控制台已清空', 'color: #667eea; font-weight: bold;');
+        }
+
+        // 更新状态徽章
+        function updateStatus(status, text) {
+            const badge = document.getElementById('statusBadge');
+
+            badge.className = 'status-badge';
+
+            switch (status) {
+                case 'ready':
+                    badge.classList.add('ready');
+                    badge.innerHTML = '<i class="ri-checkbox-circle-fill"></i> ' + text;
+                    break;
+                case 'testing':
+                    badge.classList.add('not-ready');
+                    badge.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> ' + text;
+                    break;
+                case 'all-pass':
+                    badge.classList.add('ready');
+                    badge.innerHTML = '<i class="ri-checkbox-circle-fill"></i> ' + text;
+                    break;
+                case 'partial-pass':
+                    badge.classList.add('not-ready');
+                    badge.style.background = 'rgba(245, 158, 11, 0.2)';
+                    badge.style.color = '#f59e0b';
+                    badge.innerHTML = '<i class="ri-error-warning-line"></i> ' + text;
+                    break;
+                case 'failed':
+                    badge.classList.add('not-ready');
+                    badge.innerHTML = '<i class="ri-close-circle-fill"></i> ' + text;
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

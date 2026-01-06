@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL测试</title>
+</head>
+<body>
+    <h1>URL参数测试</h1>
+
+    <p>当前URL: <code id="current-url"></code></p>
+    <p>URL参数: <code id="url-params"></code></p>
+
+    <h2>测试链接</h2>
+    <ul>
+        <li><a href="dataset-editor.html?id=test123" id="test-link">普通链接: dataset-editor.html?id=test123</a></li>
+        <li><button onclick="testWindowLocation()">使用 window.location.href</a></button>
+        <li><button onclick="testWindowOpen()">使用 window.open()</button></li>
+    </ul>
+
+    <script>
+        // 显示当前URL
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('url-params').textContent = window.location.search;
+
+        function testWindowLocation() {
+            console.log('跳转前:', window.location.href);
+            window.location.href = 'dataset-editor.html?id=test123';
+            console.log('跳转后（可能看不到这行）');
+        }
+
+        function testWindowOpen() {
+            console.log('打开新窗口');
+            window.open('dataset-editor.html?id=test123', '_blank');
+        }
+    </script>
+</body>
+</html>

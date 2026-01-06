@@ -74,8 +74,12 @@ function showError(message) {
 // 初始化封面
 function initCover(data) {
     const stats = data.basic_stats;
+
+    // 🔧 修复：计算从第一条消息到今天的天数（而不是数据集的时间跨度）
+    const now = new Date();
+    const start = new Date(stats.date_range.start);
     const days = Math.max(1, Math.ceil(
-        (new Date(stats.date_range.end) - new Date(stats.date_range.start)) / (1000 * 60 * 60 * 24)
+        (now - start) / (1000 * 60 * 60 * 24)
     ));
 
     setTimeout(() => animateNumber(document.getElementById('stat-msgs'), stats.total_messages), 200);

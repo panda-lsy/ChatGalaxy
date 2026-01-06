@@ -71,6 +71,42 @@ var Log = window.Log;
             // 动态加载data.js和insights.js
             console.time('data.js加载时间');
             await loadScript('js/data.js');
+
+            // 🔧 修复：将 data.js 的秒级时间戳转换为毫秒级（统一标准）
+            if (window.CHAT_DATA && window.CHAT_DATA.messages) {
+                console.log('🔄 Converting timestamps from seconds to milliseconds...');
+                const conversionCount = window.CHAT_DATA.messages.length;
+
+                // 转换消息数组中的时间戳（索引2是timestamp）
+                window.CHAT_DATA.messages.forEach(msgArr => {
+                    if (Array.isArray(msgArr) && msgArr.length > 2) {
+                        // data.js格式: [id, sender_id, timestamp, text, sentiment, keywords]
+                        // timestamp是秒级，需要乘以1000转为毫秒
+                        msgArr[2] = msgArr[2] * 1000;
+                    }
+                });
+
+                // 转换图节点中的 first_seen（如果有）
+                if (window.CHAT_DATA.graph && window.CHAT_DATA.graph.nodes) {
+                    window.CHAT_DATA.graph.nodes.forEach(node => {
+                        if (node.first_seen) {
+                            node.first_seen = node.first_seen * 1000;
+                        }
+                    });
+                }
+
+                // 转换图连接中的 first_seen（如果有）
+                if (window.CHAT_DATA.graph && window.CHAT_DATA.graph.links) {
+                    window.CHAT_DATA.graph.links.forEach(link => {
+                        if (link.first_seen) {
+                            link.first_seen = link.first_seen * 1000;
+                        }
+                    });
+                }
+
+                console.log(`✅ Converted ${conversionCount} message timestamps to milliseconds`);
+            }
+
             await loadScript('js/insights.js');
             console.timeEnd('data.js加载时间');
             console.log('✅ Local data.js loaded');

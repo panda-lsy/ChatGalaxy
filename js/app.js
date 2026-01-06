@@ -1495,11 +1495,11 @@ function initTimeTravel() {
     let lastLinkCount = -1;
     
     // Set initial date label
-    dateLabel.innerText = new Date(timeRange.end * 1000).toLocaleDateString();
-    
+    dateLabel.innerText = new Date(timeRange.end).toLocaleDateString();
+
     function updateTime(percent) {
         const currentTime = timeRange.start + (timeRange.end - timeRange.start) * (percent / 100);
-        dateLabel.innerText = new Date(currentTime * 1000).toLocaleDateString();
+        dateLabel.innerText = new Date(currentTime).toLocaleDateString();
         
         // Filter Graph Nodes
         if (Graph) {
@@ -1776,17 +1776,17 @@ function updateStats() {
     // Calculate basic stats
     const total = allMessages.length;
     const users = metaData.senders.length;
-    
-    // Calculate days range
+
+    // Calculate days from first message to today
     let days = 0;
     if (total > 0) {
         const first = getMsgObj(allMessages[0]).timestamp;
-        const last = getMsgObj(allMessages[total-1]).timestamp;
-        // Timestamp might be seconds or ms. Usually seconds in this dataset based on previous context?
-        // Let's assume seconds if small, ms if large. 
-        // 1708003568 is 2024-02-15. So it's seconds.
-        const diff = (last - first); 
-        days = Math.ceil(diff / (24 * 3600)) || 1;
+        const now = Date.now(); // 当前时间戳（毫秒）
+
+        // 🔧 修复：时间戳统一为毫秒级（data-loader.js已转换）
+        // 计算从第一条消息到今天的天数
+        const diff = now - first;
+        days = Math.ceil(diff / (24 * 3600 * 1000)) || 1;
     }
 
     document.getElementById('stat-total').innerText = total.toLocaleString();
@@ -2251,7 +2251,7 @@ function renderChatList(reset = false) {
             <div class="msg-body">
                 <div class="msg-header">
                     <span class="sender-name">${msg.sender}</span>
-                    <span>${new Date(msg.timestamp * 1000).toLocaleDateString()}</span>
+                    <span>${new Date(msg.timestamp).toLocaleDateString()}</span>
                 </div>
                 <div class="msg-bubble">${text}</div>
             </div>

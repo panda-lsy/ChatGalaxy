@@ -1,0 +1,232 @@
+/**
+ * ChatGalaxy Tabulator 表格样式适配
+ * 将 Tabulator 的默认样式适配到我们的主题
+ */
+
+/* Tabulator 容器 */
+.message-table__tabulator {
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* 覆盖 Tabulator 默认样式 */
+.tabulator {
+    background-color: var(--bg-card, #252b3d);
+    color: var(--text-primary, #e8eaf0);
+    font-size: 14px;
+    width: 100%;
+}
+
+/* 确保表格容器充满宽度 */
+.tabulator[tabulator-layout="fitColumns"] {
+    width: 100% !important;
+}
+
+.tabulator .tabulator-tableholder {
+    width: 100% !important;
+}
+
+.tabulator .tabulator-table {
+    width: 100% !important;
+}
+
+/* 表头 */
+.tabulator .tabulator-header {
+    background-color: var(--bg-hover, #2d3447);
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    font-weight: 600;
+    width: 100%;
+}
+
+.tabulator .tabulator-header .tabulator-headers {
+    width: 100% !important;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+    background-color: var(--bg-hover, #2d3447);
+    border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    color: var(--text-primary, #e8eaf0);
+}
+
+.tabulator .tabulator-header .tabulator-col:hover {
+    background-color: var(--accent-light, rgba(102, 126, 234, 0.15));
+    cursor: pointer;
+}
+
+/* 排序图标 */
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter {
+    color: var(--text-secondary, #a0a4b8);
+}
+
+/* 表格行 */
+.tabulator .tabulator-row {
+    background-color: var(--bg-card, #252b3d);
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    color: var(--text-primary, #e8eaf0);
+    min-height: 48px;
+}
+
+.tabulator .tabulator-row:hover {
+    background-color: var(--bg-hover, #2d3447);
+    cursor: pointer;
+}
+
+/* 选中行 */
+.tabulator .tabulator-row.tabulator-selectable:hover {
+    background-color: var(--bg-hover, #2d3447);
+}
+
+.tabulator .tabulator-row.tabulator-selected {
+    background-color: var(--accent-light, rgba(102, 126, 234, 0.15)) !important;
+    border-left: 3px solid var(--accent-color, #667eea);
+}
+
+.tabulator .tabulator-row.tabulator-selected:hover {
+    background-color: rgba(102, 126, 234, 0.2) !important;
+}
+
+/* 单元格 */
+.tabulator .tabulator-row .tabulator-cell {
+    padding: 12px;
+    border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+/* 复选框 */
+.tabulator .tabulator-row .tabulator-cell[type="row-selection"] {
+    padding: 0;
+}
+
+/* 操作按钮 */
+.message-table__action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #a0a4b8);
+    cursor: pointer;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.message-table__action-btn:hover {
+    background-color: var(--accent-light, rgba(102, 126, 234, 0.15));
+    color: var(--accent-color, #667eea);
+}
+
+.message-table__action-btn--delete:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: var(--danger-color, #ef4444);
+}
+
+/* Header Filter（列头筛选） */
+.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input {
+    background-color: var(--bg-secondary, #1a1f2e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    color: var(--text-primary, #e8eaf0);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input:focus {
+    outline: none;
+    border-color: var(--accent-color, #667eea);
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-header-filter select {
+    background-color: var(--bg-secondary, #1a1f2e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    color: var(--text-primary, #e8eaf0);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+}
+
+/* 分页控件 */
+.tabulator .tabulator-footer {
+    background-color: var(--bg-card, #252b3d);
+    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    padding: 10px;
+}
+
+.tabulator .tabulator-footer .tabulator-pages {
+    color: var(--text-primary, #e8eaf0);
+}
+
+.tabulator .tabulator-footer .tabulator-page {
+    background-color: var(--bg-hover, #2d3447);
+    color: var(--text-primary, #e8eaf0);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    margin: 0 2px;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.tabulator .tabulator-footer .tabulator-page:hover {
+    background-color: var(--accent-light, rgba(102, 126, 234, 0.15));
+    border-color: var(--accent-color, #667eea);
+}
+
+.tabulator .tabulator-footer .tabulator-page.active {
+    background-color: var(--accent-color, #667eea);
+    color: white;
+}
+
+.tabulator .tabulator-footer .tabulator-page:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 分页大小选择器 */
+.tabulator .tabulator-footer .tabulator-page-size-select {
+    background-color: var(--bg-hover, #2d3447);
+    color: var(--text-primary, #e8eaf0);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* 滚动条 */
+.tabulator .tabulator-tableholder::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.tabulator .tabulator-tableholder::-webkit-scrollbar-track {
+    background-color: var(--bg-secondary, #1a1f2e);
+}
+
+.tabulator .tabulator-tableholder::-webkit-scrollbar-thumb {
+    background-color: var(--border-color, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
+}
+
+.tabulator .tabulator-tableholder::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-color, rgba(255, 255, 255, 0.3));
+}
+
+/* 情感标签样式 */
+.sentiment--negative {
+    color: #ef4444;
+}
+
+.sentiment--neutral {
+    color: #a0a4b8;
+}
+
+.sentiment--positive {
+    color: #10b981;
+}
+
+.sentiment--question {
+    color: #f59e0b;
+}
+
+/* 内容截断 */
+.tabulator .tabulator-row .tabulator-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

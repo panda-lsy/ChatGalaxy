@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量操作功能测试 - ChatGalaxy</title>
+
+    <!-- RemixIcon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- 样式 -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/batch-toolbar.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+            background: var(--bg-color, #1a1a2e);
+            color: var(--text-color, #b8c1ec);
+        }
+
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-header {
+            margin-bottom: 24px;
+            padding: 20px;
+
+            background: var(--bg-secondary, #16213e);
+            border-radius: 12px;
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+        }
+
+        .test-header h1 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            color: var(--accent-color, #667eea);
+        }
+
+        .test-header p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-color, #b8c1ec);
+            opacity: 0.8;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .test-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color, #b8c1ec);
+            background: var(--button-bg, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 8px;
+
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-btn:hover {
+            background: var(--button-hover, rgba(255, 255, 255, 0.1));
+            border-color: var(--accent-color, #667eea);
+        }
+
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+
+            background: var(--bg-secondary, #16213e);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 8px;
+
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .message-item:hover {
+            border-color: var(--accent-color, #667eea);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .message-item--selected {
+            border-color: var(--accent-color, #667eea);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .message-checkbox {
+            width: 20px;
+            height: 20px;
+
+            border: 2px solid var(--border-color, rgba(255, 255, 255, 0.3));
+            border-radius: 4px;
+
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            flex-shrink: 0;
+        }
+
+        .message-item--selected .message-checkbox {
+            background: var(--accent-color, #667eea);
+            border-color: var(--accent-color, #667eea);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #ffffff;
+            font-size: 12px;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--accent-color, #667eea);
+            margin-bottom: 4px;
+        }
+
+        .message-text {
+            font-size: 14px;
+            color: var(--text-color, #b8c1ec);
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .message-sentiment {
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 4px;
+
+            flex-shrink: 0;
+        }
+
+        .message-sentiment--0 {
+            background: rgba(246, 74, 74, 0.2);
+            color: #f64a4a;
+        }
+
+        .message-sentiment--1 {
+            background: rgba(184, 193, 236, 0.2);
+            color: #b8c1ec;
+        }
+
+        .message-sentiment--2 {
+            background: rgba(81, 207, 102, 0.2);
+            color: #51cf66;
+        }
+
+        .message-sentiment--3 {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .test-status {
+            margin-top: 20px;
+            padding: 12px 16px;
+
+            background: var(--bg-secondary, #16213e);
+            border-left: 4px solid var(--accent-color, #667eea);
+            border-radius: 4px;
+
+            font-size: 14px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+
+            color: var(--text-color, #b8c1ec);
+            opacity: 0.6;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- 测试页头 -->
+        <div class="test-header">
+            <h1>🧪 批量操作功能测试</h1>
+            <p>测试 DataBatchOperations 和 BatchToolbar 组件</p>
+        </div>
+
+        <!-- 批量工具栏 -->
+        <batch-toolbar id="batchToolbar"></batch-toolbar>
+
+        <!-- 测试控制按钮 -->
+        <div class="test-controls">
+            <button class="test-btn" id="loadSampleData">
+                <i class="ri-database-2-line"></i> 加载测试数据
+            </button>
+            <button class="test-btn" id="clearAllData">
+                <i class="ri-delete-bin-line"></i> 清空数据
+            </button>
+            <button class="test-btn" id="checkSelection">
+                <i class="ri-check-line"></i> 检查选中状态
+            </button>
+        </div>
+
+        <!-- 消息列表 -->
+        <div class="message-list" id="messageList">
+            <div class="empty-state">
+                <i class="ri-inbox-line"></i>
+                <p>暂无消息数据</p>
+                <p>点击"加载测试数据"按钮开始测试</p>
+            </div>
+        </div>
+
+        <!-- 测试状态日志 -->
+        <div class="test-status" id="testStatus">
+            等待操作...
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="../js/utils/logger.js"></script>
+    <script src="../js/data/dataset-manager-v3.js"></script>
+    <script src="../js/data/data-batch-operations.js"></script>
+    <script src="../js/ui/batch-toolbar.js"></script>
+
+    <script>
+        // ========== 测试脚本 ==========
+
+        const TEST_DATASET_ID = 'test_batch_dataset_' + Date.now();
+
+        // DOM 元素
+        const batchToolbar = document.getElementById('batchToolbar');
+        const messageList = document.getElementById('messageList');
+        const testStatus = document.getElementById('testStatus');
+
+        // 批量操作管理器
+        let batchOperations = null;
+
+        // 测试数据
+        const sampleMessages = [
+            {
+                id: 'msg_1',
+                senderName: '张三',
+                text: '大家好！今天天气真好啊。',
+                sentiment: 2,
+                timestamp: Math.floor(Date.now() / 1000)
+            },
+            {
+                id: 'msg_2',
+                senderName: '李四',
+                text: '是啊，很适合出去玩。',
+                sentiment: 2,
+                timestamp: Math.floor(Date.now() / 1000) + 60
+            },
+            {
+                id: 'msg_3',
+                senderName: '王五',
+                text: '有人在吗？',
+                sentiment: 3,
+                timestamp: Math.floor(Date.now() / 1000) + 120
+            },
+            {
+                id: 'msg_4',
+                senderName: '赵六',
+                text: '这里怎么这么安静。',
+                sentiment: 1,
+                timestamp: Math.floor(Date.now() / 1000) + 180
+            },
+            {
+                id: 'msg_5',
+                senderName: '小明',
+                text: '我不开心，心情很差。',
+                sentiment: 0,
+                timestamp: Math.floor(Date.now() / 1000) + 240
+            }
+        ];
+
+        // ========== 工具函数 ==========
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            testStatus.textContent = `[${timestamp}] ${message}`;
+            console.log(`[BatchOperations Test] ${message}`);
+        }
+
+        // ========== 加载测试数据 ==========
+
+        async function loadSampleData() {
+            try {
+                log('正在加载测试数据...');
+
+                // 创建测试数据集
+                const dataset = {
+                    id: TEST_DATASET_ID,
+                    name: '批量操作测试数据集',
+                    description: '用于测试批量操作功能',
+                    createdAt: Date.now(),
+                    messageCount: sampleMessages.length,
+                    participantCount: 5,
+                    tags: ['测试'],
+                    color: '#667eea'
+                };
+
+                await window.DatasetManagerV3.createDataset(dataset);
+
+                // 添加消息
+                for (const msg of sampleMessages) {
+                    const message = {
+                        ...msg,
+                        datasetId: TEST_DATASET_ID,
+                        keywords: []
+                    };
+                    await window.DatasetManagerV3.addMessage(TEST_DATASET_ID, message);
+                }
+
+                // 初始化批量操作管理器
+                batchOperations = new window.ChatGalaxy.Data.DataBatchOperations(TEST_DATASET_ID);
+                batchOperations.setBatchOperations = batchOperations; // 自引用
+                batchToolbar.setBatchOperations(batchOperations);
+
+                // 渲染消息列表
+                await batchOperations.loadMessages();
+                renderMessageList();
+
+                log(`✅ 成功加载 ${sampleMessages.length} 条测试数据`);
+
+            } catch (error) {
+                log(`❌ 加载失败: ${error.message}`);
+                console.error(error);
+            }
+        }
+
+        // ========== 渲染消息列表 ==========
+
+        function renderMessageList() {
+            if (!batchOperations || batchOperations.allMessages.length === 0) {
+                messageList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="ri-inbox-line"></i>
+                        <p>暂无消息数据</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sentimentMap = {
+                0: '消极',
+                1: '中性',
+                2: '积极',
+                3: '疑问'
+            };
+
+            messageList.innerHTML = batchOperations.allMessages.map(msg => {
+                const isSelected = batchOperations.selectedMessages.has(msg.id);
+
+                return `
+                    <div class="message-item ${isSelected ? 'message-item--selected' : ''}"
+                         data-id="${msg.id}">
+                        <div class="message-checkbox">
+                            ${isSelected ? '<i class="ri-check-line"></i>' : ''}
+                        </div>
+                        <div class="message-content">
+                            <div class="message-sender">${msg.senderName}</div>
+                            <div class="message-text">${msg.text}</div>
+                        </div>
+                        <div class="message-sentiment message-sentiment--${msg.sentiment}">
+                            ${sentimentMap[msg.sentiment]}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 添加点击事件
+            messageList.querySelectorAll('.message-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const messageId = item.dataset.id;
+                    batchOperations.toggleSelection(messageId);
+                    renderMessageList();
+                });
+            });
+
+            log(`已渲染 ${batchOperations.allMessages.length} 条消息`);
+        }
+
+        // ========== 事件监听 ==========
+
+        document.getElementById('loadSampleData').addEventListener('click', loadSampleData);
+
+        document.getElementById('clearAllData').addEventListener('click', async () => {
+            try {
+                log('正在清空数据...');
+
+                // 删除数据集
+                await window.DatasetManagerV3.deleteDataset(TEST_DATASET_ID);
+
+                // 清空批量操作管理器
+                if (batchOperations) {
+                    batchOperations.destroy();
+                    batchOperations = null;
+                }
+
+                // 重新渲染
+                messageList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="ri-inbox-line"></i>
+                        <p>数据已清空</p>
+                    </div>
+                `;
+
+                log('✅ 数据已清空');
+
+            } catch (error) {
+                log(`❌ 清空失败: ${error.message}`);
+                console.error(error);
+            }
+        });
+
+        document.getElementById('checkSelection').addEventListener('click', () => {
+            if (!batchOperations) {
+                log('❌ 请先加载测试数据');
+                return;
+            }
+
+            const selectedIds = batchOperations.getSelectedIds();
+            log(`当前选中: ${selectedIds.length} 条消息 [${selectedIds.join(', ')}]`);
+        });
+
+        // 监听选择变化事件
+        document.addEventListener('batchSelectionChanged', (e) => {
+            renderMessageList();
+        });
+
+        // 监听数据集更新事件
+        document.addEventListener('datasetUpdated', async () => {
+            if (batchOperations) {
+                await batchOperations.loadMessages();
+                renderMessageList();
+                log('✅ 数据集已更新');
+            }
+        });
+
+        // ========== 初始化 ==========
+
+        log('批量操作功能测试页面已就绪');
+    </script>
+</body>
+</html>

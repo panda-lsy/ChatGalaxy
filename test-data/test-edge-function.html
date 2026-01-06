@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>边缘函数集成测试 - ChatGalaxy</title>
+
+    <!-- RemixIcon -->
+    <link href="js/lib/remixicon/remixicon.css" rel="stylesheet">
+
+    <!-- 样式 -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/data-manager.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+            background: var(--bg-color, #1a1a2e);
+            color: var(--text-color, #b8c1ec);
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .test-header h1 {
+            color: var(--accent-color, #667eea);
+            margin-bottom: 8px;
+        }
+
+        .test-section {
+            background: var(--bg-secondary, #16213e);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            margin-top: 0;
+            color: var(--text-color, #b8c1ec);
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            padding-bottom: 12px;
+        }
+
+        .test-input {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+
+            font-size: 14px;
+            color: var(--text-color, #b8c1ec);
+            background: var(--bg-color, #1a1a2e);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .test-btn {
+            padding: 12px 24px;
+            margin: 8px 8px 8px 0;
+
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            background: var(--accent-color, #667eea);
+            border: none;
+            border-radius: 6px;
+
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-btn:hover {
+            background: var(--accent-hover, #5568d3);
+            transform: translateY(-2px);
+        }
+
+        .test-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .test-result {
+            margin-top: 16px;
+            padding: 16px;
+
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            color: var(--text-color, #b8c1ec);
+            background: var(--bg-color, #1a1a2e);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 6px;
+
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .test-result.error {
+            border-color: var(--danger-color, #ef4444);
+            color: var(--danger-color, #ef4444);
+        }
+
+        .test-result.success {
+            border-color: var(--success-color, #10b981);
+            color: var(--success-color, #10b981);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            margin: 8px 0;
+
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+
+        .status-badge.available {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-badge.unavailable {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- 页头 -->
+        <div class="test-header">
+            <h1>🧪 边缘函数集成测试</h1>
+            <p>测试 ChatGalaxy 边缘函数配置和调用</p>
+            <div id="statusBadge" class="status-badge unavailable">
+                <i class="ri-close-circle-line"></i> 边缘函数未配置
+            </div>
+        </div>
+
+        <!-- 测试1：配置URL -->
+        <div class="test-section">
+            <h2>1. 配置边缘函数URL</h2>
+            <p style="color: var(--text-secondary, rgba(184, 193, 236, 0.7));">
+                输入您的边缘函数URL（如果已部署），或使用模拟模式进行测试。
+            </p>
+            <input
+                type="text"
+                id="functionUrl"
+                class="test-input"
+                placeholder="https://your-function-url"
+            >
+            <button class="test-btn" onclick="saveUrl()">
+                <i class="ri-save-line"></i> 保存配置
+            </button>
+            <button class="test-btn" onclick="useMockMode()">
+                <i class="ri-mock-line"></i> 使用模拟模式
+            </button>
+            <div id="saveResult" class="test-result" style="display: none;"></div>
+        </div>
+
+        <!-- 测试2：测试连接 -->
+        <div class="test-section">
+            <h2>2. 测试连接</h2>
+            <p style="color: var(--text-secondary, rgba(184, 193, 236, 0.7));">
+                测试与边缘函数的连接是否正常。
+            </p>
+            <button class="test-btn" id="testConnectionBtn" onclick="testConnection()">
+                <i class="ri-link"></i> 测试连接
+            </button>
+            <div id="connectionResult" class="test-result" style="display: none;"></div>
+        </div>
+
+        <!-- 测试3：模拟调用 -->
+        <div class="test-section">
+            <h2>3. 模拟数据处理</h2>
+            <p style="color: var(--text-secondary, rgba(184, 193, 236, 0.7));">
+                使用模拟数据测试数据处理流程。
+            </p>
+            <button class="test-btn" onclick="simulateProcessing()">
+                <i class="ri-cpu-line"></i> 模拟处理
+            </button>
+            <div id="processingResult" class="test-result" style="display: none;"></div>
+        </div>
+
+        <!-- 测试4：配置管理器测试 -->
+        <div class="test-section">
+            <h2>4. 配置管理器API测试</h2>
+            <p style="color: var(--text-secondary, rgba(184, 193, 236, 0.7));">
+                测试边缘函数配置管理器的各项功能。
+            </p>
+            <button class="test-btn" onclick="testGetUrl()">
+                <i class="ri-links-line"></i> 获取URL
+            </button>
+            <button class="test-btn" onclick="testIsAvailable()">
+                <i class="ri-checkbox-line"></i> 检查可用性
+            </button>
+            <button class="test-btn" onclick="testClearUrls()">
+                <i class="ri-delete-bin-line"></i> 清除配置
+            </button>
+            <div id="apiResult" class="test-result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="../js/config.js"></script>
+    <script src="../js/utils/logger.js"></script>
+    <script src="../js/edge-function-config.js"></script>
+
+    <script>
+        // 更新状态徽章
+        function updateStatusBadge() {
+            const badge = document.getElementById('statusBadge');
+            const isAvailable = window.EdgeFunctionConfig.isAvailable('processChat');
+
+            if (isAvailable) {
+                badge.className = 'status-badge available';
+                badge.innerHTML = '<i class="ri-checkbox-circle-line"></i> 边缘函数已配置';
+            } else {
+                badge.className = 'status-badge unavailable';
+                badge.innerHTML = '<i class="ri-close-circle-line"></i> 边缘函数未配置';
+            }
+        }
+
+        // 1. 保存URL
+        function saveUrl() {
+            const urlInput = document.getElementById('functionUrl');
+            const url = urlInput.value.trim();
+            const resultDiv = document.getElementById('saveResult');
+
+            if (!url) {
+                resultDiv.textContent = '❌ URL不能为空';
+                resultDiv.className = 'test-result error';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                window.EdgeFunctionConfig.setUrl('processChat', url);
+                resultDiv.textContent = `✅ URL已保存: ${url}`;
+                resultDiv.className = 'test-result success';
+                resultDiv.style.display = 'block';
+                updateStatusBadge();
+            } catch (error) {
+                resultDiv.textContent = `❌ 保存失败: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        // 使用模拟模式
+        function useMockMode() {
+            const mockUrl = 'mock://edge-function';
+            window.EdgeFunctionConfig.setUrl('processChat', mockUrl);
+            document.getElementById('functionUrl').value = mockUrl;
+
+            const resultDiv = document.getElementById('saveResult');
+            resultDiv.textContent = '✅ 已切换到模拟模式（用于测试）';
+            resultDiv.className = 'test-result success';
+            resultDiv.style.display = 'block';
+            updateStatusBadge();
+        }
+
+        // 2. 测试连接
+        async function testConnection() {
+            const btn = document.getElementById('testConnectionBtn');
+            const resultDiv = document.getElementById('connectionResult');
+
+            if (!window.EdgeFunctionConfig.isAvailable('processChat')) {
+                resultDiv.textContent = '❌ 请先配置边缘函数URL';
+                resultDiv.className = 'test-result error';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 测试中...';
+            resultDiv.style.display = 'none';
+
+            try {
+                const result = await window.EdgeFunctionConfig.testConnection('processChat');
+
+                if (result.success) {
+                    resultDiv.textContent = `✅ 连接成功！\n\n响应时间: ${result.responseTime ? Date.now() - result.responseTime : 'N/A'}ms`;
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.textContent = `❌ 连接失败：${result.error}`;
+                    resultDiv.className = 'test-result error';
+                }
+
+                resultDiv.style.display = 'block';
+
+            } catch (error) {
+                resultDiv.textContent = `❌ 测试失败：${error.message}`;
+                resultDiv.className = 'test-result error';
+                resultDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-link"></i> 测试连接';
+            }
+        }
+
+        // 3. 模拟处理
+        async function simulateProcessing() {
+            const resultDiv = document.getElementById('processingResult');
+
+            const mockMessages = [
+                {
+                    id: 'test_1',
+                    senderName: '张三',
+                    text: '今天天气真好！',
+                    timestamp: 1704508800
+                },
+                {
+                    id: 'test_2',
+                    senderName: '李四',
+                    text: '这个功能怎么用？',
+                    timestamp: 1704508860
+                }
+            ];
+
+            resultDiv.textContent = '⏳ 正在模拟处理...';
+            resultDiv.className = 'test-result';
+            resultDiv.style.display = 'block';
+
+            // 模拟延迟
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // 模拟返回结果
+            const mockResult = {
+                success: true,
+                results: [
+                    {
+                        id: 'test_1',
+                        senderName: '张三',
+                        text: '今天天气真好！',
+                        timestamp: 1704508800,
+                        sentiment: 2, // 积极
+                        keywords: ['天气', '真'],
+                        words: ['今天', '天气', '真']
+                    },
+                    {
+                        id: 'test_2',
+                        senderName: '李四',
+                        text: '这个功能怎么用？',
+                        timestamp: 1704508860,
+                        sentiment: 3, // 疑问
+                        keywords: ['功能', '怎么'],
+                        words: ['这个', '功能', '怎么', '用']
+                    }
+                ],
+                stats: {
+                    total: 2,
+                    processed: 2,
+                    failed: 0
+                }
+            };
+
+            resultDiv.textContent = `✅ 模拟处理成功！\n\n${JSON.stringify(mockResult, null, 2)}`;
+            resultDiv.className = 'test-result success';
+        }
+
+        // 4.1 获取URL
+        function testGetUrl() {
+            const resultDiv = document.getElementById('apiResult');
+            const url = window.EdgeFunctionConfig.getUrl('processChat');
+
+            resultDiv.textContent = `当前URL: ${url || '(未配置)'}`;
+            resultDiv.className = 'test-result';
+            resultDiv.style.display = 'block';
+        }
+
+        // 4.2 检查可用性
+        function testIsAvailable() {
+            const resultDiv = document.getElementById('apiResult');
+            const isAvailable = window.EdgeFunctionConfig.isAvailable('processChat');
+
+            resultDiv.textContent = `可用状态: ${isAvailable ? '✅ 可用' : '❌ 不可用'}`;
+            resultDiv.className = `test-result ${isAvailable ? 'success' : 'error'}`;
+            resultDiv.style.display = 'block';
+        }
+
+        // 4.3 清除配置
+        function testClearUrls() {
+            if (confirm('确定要清除所有URL配置吗？')) {
+                window.EdgeFunctionConfig.clearUrls();
+
+                const resultDiv = document.getElementById('apiResult');
+                resultDiv.textContent = '✅ 配置已清除';
+                resultDiv.className = 'test-result success';
+                resultDiv.style.display = 'block';
+
+                updateStatusBadge();
+            }
+        }
+
+        // 页面加载时更新状态
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatusBadge();
+
+            // 如果已有配置，填充到输入框
+            const url = window.EdgeFunctionConfig.getUrl('processChat');
+            if (url) {
+                document.getElementById('functionUrl').value = url;
+            }
+        });
+    </script>
+</body>
+</html>

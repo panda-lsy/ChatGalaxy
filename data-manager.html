@@ -6,6 +6,180 @@
     <title>数据管理器 - ChatGalaxy</title>
     <link href="js/lib/remixicon/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="css/data-manager.css">
+
+    <!-- 处理模式选择器样式 -->
+    <style>
+        /* 处理模式选择器 */
+        .processing-mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .mode-option {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mode-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .mode-card {
+            display: flex;
+            gap: 12px;
+
+            padding: 16px;
+
+            background: var(--bg-color, #1a1a2e);
+            border: 2px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+
+            transition: all 0.3s ease;
+        }
+
+        .mode-option input[type="radio"]:checked + .mode-card {
+            border-color: var(--accent-color, #667eea);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .mode-card:hover {
+            border-color: var(--accent-color, #667eea);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .mode-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 24px;
+            color: var(--text-color, #b8c1ec);
+            background: var(--bg-secondary, #16213e);
+            border-radius: 10px;
+
+            flex-shrink: 0;
+        }
+
+        .mode-option input[type="radio"]:checked + .mode-card .mode-icon {
+            background: var(--accent-color, #667eea);
+            color: #ffffff;
+        }
+
+        .mode-content {
+            flex: 1;
+        }
+
+        .mode-content h3 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color, #b8c1ec);
+        }
+
+        .mode-content p {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            color: var(--text-secondary, rgba(184, 193, 236, 0.7));
+        }
+
+        .mode-features {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .mode-features li {
+            font-size: 12px;
+            color: var(--text-secondary, rgba(184, 193, 236, 0.7));
+            padding: 2px 0;
+        }
+
+        .mode-features li.mode-limit {
+            color: var(--warning-color, #f59e0b);
+            font-weight: 500;
+        }
+
+        .mode-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            padding: 4px 8px;
+
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px;
+
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mode-option input[type="radio"]:checked + .mode-card .mode-badge {
+            opacity: 1;
+        }
+
+        .label-hint {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+
+            font-size: 12px;
+            color: var(--accent-color, #667eea);
+            text-align: center;
+            line-height: 16px;
+
+            cursor: help;
+        }
+
+        .mode-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            margin-top: 8px;
+            padding: 8px 12px;
+
+            font-size: 13px;
+            color: var(--text-secondary, rgba(184, 193, 236, 0.7));
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+        }
+
+        .mode-hint i {
+            font-size: 14px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .processing-mode-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .mode-card {
+                padding: 12px;
+            }
+
+            .mode-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- 背景装饰 - 与主页面一致 -->
@@ -118,6 +292,61 @@
                             </div>
                         </div>
 
+                        <!-- 处理模式选择 -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                处理模式
+                                <span class="label-hint" title="选择数据处理方式">ⓘ</span>
+                            </label>
+                            <div class="processing-mode-selector">
+                                <label class="mode-option">
+                                    <input type="radio" name="processingMode" value="fast" checked>
+                                    <div class="mode-card">
+                                        <div class="mode-icon">
+                                            <i class="ri-flash-line"></i>
+                                        </div>
+                                        <div class="mode-content">
+                                            <h3>快速模式</h3>
+                                            <p>前端处理，秒级响应</p>
+                                            <ul class="mode-features">
+                                                <li>✓ 即时处理</li>
+                                                <li>✓ 无需服务器</li>
+                                                <li>✓ 适合小数据集</li>
+                                                <li class="mode-limit">推荐 &lt; 1,000 条消息</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="mode-option">
+                                    <input type="radio" name="processingMode" value="precise">
+                                    <div class="mode-card">
+                                        <div class="mode-icon">
+                                            <i class="ri-precision-line"></i>
+                                        </div>
+                                        <div class="mode-content">
+                                            <h3>精确模式</h3>
+                                            <p>后端处理，精确分析</p>
+                                            <ul class="mode-features">
+                                                <li>✓ jieba 精确分词</li>
+                                                <li>✓ SnowNLP 情感分析</li>
+                                                <li>✓ TF-IDF 关键词提取</li>
+                                                <li class="mode-limit">适合大数据集</li>
+                                            </ul>
+                                        </div>
+                                        <div class="mode-badge" id="edgeFunctionStatus" style="display: none;">
+                                            <i class="ri-cloud-line"></i>
+                                            可用
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="mode-hint" id="modeHint">
+                                <i class="ri-information-line"></i>
+                                <span>快速模式使用浏览器内置分词，精确模式需要配置边缘函数</span>
+                            </div>
+                        </div>
+
                         <!-- 进度条 -->
                         <div class="progress-container" id="import-progress" style="display: none;">
                             <div class="progress-bar-bg">
@@ -151,6 +380,51 @@
                     <!-- 数据集卡片将动态生成 -->
                 </div>
             </section>
+
+            <!-- 黑名单设置 -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <h2><i class="ri-shield-keyhole-line"></i> 黑名单设置</h2>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="blacklist-toggle" checked onchange="toggleBlacklist()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-content" id="blacklist-settings">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3><i class="ri-bracket-line"></i> 中括号标记过滤</h3>
+                            <p>自动过滤用中括号 [ ] 括起来的内容。在聊天记录中用中括号标记不希望显示的关键词。</p>
+                            <div class="setting-example">
+                                <strong>示例：</strong>
+                                <code>今天讨论了[广告]相关的内容，很棒！</code>
+                                <span class="example-arrow">→</span>
+                                <code>今天讨论了相关的内容，很棒！</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3><i class="ri-filter-line"></i> 过滤策略</h3>
+                            <p>选择包含标记内容的处理方式：</p>
+                        </div>
+                        <div class="setting-control">
+                            <select id="blacklist-strategy" class="form-select" onchange="updateBlacklistStrategy()">
+                                <option value="filter_only" selected>仅过滤关键词（推荐）</option>
+                                <option value="skip">跳过整条消息</option>
+                                <option value="mark">标记但保留消息</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-status" id="blacklist-status">
+                        <i class="ri-checkbox-circle-line" style="color: #10b981;"></i>
+                        <span>黑名单过滤已启用</span>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -181,6 +455,85 @@
     <script src="js/data-manager.js"></script>
     <script src="js/data-import.js"></script>
     <script src="js/processors/text-processor.js"></script>
-    <script src="js/data-manager-ui.js"></script>
+    <script src="js/edge-function-config.js"></script>
+    <script src="js/data-manager-ui.js?v=1.1.0-session-storage"></script>
+
+    <!-- 边缘函数配置UI逻辑 -->
+    <script>
+        // 检查边缘函数是否可用
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.EdgeFunctionConfig && window.EdgeFunctionConfig.isAvailable('processChat')) {
+                // 显示"可用"徽章
+                const badge = document.getElementById('edgeFunctionStatus');
+                if (badge) {
+                    badge.style.display = 'block';
+                    badge.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                }
+
+                // 更新提示信息
+                const hint = document.getElementById('modeHint');
+                if (hint) {
+                    hint.innerHTML = '<i class="ri-checkbox-circle-line"></i><span>边缘函数已配置，可以使用精确模式</span>';
+                    hint.style.color = '#10b981';
+                }
+
+                console.log('✅ Edge Function is available');
+            } else {
+                console.warn('⚠️ Edge Function not configured');
+
+                // 添加配置按钮
+                const hint = document.getElementById('modeHint');
+                if (hint) {
+                    hint.innerHTML = `
+                        <i class="ri-alert-line"></i>
+                        <span>边缘函数未配置，将使用快速模式</span>
+                        <button onclick="configureEdgeFunction()" style="margin-left: 8px; padding: 4px 12px; font-size: 12px; background: var(--accent-color, #667eea); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            配置
+                        </button>
+                    `;
+                }
+            }
+
+            // 监听模式切换
+            const modeInputs = document.querySelectorAll('input[name="processingMode"]');
+            modeInputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    if (e.target.value === 'precise' && !window.EdgeFunctionConfig.isAvailable('processChat')) {
+                        // 如果选择精确模式但边缘函数未配置，给出提示
+                        if (confirm('精确模式需要配置边缘函数。\n\n是否立即配置？')) {
+                            configureEdgeFunction();
+                        } else {
+                            // 切换回快速模式
+                            document.querySelector('input[name="processingMode"][value="fast"]').checked = true;
+                        }
+                    }
+                });
+            });
+        });
+
+        // 配置边缘函数
+        function configureEdgeFunction() {
+            const url = prompt('请输入边缘函数 URL：\n\n(例如: https://your-function-url)', window.EdgeFunctionConfig?.getUrl('processChat') || '');
+
+            if (url && url.trim()) {
+                window.EdgeFunctionConfig.setUrl('processChat', url.trim());
+                alert('✅ 边缘函数URL已保存！\n\n正在测试连接...');
+
+                // 测试连接
+                window.EdgeFunctionConfig.testConnection('processChat').then(result => {
+                    if (result.success) {
+                        alert('✅ 边缘函数连接成功！\n\n现在可以使用精确模式了。');
+                        // 刷新页面以更新UI
+                        location.reload();
+                    } else {
+                        alert('❌ 边缘函数连接失败：\n' + result.error + '\n\n请检查URL是否正确。');
+                    }
+                });
+            }
+        }
+
+        // 在控制台提供便捷的配置方法
+        window.configureEdgeFunction = configureEdgeFunction;
+    </script>
 </body>
 </html>

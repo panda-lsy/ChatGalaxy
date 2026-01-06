@@ -11,13 +11,166 @@
  * @updated 2026-01-06
  */
 
-// ========== 导入主线程的分词器 ==========
-
-// Web Worker中无法直接使用Intl.Segmenter
-// 需要通过消息传递接收分词结果，或使用简化分词
+// ========== 中文分词（Worker环境）==========
 
 /**
- * 简化版中文分词（基于正则）
+ * 统计分词算法（基于互信息和N-gram）
+ * 不依赖词典，自动从文本中发现词汇
+ */
+
+/**
+ * 提取所有可能的候选词（基于统计规律）
+ * @param {string} text - 输入文本
+ * @returns {Map<string, number>} - 词频统计
+ */
+function extractCandidates(text) {
+    // 移除中括号内容
+    text = text.replace(/\[[^\]]*\]/g, '');
+
+    // 移除特殊字符，保留中文、英文、数字
+    const cleanText = text.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, ' ');
+
+    // 统计2-4字的词频
+    const freq = new Map();
+    const chars = cleanText.split('');
+
+    for (let i = 0; i < chars.length; i++) {
+        // 单个字符（英文单词）
+        if (/[a-zA-Z0-9]/.test(chars[i])) {
+            // 提取完整单词
+            let word = '';
+            let j = i;
+            while (j < chars.length && /[a-zA-Z0-9]/.test(chars[j])) {
+                word += chars[j];
+                j++;
+            }
+            if (word.length >= 2) {
+                freq.set(word, (freq.get(word) || 0) + 1);
+            }
+            i = j - 1;
+            continue;
+        }
+
+        // 2-4字的中文词
+        for (let len = 2; len <= 4 && i + len <= chars.length; len++) {
+            const candidate = chars.slice(i, i + len).join('');
+
+            // 检查是否全是中文
+            if (/^[\u4e00-\u9fa5]+$/.test(candidate)) {
+                freq.set(candidate, (freq.get(candidate) || 0) + 1);
+            }
+        }
+    }
+
+    return freq;
+}
+
+/**
+ * 计算互信息，过滤有意义的词
+ * @param {Map} freq - 词频统计
+ * @returns {Array} - 有意义的词列表
+ */
+function filterMeaningfulWords(freq) {
+    const words = [];
+
+    for (const [word, count] of freq.entries()) {
+        // 过滤条件：
+        // 1. 频次 >= 2
+        // 2. 长度 >= 2
+        if (count >= 2 && word.length >= 2) {
+            words.push({ word, count });
+        }
+    }
+
+    // 按频次和长度排序
+    words.sort((a, b) => {
+        // 长度优先，然后频次
+        if (a.word.length !== b.word.length) {
+            return b.word.length - a.word.length;
+        }
+        return b.count - a.count;
+    });
+
+    return words;
+}
+
+/**
+ * 智能分词（基于统计）
+ * @param {string} text - 输入文本
+ * @returns {string[]} - 分词数组
+ */
+function statisticalSegment(text) {
+    if (!text || typeof text !== 'string') {
+        return [];
+    }
+
+    // 移除中括号内容
+    text = text.replace(/\[[^\]]*\]/g, '');
+
+    // 提取候选词
+    const freq = extractCandidates(text);
+    const meaningfulWords = filterMeaningfulWords(freq);
+
+    // 构建词典（只保留高频词）
+    const dict = new Set(meaningfulWords.slice(0, 200).map(w => w.word));
+
+    // 使用词典进行分词（最大匹配）
+    const words = [];
+    let i = 0;
+    const MAX_WORD_LENGTH = 4;
+
+    while (i < text.length) {
+        let matched = false;
+
+        // 从最大长度开始匹配
+        for (let len = MAX_WORD_LENGTH; len >= 2; len--) {
+            if (i + len > text.length) continue;
+
+            const candidate = text.slice(i, i + len);
+
+            // 检查是否在词典中
+            if (dict.has(candidate)) {
+                words.push(candidate);
+                i += len;
+                matched = true;
+                break;
+            }
+        }
+
+        // 如果没有匹配到
+        if (!matched) {
+            const char = text[i];
+
+            // 跳过标点符号和空格
+            if (/[\u4e00-\u9fa5a-zA-Z0-9]/.test(char)) {
+                // 英文单词
+                if (/[a-zA-Z0-9]/.test(char)) {
+                    let word = '';
+                    let j = i;
+                    while (j < text.length && /[a-zA-Z0-9]/.test(text[j])) {
+                        word += text[j];
+                        j++;
+                    }
+                    if (word.length >= 2) {
+                        words.push(word);
+                    }
+                    i = j;
+                } else {
+                    // 单个汉字（跳过）
+                    i++;
+                }
+            } else {
+                i++;
+            }
+        }
+    }
+
+    return words;
+}
+
+/**
+ * 简化版中文分词
+ * 使用统计方法 + 规则
  * @param {string} text - 输入文本
  * @returns {string[]} - 分词数组
  */
@@ -26,13 +179,19 @@ function simpleSegment(text) {
         return [];
     }
 
-    // 移除标点符号
-    const cleanText = text.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, ' ');
+    // 使用统计分词
+    const words = statisticalSegment(text);
 
-    // 按空格分割
-    const words = cleanText.split(/\s+/).filter(w => w.length >= 2);
+    // 过滤结果
+    return words.filter(word => {
+        // 保留双字及以上词汇
+        if (word.length >= 2) return true;
 
-    return words;
+        // 保留英文单词
+        if (/^[a-zA-Z]{2,}$/.test(word)) return true;
+
+        return false;
+    });
 }
 
 // ========== 情感分析（复制自主线程） ==========
@@ -43,20 +202,37 @@ const QUESTION_WORDS = new Set([
 ]);
 
 const POSITIVE_WORDS = new Set([
-    '好', '棒', '优秀', '厉害', '强', '喜欢', '爱', '开心', '快乐', '高兴',
-    '幸福', '满意', '赞', '支持', '感谢', '谢谢', '不错', '可以', '行',
-    '对', '是', '成功', '胜利', '棒极了', '太好了', '优秀', '完美', '漂亮',
-    '美好', '精彩', '出色', '卓越', '杰出', '超赞', '好评', '给力', '牛',
-    '哈哈', '嘻嘻', '呵呵', '加油', '努力', '坚持', '相信', '希望', '期待',
-    '美丽', '可爱', '温柔', '善良', '友好', '热情', '真诚', '感动', '温暖'
+    // 单字词
+    '好', '棒', '赞', '爱', '喜', '对', '是', '行', '强', '牛',
+
+    // 双字词
+    '优秀', '厉害', '喜欢', '开心', '快乐', '高兴', '幸福', '满意', '成功',
+    '胜利', '完美', '漂亮', '美好', '精彩', '出色', '卓越', '杰出', '超赞',
+    '好评', '给力', '加油', '努力', '坚持', '相信', '希望', '期待', '美丽',
+    '可爱', '温柔', '善良', '友好', '热情', '真诚', '感动', '温暖', '舒服',
+    '轻松', '自由', '愉快', '欢乐', '祥和', '和谐', '平静', '安宁', '兴奋',
+    '激动', '惊喜', '陶醉', '享受', '满足', '充实', '丰富', '可以', '不错',
+    '很好', '挺好', '太棒', '真棒', '支持', '感谢', '谢谢', '好的', '是的',
+
+    // 三字及以上
+    '棒极了', '太好了', '非常好', '特别好', '很不错', '没问题', '没关系',
+    '哈哈', '嘻嘻', '呵呵'
 ]);
 
 const NEGATIVE_WORDS = new Set([
-    '不好', '差', '坏', '烂', '糟糕', '讨厌', '恨', '烦', '烦躁', '生气',
-    '愤怒', '难过', '伤心', '痛苦', '失望', '绝望', '郁闷', '压抑', '沉重',
-    '累', '疲惫', '疲倦', '困', '饿', '痛', '难受', '不舒服', '病', '伤',
-    '错', '错误', '失误', '失败', '输', '败', '惨', '惨痛', '糟糕', '完蛋',
-    '不行', '不可以', '不能', '没用', '无用', '垃圾', '废物', '废柴', '笨'
+    // 单字词
+    '差', '坏', '烂', '糟', '恨', '烦', '怒', '痛', '累', '错',
+
+    // 双字词
+    '不好', '糟糕', '讨厌', '烦躁', '生气', '愤怒', '难过', '伤心', '痛苦',
+    '失望', '绝望', '郁闷', '压抑', '沉重', '疲惫', '疲倦', '难受', '不舒服',
+    '错误', '失误', '失败', '失败', '惨痛', '完蛋', '不行', '没用', '无用',
+    '垃圾', '废物', '废柴', '蠢笨', '傻逼', '白痴', '弱智', '脑残', '神经',
+    '疯子', '变态', '恶心', '反胃', '呕吐', '厌恶', '憎恨', '鄙视', '轻视',
+    '害怕', '恐惧', '担心', '忧虑', '焦虑', '紧张', '慌张', '惊慌', '害怕',
+
+    // 三字及以上
+    '不喜欢', '很难过', '特别糟', '太差了', '不可以', '不能', '不要'
 ]);
 
 const INTENSIFIERS = new Set([
@@ -140,6 +316,32 @@ function filterStopWords(words) {
 }
 
 /**
+ * 过滤黑名单词
+ * @param {string[]} words - 分词数组
+ * @returns {string[]} - 过滤后的词数组
+ */
+function filterBlacklistWords(words) {
+    return words.filter(word => {
+        // 只过滤用中括号括起来的词
+        if (/^\[.+\]$/.test(word)) {
+            return false;
+        }
+
+        return true;
+    });
+}
+
+/**
+ * 从文本中移除中括号内容
+ * @param {string} text - 输入文本
+ * @returns {string} - 移除中括号后的文本
+ */
+function removeBracketedContent(text) {
+    // 移除所有中括号及其内容
+    return text.replace(/\[[^\]]*\]/g, '');
+}
+
+/**
  * 提取关键词
  * @param {string} text - 输入文本
  * @param {number} topN - 返回前N个关键词
@@ -150,8 +352,12 @@ function extractKeywords(text, topN = 5) {
         return [];
     }
 
+    // 先移除中括号内容
+    text = removeBracketedContent(text);
+
     const words = simpleSegment(text);
-    const filteredWords = filterStopWords(words);
+    let filteredWords = filterStopWords(words);
+    filteredWords = filterBlacklistWords(filteredWords);
 
     if (filteredWords.length === 0) {
         return [];
@@ -187,7 +393,10 @@ function extractKeywords(text, topN = 5) {
  * @returns {Object} - 处理后的消息
  */
 function processMessage(msg) {
-    const text = msg.text || msg.content || '';
+    let text = msg.text || msg.content || '';
+
+    // 移除中括号内容
+    text = removeBracketedContent(text);
 
     return {
         ...msg,

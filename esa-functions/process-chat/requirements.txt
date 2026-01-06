@@ -1,0 +1,19 @@
+# ChatGalaxy 聊天数据处理边缘函数依赖
+# 阿里云 ESA (Edge Script Functions) Python 3.9
+
+# 中文分词
+jieba==0.42.1
+
+# 情感分析
+snownlp==0.12.3
+
+# JSON 处理
+# json (内置库，无需安装)
+
+# 日志
+# logging (内置库，无需安装)
+
+# 可选依赖（如果需要更多功能）
+# numpy>=1.21.0
+# scipy>=1.7.0
+# scikit-learn>=1.0.0

@@ -325,8 +325,8 @@ function generateInsights(chatData) {
     const timestamps = messages.map(m => m[2]);
     const minTime = Math.min(...timestamps);
     const maxTime = Math.max(...timestamps);
-    const startDate = new Date(minTime * 1000).toISOString().split('T')[0];
-    const endDate = new Date(maxTime * 1000).toISOString().split('T')[0];
+    const startDate = new Date(minTime).toISOString().split('T')[0];
+    const endDate = new Date(maxTime).toISOString().split('T')[0];
 
     let dialogTurns = 0;
     for (let i = 1; i < messages.length; i++) {
@@ -351,7 +351,7 @@ function generateInsights(chatData) {
     for (let i = 0; i < 24; i++) hourly[i] = 0;
 
     messages.forEach(msg => {
-        const date = new Date(msg[2] * 1000);
+        const date = new Date(msg[2]);
         hourly[date.getHours()]++;
         daily[weekdayNames[date.getDay()]]++;
         const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -385,7 +385,7 @@ function generateInsights(chatData) {
 
         const st = sample.length || 1;
         dailyTrend.push({
-            date: new Date(sample[0][2] * 1000).toISOString().split('T')[0],
+            date: new Date(sample[0][2]).toISOString().split('T')[0],
             happy: (counts[1] / st * 100).toFixed(1),
             neutral: (counts[0] / st * 100).toFixed(1),
             question: (counts[2] / st * 100).toFixed(1),
@@ -417,7 +417,7 @@ function generateInsights(chatData) {
     // 6. 活动模式 - 计算最活跃的一天
     const dailyMessageCounts = {};
     messages.forEach(msg => {
-        const date = new Date(msg[2] * 1000).toISOString().split('T')[0];
+        const date = new Date(msg[2]).toISOString().split('T')[0];
         dailyMessageCounts[date] = (dailyMessageCounts[date] || 0) + 1;
     });
 

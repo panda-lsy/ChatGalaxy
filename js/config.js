@@ -93,6 +93,23 @@ window.ChatGalaxyConfig.KEYWORD_RANKING_COUNT = 50;
  */
 window.ChatGalaxyConfig.ENABLE_STOP_WORDS = true;
 
+// ========== 黑名单配置 ==========
+
+/**
+ * 是否启用黑名单过滤
+ * true: 启用黑名单功能（过滤中括号内容）
+ * false: 禁用黑名单功能
+ */
+window.ChatGalaxyConfig.ENABLE_BLACKLIST = true;
+
+/**
+ * 黑名单消息处理策略
+ * 'skip': 跳过包含黑标记的消息
+ * 'mark': 标记但保留消息
+ * 'filter_only': 仅过滤关键词，不过滤消息（默认）
+ */
+window.ChatGalaxyConfig.BLACKLIST_STRATEGY = 'filter_only';
+
 // ========== 演示数据配置 ==========
 
 /**

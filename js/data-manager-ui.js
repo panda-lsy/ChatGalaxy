@@ -183,8 +183,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 初始化上传区域
     initUploadZone();
 
+    // 🔧 设置事件委托：在父容器上监听所有按钮点击
+    const datasetList = document.getElementById('dataset-list');
+    if (datasetList) {
+        datasetList.addEventListener('click', (e) => {
+            const btn = e.target.closest('.dataset-action-btn');
+            if (!btn) return;
+
+            // 阻止按钮的默认行为（防止表单提交等干扰）
+            e.preventDefault();
+            e.stopPropagation();
+
+            const datasetId = btn.getAttribute('data-id');
+
+            if (btn.classList.contains('btn-switch')) {
+                switchToDataset(datasetId);
+            } else if (btn.classList.contains('btn-edit')) {
+                editDataset(datasetId);
+            } else if (btn.classList.contains('btn-export')) {
+                exportDataset(datasetId);
+            } else if (btn.classList.contains('btn-delete')) {
+                deleteDataset(datasetId);
+            }
+        });
+    }
+
     // 加载数据集列表
     await loadDatasetList();
+
+    // 初始化黑名单设置
+    initializeBlacklistSettings();
 
     Log.info('Init', 'DataManager UI initialized');
 });
@@ -263,6 +291,16 @@ async function handleFileSelect(file) {
     fileName.textContent = `${file.name} (${window.DataImportV3.formatFileSize(file.size)})`;
     fileInfo.style.display = 'block';
 
+    // 🔧 清除旧的验证警告（修复：新文件导入时警告不消失的问题）
+    const warningContainer = document.getElementById('validation-warnings');
+    const warningList = document.getElementById('validation-warning-list');
+    if (warningList) {
+        warningList.innerHTML = '';
+    }
+    if (warningContainer) {
+        warningContainer.style.display = 'none';
+    }
+
     // 验证文件
     try {
         const data = await window.DataImportV3.readJSONFile(file);
@@ -298,7 +336,32 @@ function showValidationWarnings(warnings) {
     const container = document.getElementById('validation-warnings');
     const list = document.getElementById('validation-warning-list');
 
-    list.innerHTML = warnings.map(w => `<li>${w}</li>`).join('');
+    // 🔧 改进警告显示：区分警告和提示
+    const hasLargeFileWarning = warnings.some(w => w.includes('超过快速模式限制'));
+
+    if (hasLargeFileWarning) {
+        // 大文件警告：改为友好的提示信息
+        const largeFileWarning = warnings.find(w => w.includes('超过快速模式限制'));
+        const otherWarnings = warnings.filter(w => !w.includes('超过快速模式限制'));
+
+        let html = '';
+
+        // 大文件提示（绿色，表示可以继续）
+        if (largeFileWarning) {
+            html += `<li class="warning-info">💡 ${largeFileWarning.replace('建议使用精确模式', '您仍可以继续导入，系统会自动使用分批处理')}</li>`;
+        }
+
+        // 其他警告（黄色）
+        otherWarnings.forEach(w => {
+            html += `<li class="warning-caution">⚠️ ${w}</li>`;
+        });
+
+        list.innerHTML = html;
+    } else {
+        // 普通警告
+        list.innerHTML = warnings.map(w => `<li>⚠️ ${w}</li>`).join('');
+    }
+
     container.style.display = 'block';
 }
 
@@ -339,6 +402,10 @@ async function startImport() {
 
     const description = document.getElementById('dataset-description').value.trim();
 
+    // 获取处理模式
+    const processingModeInput = document.querySelector('input[name="processingMode"]:checked');
+    const processingMode = processingModeInput ? processingModeInput.value : 'fast';
+
     // 显示进度条
     const progressContainer = document.getElementById('import-progress');
     const progressBar = document.getElementById('progress-bar-fill');
@@ -354,7 +421,7 @@ async function startImport() {
             description,
             tags: selectedTags,
             color: selectedColor,
-            mode: 'fast',
+            mode: processingMode,  // 使用选择的处理模式
             onProgress: (current, total) => {
                 const percent = Math.floor((current / total) * 100);
                 progressBar.style.width = percent + '%';
@@ -386,7 +453,17 @@ function resetImportForm() {
 
     document.getElementById('file-input').value = '';
     document.getElementById('file-info').style.display = 'none';
-    document.getElementById('validation-warnings').style.display = 'none';
+
+    // 🔧 清空并隐藏警告提示（确保完全清除）
+    const warningList = document.getElementById('validation-warning-list');
+    const warningContainer = document.getElementById('validation-warnings');
+    if (warningList) {
+        warningList.innerHTML = '';
+    }
+    if (warningContainer) {
+        warningContainer.style.display = 'none';
+    }
+
     document.getElementById('dataset-form').style.display = 'none';
     document.getElementById('dataset-name').value = '';
     document.getElementById('dataset-description').value = '';
@@ -487,13 +564,16 @@ async function loadDatasetList() {
                     ` : ''}
 
                     <div class="dataset-actions">
-                        <button class="dataset-action-btn" onclick="switchToDataset('${dataset.id}')">
+                        <button type="button" class="dataset-action-btn btn-switch" data-id="${dataset.id}">
                             ${isActive ? '✓ 当前使用' : '切换到此数据集'}
                         </button>
-                        <button class="dataset-action-btn" onclick="exportDataset('${dataset.id}')">
+                        <button type="button" class="dataset-action-btn btn-edit" data-id="${dataset.id}">
+                            <i class="ri-edit-line"></i> 编辑
+                        </button>
+                        <button type="button" class="dataset-action-btn btn-export" data-id="${dataset.id}">
                             <i class="ri-download-line"></i> 导出
                         </button>
-                        <button class="dataset-action-btn danger" onclick="deleteDataset('${dataset.id}')">
+                        <button type="button" class="dataset-action-btn btn-delete danger" data-id="${dataset.id}">
                             <i class="ri-delete-bin-line"></i> 删除
                         </button>
                     </div>
@@ -569,6 +649,23 @@ async function exportDataset(datasetId) {
     }
 }
 
+async function editDataset(datasetId) {
+    try {
+        if (!datasetId) {
+            throw new Error('数据集ID为空');
+        }
+
+        // 🔧 使用 Session Storage 存储数据集ID，绕过 URL 参数传递
+        sessionStorage.setItem('chatgalaxy_editDatasetId', datasetId);
+
+        // 直接跳转（不带参数）
+        window.location.href = 'dataset-editor.html';
+
+    } catch (error) {
+        showToast('error', '打开编辑器失败: ' + error.message);
+    }
+}
+
 // ========== Toast 提示 ==========
 
 function showToast(type, message) {
@@ -611,6 +708,96 @@ window.deleteDataset = deleteDataset;
 window.exportDataset = exportDataset;
 window.toggleTag = toggleTag;
 window.selectColor = selectColor;
+
+// ========== 黑名单设置函数 ==========
+
+/**
+ * 切换黑名单开关
+ */
+function toggleBlacklist() {
+    const toggle = document.getElementById('blacklist-toggle');
+    const status = document.getElementById('blacklist-status');
+    const isEnabled = toggle.checked;
+
+    // 更新配置
+    window.ChatGalaxyConfig.ENABLE_BLACKLIST = isEnabled;
+
+    // 保存到 localStorage
+    localStorage.setItem('chatgalaxy_blacklist_enabled', isEnabled);
+
+    // 更新UI状态
+    if (isEnabled) {
+        status.innerHTML = '<i class="ri-checkbox-circle-line" style="color: #10b981;"></i><span>黑名单过滤已启用</span>';
+        showToast('success', '✅ 黑名单过滤已启用');
+    } else {
+        status.innerHTML = '<i class="ri-close-circle-line" style="color: #ef4444;"></i><span>黑名单过滤已禁用</span>';
+        showToast('info', 'ℹ️ 黑名单过滤已禁用');
+    }
+
+    console.log('[Blacklist] 黑名单过滤:', isEnabled ? '启用' : '禁用');
+}
+
+/**
+ * 更新黑名单策略
+ */
+function updateBlacklistStrategy() {
+    const strategySelect = document.getElementById('blacklist-strategy');
+    const strategy = strategySelect.value;
+
+    // 更新配置
+    window.ChatGalaxyConfig.BLACKLIST_STRATEGY = strategy;
+
+    // 保存到 localStorage
+    localStorage.setItem('chatgalaxy_blacklist_strategy', strategy);
+
+    // 显示提示
+    const strategyNames = {
+        'filter_only': '仅过滤关键词（推荐）',
+        'skip': '跳过整条消息',
+        'mark': '标记但保留消息'
+    };
+
+    showToast('success', `✅ 策略已更新：${strategyNames[strategy]}`);
+    console.log('[Blacklist] 策略已更新:', strategy);
+}
+
+/**
+ * 初始化黑名单设置
+ */
+function initializeBlacklistSettings() {
+    // 从 localStorage 读取设置
+    const enabled = localStorage.getItem('chatgalaxy_blacklist_enabled');
+    const strategy = localStorage.getItem('chatgalaxy_blacklist_strategy');
+
+    // 更新配置
+    if (enabled !== null) {
+        window.ChatGalaxyConfig.ENABLE_BLACKLIST = enabled === 'true';
+        document.getElementById('blacklist-toggle').checked = enabled === 'true';
+    }
+
+    if (strategy !== null) {
+        window.ChatGalaxyConfig.BLACKLIST_STRATEGY = strategy;
+        document.getElementById('blacklist-strategy').value = strategy;
+    }
+
+    // 更新状态显示
+    const status = document.getElementById('blacklist-status');
+    if (window.ChatGalaxyConfig.ENABLE_BLACKLIST) {
+        status.innerHTML = '<i class="ri-checkbox-circle-line" style="color: #10b981;"></i><span>黑名单过滤已启用</span>';
+    } else {
+        status.innerHTML = '<i class="ri-close-circle-line" style="color: #ef4444;"></i><span>黑名单过滤已禁用</span>';
+    }
+
+    console.log('[Blacklist] 设置已初始化:', {
+        enabled: window.ChatGalaxyConfig.ENABLE_BLACKLIST,
+        strategy: window.ChatGalaxyConfig.BLACKLIST_STRATEGY
+    });
+}
+
+// 导出到全局
+window.toggleBlacklist = toggleBlacklist;
+window.updateBlacklistStrategy = updateBlacklistStrategy;
+window.initializeBlacklistSettings = initializeBlacklistSettings;
 
 // ========== 从index.html调用的函数 ==========
 

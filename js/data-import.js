@@ -6,11 +6,151 @@
  * @updated 2026-01-06
  */
 
+// ========== 本地日志包装器 ==========
+// 防止 Log 未定义时出错（IIFE 在 log-wrapper.js 加载前执行）
+if (!window.Log) {
+    window.Log = {
+        info: (tag, ...msg) => console.log(`[INFO] [${tag}]`, ...msg),
+        warn: (tag, ...msg) => console.warn(`[WARN] [${tag}]`, ...msg),
+        error: (tag, ...msg) => console.error(`[ERROR] [${tag}]`, ...msg),
+        debug: (tag, ...msg) => console.log(`[DEBUG] [${tag}]`, ...msg)
+    };
+}
+var Log = window.Log;
+
 // ========== 常量定义 ==========
 
 /** IndexedDB 存储名称 */
 const DATASETS_STORE = window.ChatGalaxyConfig.DATASETS_STORE;
 const MESSAGES_STORE = window.ChatGalaxyConfig.MESSAGES_STORE;
+
+/** Worker 文件路径 */
+const WORKER_PATH = 'js/workers/import-worker.js';
+
+// ========== Web Worker 管理 ==========
+
+/**
+ * 创建数据处理 Worker
+ * @returns {Worker} Worker 实例
+ */
+function createProcessingWorker() {
+    try {
+        return new Worker(WORKER_PATH);
+    } catch (error) {
+        Log.error('Import', 'Failed to create worker:', error);
+        return null;
+    }
+}
+
+/**
+ * 使用 Worker 处理消息数据
+ * @param {Array} messages - 原始消息数组
+ * @param {string} datasetId - 数据集ID
+ * @param {Function} onProgress - 进度回调
+ * @returns {Promise<Array>} - 处理后的消息数组
+ */
+function processWithWorker(messages, datasetId, onProgress) {
+    return new Promise((resolve, reject) => {
+        const worker = createProcessingWorker();
+        if (!worker) {
+            reject(new Error('Worker 创建失败'));
+            return;
+        }
+
+        let processedMessages = [];
+
+        // 监听 Worker 消息
+        worker.onmessage = (e) => {
+            const { type, data } = e.data;
+
+            switch (type) {
+                case 'progress':
+                    // 进度更新
+                    if (onProgress) {
+                        onProgress(data);
+                    }
+                    break;
+
+                case 'success':
+                    // 处理完成
+                    processedMessages = data.messages;
+                    worker.terminate();
+                    resolve(processedMessages);
+                    break;
+
+                case 'error':
+                    // 处理失败
+                    worker.terminate();
+                    reject(new Error(data.error?.message || 'Worker 处理失败'));
+                    break;
+
+                default:
+                    // 其他消息忽略（如 'ready'）
+                    break;
+            }
+        };
+
+        // 错误处理
+        worker.onerror = (error) => {
+            worker.terminate();
+            reject(new Error(`Worker 错误: ${error.message}`));
+        };
+
+        // 发送处理请求
+        worker.postMessage({
+            type: 'process',
+            data: {
+                messages: messages,
+                datasetId: datasetId
+            }
+        });
+    });
+}
+
+/**
+ * 使用边缘函数处理消息（精确模式）
+ * @param {Array} messages - 原始消息数组
+ * @param {Function} onProgress - 进度回调
+ * @returns {Promise<Array>} - 处理后的消息数组
+ */
+async function processWithEdgeFunction(messages, onProgress) {
+    try {
+        Log.info('Import', `Invoking Edge Function for ${messages.length} messages...`);
+
+        // 调用边缘函数
+        const response = await window.EdgeFunctionConfig.invoke('processChat', {
+            messages: messages
+        });
+
+        if (!response.success) {
+            throw new Error(response.error || '边缘函数处理失败');
+        }
+
+        const processedMessages = response.results;
+
+        // 触发进度更新（100%）
+        if (onProgress) {
+            onProgress({
+                current: processedMessages.length,
+                total: processedMessages.length,
+                percent: 100
+            });
+        }
+
+        Log.info('Import', `✅ Edge Function processed ${processedMessages.length} messages successfully`);
+
+        // 返回统计信息
+        if (response.stats) {
+            Log.info('Import', `Stats: ${JSON.stringify(response.stats)}`);
+        }
+
+        return processedMessages;
+
+    } catch (error) {
+        Log.error('Import', 'Edge Function processing failed:', error);
+        throw error; // 重新抛出错误，让调用者决定是否降级
+    }
+}
 
 // ========== JSON格式验证 ==========
 
@@ -113,6 +253,54 @@ function parseTimestamp(ts) {
 // ========== 消息数据解析 ==========
 
 /**
+ * 从 QQChatExporter V5 格式中提取发送者ID
+ * @param {string|Object} senderId - 原始senderId
+ * @returns {string} - 提取的ID字符串
+ */
+function extractSenderId(senderId) {
+    if (typeof senderId === 'string') {
+        return senderId;
+    }
+    if (typeof senderId === 'object' && senderId !== null) {
+        // QQChatExporter V5 格式: {uid, uin, name}
+        return senderId.uid || senderId.uin || senderId.name || 'unknown';
+    }
+    return 'unknown';
+}
+
+/**
+ * 从 QQChatExporter V5 格式中提取发送者名称
+ * @param {string|Object} senderName - 原始senderName
+ * @returns {string} - 提取的名称字符串
+ */
+function extractSenderName(senderName) {
+    if (typeof senderName === 'string') {
+        return senderName;
+    }
+    if (typeof senderName === 'object' && senderName !== null) {
+        // QQChatExporter V5 格式: {uid, uin, name}
+        return senderName.name || senderName.uid || senderName.uin || 'Unknown';
+    }
+    return 'Unknown';
+}
+
+/**
+ * 从 QQChatExporter V5 格式中提取消息文本
+ * @param {string|Object} text - 原始text
+ * @returns {string} - 提取的文本字符串
+ */
+function extractText(text) {
+    if (typeof text === 'string') {
+        return text;
+    }
+    if (typeof text === 'object' && text !== null) {
+        // QQChatExporter V5 格式: {text, html, elements...}
+        return text.text || text.content || '';
+    }
+    return '';
+}
+
+/**
  * 解析消息数据，统一格式
  * @param {Object} data - 原始JSON数据
  * @returns {Object} - { messages: Message[], senders: Map<string, Sender> }
@@ -124,9 +312,15 @@ function parseMessageData(data) {
     let senderIdCounter = 0;
 
     rawMessages.forEach((rawMsg, index) => {
-        // 解析发送者信息
+        // 🔧 支持多种格式：简单字符串格式和 QQChatExporter V5 对象格式
         let senderId = rawMsg.senderId || rawMsg.sender || rawMsg.userId || rawMsg.role || 'unknown';
         let senderName = rawMsg.senderName || rawMsg.sender || rawMsg.userName || rawMsg.role || senderId;
+
+        // 提取发送者ID（处理QQChatExporter V5对象格式）
+        senderId = extractSenderId(senderId);
+
+        // 提取发送者名称（处理QQChatExporter V5对象格式）
+        senderName = extractSenderName(senderName);
 
         // 如果发送者ID未知，生成一个
         if (senderId === 'unknown' || senderId === null || senderId === undefined) {
@@ -144,6 +338,10 @@ function parseMessageData(data) {
         }
         senders.get(senderId).count++;
 
+        // 提取消息文本（处理QQChatExporter V5对象格式）
+        const rawText = rawMsg.text || rawMsg.content || '';
+        const text = extractText(rawText);
+
         // 解析消息
         const message = {
             id: rawMsg.id || `msg_${Date.now()}_${index}`,
@@ -151,7 +349,7 @@ function parseMessageData(data) {
             senderId: senderId,
             senderName: senderName,
             timestamp: parseTimestamp(rawMsg.timestamp || rawMsg.time || rawMsg.createdAt),
-            text: rawMsg.text || rawMsg.content || '',
+            text: text,
             sentiment: rawMsg.sentiment || 1, // 默认中性
             keywords: rawMsg.keywords || []
         };
@@ -302,6 +500,8 @@ async function importJSON(file, options = {}) {
         onProgress
     } = options;
 
+    let dataset = null; // 跟踪创建的数据集，用于失败时清理
+
     try {
         // 1. 文件大小检查
         if (file.size > window.ChatGalaxyConfig.MAX_FILE_SIZE) {
@@ -325,41 +525,97 @@ async function importJSON(file, options = {}) {
         const { messages, senders } = parseMessageData(data);
 
         // 4. 创建数据集
-        const dataset = await window.DatasetManagerV3.createDataset({
+        dataset = await window.DatasetManagerV3.createDataset({
             name: name || file.name.replace('.json', ''),
             description,
             tags,
             color
         });
 
-        // 5. 保存消息到IndexedDB
-        await window.DatasetManagerV3.saveMessages(dataset.id, messages, onProgress);
+        // 5. 处理消息（根据模式选择处理方式）
+        let processedMessages;
+        const messageCount = messages.length;
 
-        // 6. 生成图数据（基于关键词共现）
-        const graph = buildGraphFromMessages(messages);
+        Log.info('Import', `Processing ${messageCount} messages in ${mode} mode`);
 
-        // 7. 更新数据集统计（使用标准方法确保缓存同步）
+        // 🆕 边缘函数精确模式
+        if (mode === 'precise' && window.EdgeFunctionConfig && window.EdgeFunctionConfig.isAvailable('processChat')) {
+            try {
+                Log.info('Import', 'Using Edge Function for precise processing...');
+                processedMessages = await processWithEdgeFunction(messages, onProgress);
+            } catch (edgeError) {
+                Log.warn('Import', 'Edge Function failed, falling back to Worker:', edgeError);
+                // 降级到Worker模式
+                const useWorker = messageCount > 500;
+                if (useWorker) {
+                    processedMessages = await processWithWorker(messages, dataset.id, onProgress);
+                } else {
+                    processedMessages = await window.TextProcessor.processMessages(messages, onProgress);
+                }
+            }
+        }
+        // 快速模式：使用 Worker 或同步处理
+        else {
+            const useWorker = messageCount > 500; // 超过500条使用Worker
+            Log.info('Import', `Using ${useWorker ? 'Worker' : 'sync'} processing`);
+
+            if (useWorker) {
+                // 使用 Worker 异步处理
+                try {
+                    processedMessages = await processWithWorker(messages, dataset.id, onProgress);
+                } catch (workerError) {
+                    Log.warn('Import', 'Worker processing failed, falling back to sync:', workerError);
+                    // 降级到同步处理：使用 TextProcessor 分词
+                    if (window.TextProcessor && typeof window.TextProcessor.processMessages === 'function') {
+                        Log.info('Import', 'Processing messages with TextProcessor (sync mode)...');
+                        processedMessages = await window.TextProcessor.processMessages(messages, onProgress);
+                    } else {
+                        // 如果 TextProcessor 不可用，使用原始消息（无分词）
+                        Log.warn('Import', 'TextProcessor not available, using raw messages without segmentation');
+                        processedMessages = messages;
+                    }
+                }
+            } else {
+                // 同步处理（小数据量）：使用 TextProcessor 分词
+                if (window.TextProcessor && typeof window.TextProcessor.processMessages === 'function') {
+                    Log.info('Import', 'Processing messages with TextProcessor (sync mode)...');
+                    processedMessages = await window.TextProcessor.processMessages(messages, onProgress);
+                } else {
+                    // 如果 TextProcessor 不可用，使用原始消息（无分词）
+                    Log.warn('Import', 'TextProcessor not available, using raw messages without segmentation');
+                    processedMessages = messages;
+                }
+            }
+        }
+
+        // 6. 保存消息到IndexedDB
+        await window.DatasetManagerV3.saveMessages(dataset.id, processedMessages, onProgress);
+
+        // 7. 生成图数据（基于关键词共现）
+        const graph = buildGraphFromMessages(processedMessages);
+
+        // 8. 更新数据集统计（使用标准方法确保缓存同步）
         const updatedDataset = await window.DatasetManagerV3.getDataset(dataset.id);
-        updatedDataset.messageCount = messages.length;
+        updatedDataset.messageCount = processedMessages.length;
         updatedDataset.participantCount = senders.size;
         updatedDataset.graph = graph; // 保存图数据
         updatedDataset.updatedAt = new Date().toISOString();
         const dbHelper = await window.DatasetManagerV3.initDatabase();
         await dbHelper.put(DATASETS_STORE, updatedDataset);
 
-        // 8. 更新LocalStorage缓存以保持同步
+        // 9. 更新LocalStorage缓存以保持同步
         const { cacheDatasetList } = window.DatasetManagerV3;
         if (typeof cacheDatasetList === 'function') {
             await cacheDatasetList();
         }
 
-        // 7. 生成统计数据
+        // 10. 生成统计数据
         const stats = {
-            totalMessages: messages.length,
+            totalMessages: processedMessages.length,
             totalSenders: senders.size,
             dateRange: {
-                start: new Date(Math.min(...messages.map(m => m.timestamp))).toISOString().split('T')[0],
-                end: new Date(Math.max(...messages.map(m => m.timestamp))).toISOString().split('T')[0]
+                start: new Date(Math.min(...processedMessages.map(m => m.timestamp))).toISOString().split('T')[0],
+                end: new Date(Math.max(...processedMessages.map(m => m.timestamp))).toISOString().split('T')[0]
             },
             topSenders: Array.from(senders.values())
                 .sort((a, b) => b.count - a.count)
@@ -373,7 +629,20 @@ async function importJSON(file, options = {}) {
 
     } catch (error) {
         console.error('❌ Import failed:', error);
-        throw error;
+
+        // 🔧 修复：如果创建了数据集但导入失败，清理空数据集
+        if (dataset && dataset.id) {
+            try {
+                console.warn('[Import] Cleaning up failed dataset:', dataset.id);
+                await window.DatasetManagerV3.deleteDataset(dataset.id);
+                console.log('[Import] Cleanup successful');
+            } catch (cleanupError) {
+                console.error('[Import] Cleanup failed:', cleanupError);
+                // 清理失败不影响错误抛出
+            }
+        }
+
+        throw error; // 重新抛出原始错误
     }
 }
 
@@ -396,14 +665,14 @@ async function createEmptyDataset(datasetInfo) {
  * @returns {Promise<Object>} - JSON数据
  */
 async function exportDataset(datasetId) {
-    await window.DatasetManagerV3.initDatabase();
+    const dbHelper = await window.DatasetManagerV3.initDatabase();
 
     const dataset = await window.DatasetManagerV3.getDataset(datasetId);
     if (!dataset) {
         throw new Error(`数据集不存在: ${datasetId}`);
     }
 
-    const messages = await window.DatasetManagerV3.dbHelper.getByIndex(
+    const messages = await dbHelper.getByIndex(
         MESSAGES_STORE,
         'datasetId',
         datasetId

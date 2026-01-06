@@ -191,6 +191,71 @@ function filterStopWords(words) {
     });
 }
 
+// ========== 黑名单过滤 ==========
+
+/**
+ * 从文本中移除中括号内容
+ * @param {string} text - 输入文本
+ * @returns {string} - 移除中括号后的文本
+ */
+function removeBracketedContent(text) {
+    // 检查是否启用黑名单
+    if (!window.ChatGalaxyConfig || !window.ChatGalaxyConfig.ENABLE_BLACKLIST) {
+        return text;
+    }
+
+    // 移除所有中括号及其内容
+    return text.replace(/\[[^\]]*\]/g, '');
+}
+
+/**
+ * 过滤中括号内容
+ * @param {string[]} words - 分词数组
+ * @returns {string[]} - 过滤后的词数组
+ */
+function filterBlacklistWords(words) {
+    // 检查是否启用黑名单
+    if (!window.ChatGalaxyConfig || !window.ChatGalaxyConfig.ENABLE_BLACKLIST) {
+        return words;
+    }
+
+    return words.filter(word => {
+        // 只过滤用中括号括起来的词
+        if (/^\[.+\]$/.test(word)) {
+            return false;
+        }
+
+        return true;
+    });
+}
+
+/**
+ * 检测文本是否包含中括号标记
+ * @param {string} text - 输入文本
+ * @returns {Object} - { isBlacklisted: boolean, matchedPatterns: string[] }
+ */
+function detectBlacklistContent(text) {
+    // 检查是否启用黑名单
+    if (!window.ChatGalaxyConfig || !window.ChatGalaxyConfig.ENABLE_BLACKLIST) {
+        return { isBlacklisted: false, matchedPatterns: [] };
+    }
+
+    const matchedPatterns = [];
+
+    // 检查中括号格式的内容
+    const bracketMatches = text.match(/\[[^\]]+\]/g);
+    if (bracketMatches) {
+        bracketMatches.forEach(match => {
+            matchedPatterns.push(`标记: ${match}`);
+        });
+    }
+
+    return {
+        isBlacklisted: matchedPatterns.length > 0,
+        matchedPatterns
+    };
+}
+
 // ========== 关键词提取 ==========
 
 /**
@@ -220,20 +285,26 @@ function extractKeywords(text, topN = 10) {
         return [];
     }
 
+    // 0. 先移除中括号内容（在分词之前）
+    text = removeBracketedContent(text);
+
     // 1. 分词
     const words = segmentText(text);
 
     // 2. 过滤停用词
-    const filteredWords = filterStopWords(words);
+    let filteredWords = filterStopWords(words);
+
+    // 3. 过滤黑名单词
+    filteredWords = filterBlacklistWords(filteredWords);
 
     if (filteredWords.length === 0) {
         return [];
     }
 
-    // 3. 计算词频
+    // 4. 计算词频
     const tf = calculateTermFrequency(filteredWords);
 
-    // 4. 计算IDF简化版（基于词长度和词频的权重）
+    // 5. 计算IDF简化版（基于词长度和词频的权重）
     const keywords = [];
     for (const [word, count] of tf.entries()) {
         // TF-IDF简化公式：score = TF * log(word_length)
@@ -245,7 +316,7 @@ function extractKeywords(text, topN = 10) {
         });
     }
 
-    // 5. 排序并返回TopN
+    // 6. 排序并返回TopN
     keywords.sort((a, b) => b.score - a.score);
 
     return keywords.slice(0, topN);
@@ -263,24 +334,49 @@ async function processMessages(messages, onProgress) {
     const results = [];
     const total = messages.length;
 
+    // 获取黑名单策略
+    const strategy = window.ChatGalaxyConfig?.BLACKLIST_STRATEGY || 'filter_only';
+
     for (let i = 0; i < total; i++) {
         const msg = messages[i];
+        let text = msg.text || '';
+
+        // 检测黑名单内容（在原始文本上检测）
+        const blacklistCheck = detectBlacklistContent(text);
+
+        // 根据策略处理黑名单消息
+        if (blacklistCheck.isBlacklisted && strategy === 'skip') {
+            // 跳过包含黑名单的消息
+            console.debug('[TextProcessor] 跳过黑名单消息:', blacklistCheck.matchedPatterns);
+            continue;
+        }
+
+        // 移除中括号内容（在情感分析和关键词提取之前）
+        text = removeBracketedContent(text);
 
         // 分词
-        const words = segmentText(msg.text || '');
+        const words = segmentText(text);
 
-        // 情感分析
-        const sentiment = analyzeSentiment(msg.text || '');
+        // 情感分析（使用清理后的文本）
+        const sentiment = analyzeSentiment(text);
 
-        // 关键词提取
-        const keywordObjects = extractKeywords(msg.text || '', 5);
+        // 关键词提取（已包含黑名单词过滤）
+        const keywordObjects = extractKeywords(text, 5);
         const keywords = keywordObjects.map(k => k.word);
 
-        results.push({
+        const processedMsg = {
             ...msg,
             sentiment,
             keywords
-        });
+        };
+
+        // 如果策略是 mark，标记包含黑名单的消息
+        if (blacklistCheck.isBlacklisted && strategy === 'mark') {
+            processedMsg.isBlacklisted = true;
+            processedMsg.blacklistReasons = blacklistCheck.matchedPatterns;
+        }
+
+        results.push(processedMsg);
 
         // 报告进度（每处理100条报告一次）
         if (onProgress && (i + 1) % 100 === 0) {
@@ -355,8 +451,11 @@ window.TextProcessor = {
     // 文本统计
     getTextStats,
 
-    // 工具函数
+    // 黑名单工具
+    removeBracketedContent,
     filterStopWords,
+    filterBlacklistWords,
+    detectBlacklistContent,
     calculateTermFrequency
 };
 
@@ -364,3 +463,4 @@ console.log('📝 TextProcessor v1.0 initialized');
 console.log('✅ 中文分词: Intl.Segmenter');
 console.log('✅ 情感分析: 规则引擎');
 console.log('✅ 关键词提取: 简化版TF-IDF');
+console.log('✅ 黑名单过滤: 已启用');

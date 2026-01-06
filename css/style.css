@@ -803,24 +803,6 @@ body.transparent-ui .filter-btn.active {
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* ==================== Dark Theme ==================== */
-
-
-
-
-
-
-
-
-
-
-
-
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: var(--text-main);
-}
-
 /* ==================== 自定义滚动条样式 ==================== */
 
 /* 侧边栏内容区域的滚动条 */

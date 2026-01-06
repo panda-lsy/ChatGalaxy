@@ -232,9 +232,10 @@ async function saveMessages(datasetId, messages, onProgress) {
             msg.datasetId = datasetId;
         });
 
-        // 批量保存
+        // 🔧 修复：使用 put() 而不是 add()，允许覆盖已存在的消息
+        // 这样可以支持重新导入相同的文件
         for (const msg of batch) {
-            await dbHelper.add(MESSAGES_STORE, msg);
+            await dbHelper.put(MESSAGES_STORE, msg);
         }
 
         // 报告进度
@@ -551,6 +552,66 @@ function buildChatDataStructure(messages, senders, senderList, sentimentMap, key
 }
 
 /**
+ * 获取数据集的所有消息
+ * @param {string} datasetId - 数据集ID
+ * @returns {Promise<Array>} 消息数组
+ */
+async function getMessagesByDataset(datasetId) {
+    const dbHelper = await initDatabase();
+    const messages = await dbHelper.getByIndex(window.ChatGalaxyConfig.MESSAGES_STORE, 'datasetId', datasetId);
+    return messages || [];
+}
+
+/**
+ * 获取单条消息
+ * @param {string} messageId - 消息ID
+ * @returns {Promise<Object|null>} 消息对象，如果不存在则返回 null
+ */
+async function getMessage(messageId) {
+    const dbHelper = await initDatabase();
+
+    try {
+        // IndexedDB 没有直接通过主键获取单个对象的方法，需要获取所有然后过滤
+        // 但这效率很低。更好的方法是先获取 datasetId，然后查询
+
+        // 方法：获取所有存储的数据集，找到消息所在的dataset
+        const datasets = await dbHelper.getAll(window.ChatGalaxyConfig.DATASETS_STORE);
+
+        // 尝试从每个数据集中查找消息（效率较低但保证准确性）
+        for (const dataset of datasets) {
+            const messages = await dbHelper.getByIndex(window.ChatGalaxyConfig.MESSAGES_STORE, 'datasetId', dataset.id);
+            const message = messages.find(m => m.id === messageId);
+            if (message) {
+                return message;
+            }
+        }
+
+        return null;
+    } catch (error) {
+        Log.error('DB', `Failed to get message ${messageId}:`, error);
+        return null;
+    }
+}
+
+/**
+ * 更新单条消息
+ * @param {string} messageId - 消息ID
+ * @param {Object} updatedMessage - 更新后的消息对象
+ * @returns {Promise<void>}
+ */
+async function updateMessage(messageId, updatedMessage) {
+    const dbHelper = await initDatabase();
+
+    try {
+        await dbHelper.put(window.ChatGalaxyConfig.MESSAGES_STORE, updatedMessage);
+        Log.debug('DB', `Message updated: ${messageId}`);
+    } catch (error) {
+        Log.error('DB', `Failed to update message ${messageId}:`, error);
+        throw error;
+    }
+}
+
+/**
  * 加载数据集数据（重构版）
  * @param {string} datasetId - 数据集ID
  * @returns {Promise<Object>}
@@ -608,6 +669,9 @@ window.DatasetManagerV3 = {
     renameDataset,
     switchDataset,
     loadDatasetData,
+    getMessagesByDataset,
+    getMessage, // 🔧 新增：获取单条消息
+    updateMessage, // 🔧 新增：更新单条消息
     saveMessages,
     updateDatasetStatistics,
     cacheDatasetList,
