@@ -166,10 +166,14 @@
 }
 
 .mode-features li::before {
-    content: '✓';
-    color: var(--accent-color, #667eea);
-    font-weight: bold;
-    font-size: 14px;
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    background: var(--accent-color, #667eea);
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .mode-features li.mode-limit {
@@ -182,7 +186,10 @@
 }
 
 .mode-features li.mode-limit::before {
-    content: '⚡';
+    width: 8px;
+    height: 8px;
+    background: var(--warning-color, #f59e0b);
+    border-radius: 2px;
 }
 
 /* 标签提示 */

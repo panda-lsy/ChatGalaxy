@@ -142,7 +142,7 @@
                                             <li>即时处理</li>
                                             <li>无需服务器</li>
                                             <li>浏览器本地分词</li>
-                                            <li class="mode-limit">⚡ 推荐 &lt; 1,000 条消息</li>
+                                            <li class="mode-limit">推荐 &lt; 1,000 条消息</li>
                                         </ul>
                                     </div>
                                 </label>
@@ -163,7 +163,7 @@
                                             <li>jieba 精确分词</li>
                                             <li>改进的情感分析</li>
                                             <li>TF-IDF 关键词提取</li>
-                                            <li class="mode-limit">⚡ 适合大数据集</li>
+                                            <li class="mode-limit">适合大数据集</li>
                                         </ul>
                                         <div class="mode-badge" id="edgeFunctionStatus" style="display: none;">
                                             <i class="ri-cloud-line"></i>
@@ -308,9 +308,9 @@
                     hint.style.color = '#10b981';
                 }
 
-                console.log('✅ Edge Function is available');
+                console.log('[OK] Edge Function is available');
             } else {
-                console.warn('⚠️ Edge Function not configured');
+                console.warn('[WARN] Edge Function not configured');
 
                 // 添加配置按钮
                 const hint = document.getElementById('modeHint');
@@ -348,16 +348,16 @@
 
             if (url && url.trim()) {
                 window.EdgeFunctionConfig.setUrl('processChat', url.trim());
-                alert('✅ 边缘函数URL已保存！\n\n正在测试连接...');
+                alert('[OK] 边缘函数URL已保存！\n\n正在测试连接...');
 
                 // 测试连接
                 window.EdgeFunctionConfig.testConnection('processChat').then(result => {
                     if (result.success) {
-                        alert('✅ 边缘函数连接成功！\n\n现在可以使用精确模式了。');
+                        alert('[OK] 边缘函数连接成功！\n\n现在可以使用精确模式了。');
                         // 刷新页面以更新UI
                         location.reload();
                     } else {
-                        alert('❌ 边缘函数连接失败：\n' + result.error + '\n\n请检查URL是否正确。');
+                        alert('[ERROR] 边缘函数连接失败：\n' + result.error + '\n\n请检查URL是否正确。');
                     }
                 });
             }
