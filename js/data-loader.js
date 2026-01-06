@@ -35,12 +35,12 @@ var Log = window.Log;
                 const chatData = await window.DatasetManagerV3.loadDatasetData(currentDatasetId);
 
                 // 更严格的数据验证
-                if (chatData && 
-                    chatData.meta && 
-                    chatData.messages && 
-                    Array.isArray(chatData.messages) && 
+                if (chatData &&
+                    chatData.meta &&
+                    chatData.messages &&
+                    Array.isArray(chatData.messages) &&
                     chatData.messages.length > 0) {
-                    
+
                     Log.info('Data', 'Dataset loaded from IndexedDB:', {
                         messageCount: chatData.messages.length,
                         senderCount: chatData.meta.senders ? chatData.meta.senders.length : 0
@@ -52,6 +52,7 @@ var Log = window.Log;
 
                     // 触发数据加载完成事件
                     document.dispatchEvent(new CustomEvent('chatDataLoaded'));
+                    console.log('✅ IndexedDB data loaded successfully, skipping data.js');
                     return;
                 } else {
                     console.warn('⚠️ Invalid data structure from IndexedDB');
@@ -62,17 +63,61 @@ var Log = window.Log;
             }
         }
 
-        // 如果没有IndexedDB数据，使用data.js
-        Log.info('Data', 'Falling back to local data.js');
+        // 如果没有IndexedDB数据或加载失败，动态加载data.js
+        Log.info('Data', 'No IndexedDB data, loading local data.js dynamically');
         window.USE_INDEXEDDB_DATA = false;
+
+        try {
+            // 动态加载data.js和insights.js
+            console.time('data.js加载时间');
+            await loadScript('js/data.js');
+            await loadScript('js/insights.js');
+            console.timeEnd('data.js加载时间');
+            console.log('✅ Local data.js loaded');
+        } catch (error) {
+            console.error('❌ Failed to load local data.js:', error);
+        }
 
     } catch (error) {
         console.error('❌ Data loader error:', error);
         console.error('Error stack:', error.stack);
         // 降级使用data.js
         window.USE_INDEXEDDB_DATA = false;
+        try {
+            await loadScript('js/data.js');
+            await loadScript('js/insights.js');
+        } catch (e) {
+            console.error('❌ Failed to load fallback data:', e);
+        }
     }
 })();
+
+/**
+ * 动态加载脚本
+ * @param {string} src - 脚本路径
+ * @returns {Promise<void>}
+ */
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        // 检查是否已经加载过
+        if (document.querySelector(`script[src="${src}"]`)) {
+            console.log(`⚡ ${src} already loaded, skipping`);
+            resolve();
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => {
+            console.log(`✅ ${src} loaded successfully`);
+            resolve();
+        };
+        script.onerror = () => {
+            reject(new Error(`Failed to load ${src}`));
+        };
+        document.head.appendChild(script);
+    });
+}
 
 /**
  * 等待模块加载完成

@@ -1052,43 +1052,100 @@ function reheatSimulation(_alphaTarget = 0.4, _coolDelay = 2500) {
 }
 
 function initIdleRotation() {
-    const reset = () => resetIdleTimer();
-    
+    // 防抖处理 - 避免频繁重置
+    let debounceTimer = null;
+    const DEBOUNCE_DELAY = 100; // 100ms防抖延迟
+
+    const reset = () => {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            resetIdleTimer();
+        }, DEBOUNCE_DELAY);
+    };
+
+    // 监听用户活动事件
     window.addEventListener('mousemove', reset);
     window.addEventListener('mousedown', reset);
     window.addEventListener('touchstart', reset);
     window.addEventListener('keydown', reset);
     window.addEventListener('wheel', reset);
-    
+
+    // 初始化闲置检测
     resetIdleTimer();
 }
 
 function resetIdleTimer() {
-    if (isRoaming) return; // Don't interfere with roaming
-    
-    // Stop idle rotation if active
-    if (isIdleRotating) {
-        isIdleRotating = false;
-        if (Graph) {
-            const shouldRotate = appSettings.rotateSpeed > 0;
-            Graph.controls().autoRotate = shouldRotate; // Restore base state
-            Graph.controls().autoRotateSpeed = appSettings.rotateSpeed; // Restore base speed
-        }
-    }
-    
+    // 闲置模式下，允许退出（即使正在漫游）
+    // 只有用户手动开启的漫游（非闲置模式）才不干扰
+    if (isRoaming && !isIdleRotating) return;
+
+    // 清除之前的定时器
     if (idleTimer) clearTimeout(idleTimer);
-    
-    // Only start timer if enabled
+
+    // 如果当前处于闲置旋转状态，需要退出
+    if (isIdleRotating) {
+        exitIdleRotation();
+    }
+
+    // 只在启用时启动闲置检测
     if (appSettings.idleRotationEnabled) {
         idleTimer = setTimeout(() => {
             if (!isRoaming && Graph) {
-                isIdleRotating = true;
-                Graph.controls().autoRotate = true;
-                Graph.controls().autoRotateSpeed = appSettings.idleSpeed;
-                showToast('已进入闲置旋转模式', 'info');
+                enterIdleRotation();
             }
         }, appSettings.idleTime * 1000);
     }
+}
+
+/**
+ * 进入闲置漫游模式
+ */
+function enterIdleRotation() {
+    if (isIdleRotating) return; // 已经在闲置模式中
+
+    isIdleRotating = true;
+
+    // 启用漫游模式（替代自动旋转，因为旋转效果不明显）
+    if (Graph && !isRoaming) {
+        startRoaming();
+    }
+
+    // 提示用户
+    showToast(
+        `💤 闲置检测：${appSettings.idleTime}秒无操作，已启用漫游模式（移动鼠标恢复）`,
+        'info',
+        4000 // 显示4秒
+    );
+
+    // 降低UI透明度，营造"睡眠"效果
+    document.body.classList.add('idle-mode');
+}
+
+/**
+ * 退出闲置漫游模式
+ */
+function exitIdleRotation() {
+    if (!isIdleRotating) return; // 不在闲置模式中
+
+    isIdleRotating = false;
+
+    // 停止漫游模式
+    if (Graph && isRoaming) {
+        stopRoaming();
+    }
+
+    // 恢复基础旋转设置
+    if (Graph) {
+        const shouldRotate = appSettings.rotateSpeed > 0;
+        Graph.controls().autoRotate = shouldRotate;
+        Graph.controls().autoRotateSpeed = appSettings.rotateSpeed;
+    }
+
+    // 移除闲置模式样式
+    document.body.classList.remove('idle-mode');
+
+    // 可选：显示退出提示（为了避免打扰，可以注释掉）
+    // showToast('✨ 已恢复正常模式', 'success', 2000);
 }
 
 // --- Audio System ---
@@ -1598,28 +1655,34 @@ function renderKeywordRanking() {
     container.appendChild(fragment);
 }
 
-function showToast(message, type = 'info') {
+/**
+ * 显示Toast提示
+ * @param {string} message - 提示消息
+ * @param {string} type - 类型 'info' | 'success' | 'error'
+ * @param {number} duration - 显示时长（毫秒），默认3000ms
+ */
+function showToast(message, type = 'info', duration = 3000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
+
     let icon = 'ri-information-line';
     if (type === 'success') icon = 'ri-checkbox-circle-line';
     if (type === 'error') icon = 'ri-error-warning-line';
-    
+
     toast.innerHTML = `<i class="${icon}"></i><span>${message}</span>`;
-    
+
     container.appendChild(toast);
-    
-    // Remove after 3 seconds
+
+    // 在指定时间后移除
     setTimeout(() => {
         toast.style.animation = 'fadeOut 0.3s ease-out forwards';
         setTimeout(() => {
             if (toast.parentNode) toast.parentNode.removeChild(toast);
         }, 300);
-    }, 3000);
+    }, duration);
 }
 
 function handleKeywordClick(item) {

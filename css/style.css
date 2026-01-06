@@ -858,3 +858,64 @@ body.transparent-ui .filter-btn.active {
     scrollbar-color: rgba(255, 117, 140, 0.3) rgba(255, 255, 255, 0.1);
 }
 
+/* ========== 闲置模式样式 ========== */
+body.idle-mode {
+    /* 降低UI透明度，营造"睡眠"效果 */
+    --glass-opacity: 0.3;
+}
+
+body.idle-mode #message-sidebar {
+    /* 左侧消息侧边栏淡出 */
+    opacity: 0.6;
+    transition: opacity 1s ease-in-out;
+}
+
+body.idle-mode #sidebar {
+    /* 右侧功能侧边栏淡出 */
+    opacity: 0.5;
+    transition: opacity 1s ease-in-out;
+}
+
+body.idle-mode #time-travel-container {
+    /* 时空旅行轴淡出 */
+    opacity: 0.5;
+    transition: opacity 1s ease-in-out;
+}
+
+body.idle-mode .toast {
+    /* Toast提示保持可见，但稍微透明 */
+    opacity: 0.9;
+}
+
+/* 闲置模式指示器（可选） */
+body.idle-mode::after {
+    content: '💤 闲置漫游中';
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    background: rgba(255, 117, 140, 0.9);
+    color: white;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 1000;
+    animation: fadeIn 0.5s ease-out;
+    pointer-events: none;
+}
+
+/* 恢复正常模式时的淡入效果 */
+body:not(.idle-mode) #message-sidebar {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+body:not(.idle-mode) #sidebar {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+body:not(.idle-mode) #time-travel-container {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
