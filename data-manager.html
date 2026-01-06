@@ -6,180 +6,7 @@
     <title>数据管理器 - ChatGalaxy</title>
     <link href="js/lib/remixicon/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="css/data-manager.css">
-
-    <!-- 处理模式选择器样式 -->
-    <style>
-        /* 处理模式选择器 */
-        .processing-mode-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .mode-option {
-            cursor: pointer;
-            position: relative;
-        }
-
-        .mode-option input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .mode-card {
-            display: flex;
-            gap: 12px;
-
-            padding: 16px;
-
-            background: var(--bg-color, #1a1a2e);
-            border: 2px solid var(--border-color, rgba(255, 255, 255, 0.1));
-            border-radius: 12px;
-
-            transition: all 0.3s ease;
-        }
-
-        .mode-option input[type="radio"]:checked + .mode-card {
-            border-color: var(--accent-color, #667eea);
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .mode-card:hover {
-            border-color: var(--accent-color, #667eea);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-
-        .mode-icon {
-            width: 48px;
-            height: 48px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 24px;
-            color: var(--text-color, #b8c1ec);
-            background: var(--bg-secondary, #16213e);
-            border-radius: 10px;
-
-            flex-shrink: 0;
-        }
-
-        .mode-option input[type="radio"]:checked + .mode-card .mode-icon {
-            background: var(--accent-color, #667eea);
-            color: #ffffff;
-        }
-
-        .mode-content {
-            flex: 1;
-        }
-
-        .mode-content h3 {
-            margin: 0 0 4px 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-color, #b8c1ec);
-        }
-
-        .mode-content p {
-            margin: 0 0 8px 0;
-            font-size: 13px;
-            color: var(--text-secondary, rgba(184, 193, 236, 0.7));
-        }
-
-        .mode-features {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .mode-features li {
-            font-size: 12px;
-            color: var(--text-secondary, rgba(184, 193, 236, 0.7));
-            padding: 2px 0;
-        }
-
-        .mode-features li.mode-limit {
-            color: var(--warning-color, #f59e0b);
-            font-weight: 500;
-        }
-
-        .mode-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-
-            display: flex;
-            align-items: center;
-            gap: 4px;
-
-            padding: 4px 8px;
-
-            font-size: 11px;
-            font-weight: 600;
-            color: #ffffff;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 12px;
-
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .mode-option input[type="radio"]:checked + .mode-card .mode-badge {
-            opacity: 1;
-        }
-
-        .label-hint {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-
-            font-size: 12px;
-            color: var(--accent-color, #667eea);
-            text-align: center;
-            line-height: 16px;
-
-            cursor: help;
-        }
-
-        .mode-hint {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-
-            margin-top: 8px;
-            padding: 8px 12px;
-
-            font-size: 13px;
-            color: var(--text-secondary, rgba(184, 193, 236, 0.7));
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
-        }
-
-        .mode-hint i {
-            font-size: 14px;
-        }
-
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .processing-mode-selector {
-                grid-template-columns: 1fr;
-            }
-
-            .mode-card {
-                padding: 12px;
-            }
-
-            .mode-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/processing-mode-selector.css">
 </head>
 <body>
     <!-- 背景装饰 - 与主页面一致 -->
@@ -302,38 +129,42 @@
                                 <label class="mode-option">
                                     <input type="radio" name="processingMode" value="fast" checked>
                                     <div class="mode-card">
-                                        <div class="mode-icon">
-                                            <i class="ri-flash-line"></i>
+                                        <div class="mode-card-header">
+                                            <div class="mode-icon">
+                                                <i class="ri-flash-line"></i>
+                                            </div>
+                                            <div class="mode-title">
+                                                <h3>快速模式</h3>
+                                                <p>前端处理，秒级响应</p>
+                                            </div>
                                         </div>
-                                        <div class="mode-content">
-                                            <h3>快速模式</h3>
-                                            <p>前端处理，秒级响应</p>
-                                            <ul class="mode-features">
-                                                <li>✓ 即时处理</li>
-                                                <li>✓ 无需服务器</li>
-                                                <li>✓ 适合小数据集</li>
-                                                <li class="mode-limit">推荐 &lt; 1,000 条消息</li>
-                                            </ul>
-                                        </div>
+                                        <ul class="mode-features">
+                                            <li>即时处理</li>
+                                            <li>无需服务器</li>
+                                            <li>浏览器本地分词</li>
+                                            <li class="mode-limit">⚡ 推荐 &lt; 1,000 条消息</li>
+                                        </ul>
                                     </div>
                                 </label>
 
                                 <label class="mode-option">
                                     <input type="radio" name="processingMode" value="precise">
                                     <div class="mode-card">
-                                        <div class="mode-icon">
-                                            <i class="ri-precision-line"></i>
+                                        <div class="mode-card-header">
+                                            <div class="mode-icon">
+                                                <i class="ri-precision-line"></i>
+                                            </div>
+                                            <div class="mode-title">
+                                                <h3>精确模式</h3>
+                                                <p>后端处理，精确分析</p>
+                                            </div>
                                         </div>
-                                        <div class="mode-content">
-                                            <h3>精确模式</h3>
-                                            <p>后端处理，精确分析</p>
-                                            <ul class="mode-features">
-                                                <li>✓ jieba 精确分词</li>
-                                                <li>✓ SnowNLP 情感分析</li>
-                                                <li>✓ TF-IDF 关键词提取</li>
-                                                <li class="mode-limit">适合大数据集</li>
-                                            </ul>
-                                        </div>
+                                        <ul class="mode-features">
+                                            <li>jieba 精确分词</li>
+                                            <li>改进的情感分析</li>
+                                            <li>TF-IDF 关键词提取</li>
+                                            <li class="mode-limit">⚡ 适合大数据集</li>
+                                        </ul>
                                         <div class="mode-badge" id="edgeFunctionStatus" style="display: none;">
                                             <i class="ri-cloud-line"></i>
                                             可用
