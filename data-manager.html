@@ -3,252 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数据管理 - ChatGalaxy</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
-        .dataset-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .dataset-card {
-            background: #f9f9f9;
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .dataset-card:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .dataset-card.active {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .dataset-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .dataset-info {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .btn {
-            margin-top: 20px;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .back-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-        }
-    </style>
+    <title>数据管理器 - ChatGalaxy</title>
+    <link href="js/lib/remixicon/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/data-manager.css">
 </head>
 <body>
-    <div class="container">
-        <h1>📊 数据集管理</h1>
+    <!-- 背景装饰 - 与主页面一致 -->
+    <div class="bg-decoration">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+    </div>
 
-        <div id="datasetList" class="dataset-list">
-            <div class="empty-state">
-                加载中...
+    <!-- 主容器 -->
+    <div class="manager-container">
+        <!-- 头部 -->
+        <header class="manager-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="back-btn" onclick="window.location.href='index.html'" title="返回星系">
+                        <i class="ri-arrow-go-back-line"></i>
+                    </button>
+                    <div class="header-title">
+                        <h1><i class="ri-database-2-line"></i> 数据管理器</h1>
+                        <p>管理您的聊天数据集</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn secondary" onclick="createNewDataset()">
+                        <i class="ri-add-circle-line"></i>
+                        <span>创建空数据集</span>
+                    </button>
+                    <button class="action-btn secondary" onclick="loadDemoDataset()">
+                        <i class="ri-magic-line"></i>
+                        <span>演示数据</span>
+                    </button>
+                    <button class="action-btn secondary" onclick="refreshDatasetList()">
+                        <i class="ri-refresh-line"></i>
+                        <span>刷新</span>
+                    </button>
+                </div>
             </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="manager-main">
+            <!-- 导入面板 -->
+            <section class="import-section">
+                <div class="section-header" onclick="toggleImportPanel()">
+                    <h2><i class="ri-upload-cloud-line"></i> 导入数据集</h2>
+                    <button class="collapse-btn">
+                        <i class="ri-arrow-down-s-line" id="import-panel-icon"></i>
+                    </button>
+                </div>
+
+                <div class="import-content" id="import-panel-content">
+                    <!-- 上传区域 -->
+                    <div class="upload-zone" id="upload-zone">
+                        <div class="upload-icon">
+                            <i class="ri-cloud-upload-line"></i>
+                        </div>
+                        <div class="upload-text">拖拽JSON文件到此处，或点击选择</div>
+                        <div class="upload-hint">支持最大10MB的JSON文件</div>
+                        <input type="file" id="file-input" accept=".json" style="display: none;">
+                    </div>
+
+                    <!-- 文件信息 -->
+                    <div class="file-info" id="file-info" style="display: none;">
+                        <i class="ri-file-text-line"></i>
+                        <span id="file-name"></span>
+                    </div>
+
+                    <!-- 验证警告 -->
+                    <div class="validation-warnings" id="validation-warnings" style="display: none;">
+                        <h4><i class="ri-alert-line"></i> 导入警告</h4>
+                        <ul id="validation-warning-list"></ul>
+                    </div>
+
+                    <!-- 数据集表单 -->
+                    <div class="dataset-form" id="dataset-form" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">数据集名称 <span class="required">*</span></label>
+                                <input type="text" id="dataset-name" class="form-input" placeholder="例如：我的聊天记录">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">主题颜色</label>
+                                <div class="color-selector" id="color-selector">
+                                    <div class="color-option selected" style="background: #3498db;" data-color="#3498db" onclick="selectColor(this)"></div>
+                                    <div class="color-option" style="background: #10b981;" data-color="#10b981" onclick="selectColor(this)"></div>
+                                    <div class="color-option" style="background: #f59e0b;" data-color="#f59e0b" onclick="selectColor(this)"></div>
+                                    <div class="color-option" style="background: #ef4444;" data-color="#ef4444" onclick="selectColor(this)"></div>
+                                    <div class="color-option" style="background: #8b5cf6;" data-color="#8b5cf6" onclick="selectColor(this)"></div>
+                                    <div class="color-option" style="background: #ec4899;" data-color="#ec4899" onclick="selectColor(this)"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">描述（可选）</label>
+                            <textarea id="dataset-description" class="form-textarea" placeholder="简单描述这个数据集..." rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">标签</label>
+                            <div class="tag-selector" id="tag-selector">
+                                <div class="tag-option" onclick="toggleTag(this)">游戏</div>
+                                <div class="tag-option" onclick="toggleTag(this)">工作</div>
+                                <div class="tag-option" onclick="toggleTag(this)">学习</div>
+                                <div class="tag-option" onclick="toggleTag(this)">生活</div>
+                                <div class="tag-option" onclick="toggleTag(this)">社交</div>
+                                <div class="tag-option" onclick="toggleTag(this)">其他</div>
+                            </div>
+                        </div>
+
+                        <!-- 进度条 -->
+                        <div class="progress-container" id="import-progress" style="display: none;">
+                            <div class="progress-bar-bg">
+                                <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+                            </div>
+                            <div id="progress-text" class="progress-text">准备导入...</div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="import-btn" onclick="startImport()">
+                                <i class="ri-upload-line"></i>
+                                开始导入
+                            </button>
+                            <button class="btn btn-secondary" onclick="resetImportForm()">
+                                <i class="ri-refresh-line"></i>
+                                重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 数据集列表 -->
+            <section class="datasets-section">
+                <div class="section-header">
+                    <h2><i class="ri-folder-line"></i> 我的数据集</h2>
+                    <span class="dataset-count" id="dataset-count">0 个数据集</span>
+                </div>
+
+                <div id="dataset-list" class="dataset-list">
+                    <!-- 数据集卡片将动态生成 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast-container" id="toast-container">
+        <div class="toast toast-success" id="toast-success">
+            <i class="ri-checkbox-circle-line"></i>
+            <span></span>
         </div>
-
-        <button class="btn" onclick="useSelectedDataset()">
-            使用选中的数据集 →
-        </button>
-
-        <div class="back-link">
-            <a href="#" onclick="parent.closeEmbedded('data-manager'); return false;">← 返回首页</a>
+        <div class="toast toast-error" id="toast-error">
+            <i class="ri-error-warning-line"></i>
+            <span></span>
+        </div>
+        <div class="toast toast-warning" id="toast-warning">
+            <i class="ri-alert-line"></i>
+            <span></span>
+        </div>
+        <div class="toast toast-info" id="toast-info">
+            <i class="ri-information-line"></i>
+            <span></span>
         </div>
     </div>
 
-    <script src="js/datasets.js"></script>
-    <script>
-        // 当前选中的数据集文件路径
-        let selectedDatasetFile = null;
-
-        // 检测可用的数据集
-        async function checkDatasets() {
-            const datasets = [];
-
-            // 检查不同的数据文件
-            const files = [
-                { name: '海师电竞沙盒群', path: 'js/data.js', description: '23447条消息，93人' },
-                { name: '自定义数据集', path: 'js/custom_data.js', description: '用户导入的自定义数据' },
-                { name: '群组1数据', path: 'js/data_group1.js', description: '其他群组数据' },
-                { name: '群组2数据', path: 'js/data_group2.js', description: '其他群组数据' }
-            ];
-
-            for (const file of files) {
-                try {
-                    const response = await fetch(file.path);
-                    if (response.ok) {
-                        datasets.push(file);
-                    }
-                } catch (e) {
-                    // 文件不存在
-                }
-            }
-
-            return datasets;
-        }
-
-        // 渲染数据集列表
-        async function renderDatasets() {
-            const container = document.getElementById('datasetList');
-            const datasets = await checkDatasets();
-
-            // 获取当前选中的数据集
-            const currentDataset = localStorage.getItem('chatgalaxy_dataset_file') || 'js/data.js';
-
-            if (datasets.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <p>未找到可用数据集</p>
-                        <p style="font-size: 12px; margin-top: 10px;">请先运行数据处理脚本</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = datasets.map((ds, index) => `
-                <div class="dataset-card ${ds.path === currentDataset ? 'active' : ''}"
-                     onclick="selectDataset('${ds.path}', ${index})"
-                     data-index="${index}">
-                    <div class="dataset-name">${ds.name}</div>
-                    <div class="dataset-info">${ds.description}</div>
-                    ${ds.path === currentDataset ? '<div style="color: #667eea; font-size: 12px; margin-top: 5px;">当前使用中 ✓</div>' : ''}
-                </div>
-            `).join('');
-
-            // 默认选中当前数据集
-            const currentIndex = datasets.findIndex(ds => ds.path === currentDataset);
-            if (currentIndex >= 0) {
-                selectedDatasetFile = currentDataset;
-            }
-        }
-
-        // 选中数据集
-        function selectDataset(filePath, index) {
-            const cards = document.querySelectorAll('.dataset-card');
-            cards.forEach(card => card.classList.remove('active'));
-
-            cards[index].classList.add('active');
-            selectedDatasetFile = filePath;
-        }
-
-        // 使用选中的数据集
-        async function useSelectedDataset() {
-            if (selectedDatasetFile === null) {
-                alert('请先选择一个数据集');
-                return;
-            }
-
-            // 保存到localStorage
-            localStorage.setItem('chatgalaxy_dataset_file', selectedDatasetFile);
-
-            // 🔧 尝试自动生成洞察报告
-            try {
-                console.log('🔄 正在自动生成洞察报告...');
-
-                const response = await fetch('/api/generate-insights', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    console.log('✅ 洞察报告生成成功');
-                    alert('✅ 数据集已切换！\n\n✨ 洞察报告已自动更新！\n\n页面即将重新加载...');
-                } else {
-                    console.warn('⚠️ 生成失败:', result.error);
-                    alert('✅ 数据集已切换！\n\n⚠️ 洞察报告生成失败\n\n💡 请确保 API 服务器正在运行：\npython api_server.py\n\n或者手动运行：\ncd chat_viz && python generate_insights.py\n\n页面即将重新加载...');
-                }
-            } catch (error) {
-                console.warn('⚠️ API 服务器未响应:', error);
-                alert('✅ 数据集已切换！\n\n💡 提示：如需自动生成洞察报告，请先启动 API 服务器：\npython api_server.py\n\n或者手动运行：\ncd chat_viz && python generate_insights.py\n\n页面即将重新加载...');
-            }
-
-            // 🔧 关闭 iframe 并刷新父页面
-            parent.closeEmbedded('data-manager');
-            parent.location.reload();
-        }
-
-        // 页面加载时渲染
-        window.addEventListener('load', renderDatasets);
-    </script>
+    <!-- 加载脚本 -->
+    <script src="js/config.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/data-import.js"></script>
+    <script src="js/processors/text-processor.js"></script>
+    <script src="js/data-manager-ui.js"></script>
 </body>
 </html>

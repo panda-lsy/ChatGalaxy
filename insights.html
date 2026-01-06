@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聊天洞察报告 - ChatGalaxy</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/lib/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -298,6 +298,59 @@
             transform: scale(1.2);
         }
 
+        /* 话题分析 */
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .topic-item {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            padding: 25px;
+            border-radius: 16px;
+            transition: transform 0.3s;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .topic-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .topic-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .topic-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .topic-relevance {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .topic-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .topic-keyword {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
         /* 标签 */
         .tags-grid {
             display: grid;
@@ -424,7 +477,7 @@
     <!-- 加载页面 -->
     <div id="loading" class="loading">
         <div class="loading-spinner"></div>
-        <div>正在生成洞察报告...</div>
+        <div id="loading-text">正在加载数据...</div>
     </div>
 
     <!-- 封面 -->
@@ -552,7 +605,7 @@
 
         <!-- 个性化标签 -->
         <section class="content-section">
-            <h2 class="section-title">🏷️ 你的聊天标签</h2>
+            <h2 class="section-title">🏷️ 数据集信息</h2>
             <div class="tags-grid" id="tags-grid">
                 <!-- 动态生成 -->
             </div>
@@ -561,11 +614,11 @@
         <!-- 分享 -->
         <section class="content-section">
             <div class="share-buttons">
+                <button class="share-btn" onclick="location.href='index.html'">
+                    🌌 返回3D星系
+                </button>
                 <button class="share-btn" onclick="window.print()">
                     📄 打印报告
-                </button>
-                <button class="share-btn" onclick="location.href='index.html'">
-                    🌌 查看3D星系
                 </button>
             </div>
         </section>
@@ -581,6 +634,95 @@
         </footer>
     </div>
 
-    <script src="js/insights-ui.js?v=20260105"></script>
+    <!-- 加载数据和脚本 -->
+    <!-- 1. 静态数据（降级方案） -->
+    <script src="js/insights.js"></script>
+
+    <!-- 2. 动态数据加载器（优先从IndexedDB加载） -->
+    <script src="js/insights-loader.js?v=20260106"></script>
+
+    <!-- 3. UI逻辑 - 等待所有资源加载完成 -->
+    <script>
+        // 确保 Chart.js 和数据都加载完成后再初始化 UI
+        let initAttempts = 0;
+        const MAX_INIT_ATTEMPTS = 100; // 最多等待 10 秒
+
+        function initWhenReady() {
+            initAttempts++;
+
+            // 检查 Chart.js 是否加载
+            if (typeof Chart === 'undefined') {
+                if (initAttempts < MAX_INIT_ATTEMPTS) {
+                    setTimeout(initWhenReady, 100);
+                } else {
+                    // 超时：Chart.js 加载失败
+                    const loading = document.getElementById('loading');
+                    if (loading) {
+                        loading.innerHTML = `
+                            <div style="text-align: center; padding: 40px;">
+                                <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+                                <div style="font-size: 24px; margin-bottom: 20px;">图表库加载失败</div>
+                                <div style="font-size: 16px; opacity: 0.8; margin-bottom: 30px;">
+                                    请检查网络连接或刷新页面重试
+                                </div>
+                                <div style="display: flex; gap: 15px; justify-content: center;">
+                                    <button onclick="location.reload()" style="padding: 15px 30px; font-size: 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50px; cursor: pointer;">
+                                        🔄 刷新页面
+                                    </button>
+                                    <a href="index.html" style="padding: 15px 30px; font-size: 18px; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block;">
+                                        🌌 返回3D星系
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                return;
+            }
+
+            // Chart.js 已加载，等待数据
+            if (typeof window.INSIGHTS_DATA !== 'undefined') {
+                // 数据已加载，初始化 UI
+                if (typeof initializeReport === 'function') {
+                    initializeReport();
+                }
+            } else if (initAttempts < MAX_INIT_ATTEMPTS) {
+                // 等待数据加载
+                setTimeout(initWhenReady, 100);
+            } else {
+                // 超时：数据加载失败
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 64px; margin-bottom: 20px;">⏱️</div>
+                            <div style="font-size: 24px; margin-bottom: 20px;">数据加载超时</div>
+                            <div style="font-size: 16px; opacity: 0.8; margin-bottom: 30px;">
+                                请检查是否选择了数据集，或尝试刷新页面
+                            </div>
+                            <div style="display: flex; gap: 15px; justify-content: center;">
+                                <a href="data-manager.html" style="padding: 15px 30px; font-size: 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block;">
+                                    📁 前往数据管理器
+                                </a>
+                                <a href="index.html" style="padding: 15px 30px; font-size: 18px; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block;">
+                                    🌌 返回3D星系
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // 页面加载完成后开始检查
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWhenReady);
+        } else {
+            initWhenReady();
+        }
+    </script>
+
+    <!-- 4. UI 逻辑脚本 -->
+    <script src="js/insights-ui.js?v=20260106"></script>
 </body>
 </html>

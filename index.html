@@ -10,12 +10,13 @@
     <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js" defer></script>
     <!-- Load 3D Force Graph -->
     <script src="https://unpkg.com/3d-force-graph@1.73.1/dist/3d-force-graph.min.js" defer></script>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="js/lib/remixicon/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/roam.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/emoji.css">
     <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/data-manager.css">
 </head>
 <body data-theme="light">
 
@@ -288,7 +289,17 @@
 </div>
 
 <!-- Load Data -->
+<script src="js/config.js" defer></script>
+<script src="js/logger.js" defer></script>
+<script src="js/log-wrapper.js" defer></script>
+<script src="js/error-handler.js" defer></script>
+<script src="js/data-loader.js" defer></script>
 <script src="js/data.js" defer></script>
+<script src="js/insights.js" defer></script>
+<script src="js/datasets.js" defer></script>
+<script src="js/data-manager.js" defer></script>
+<script src="js/data-import.js" defer></script>
+<script src="js/processors/text-processor.js" defer></script>
 <script src="js/app.js" defer></script>
 
 <!-- Unified Sidebar -->
@@ -319,7 +330,7 @@
                     <i class="ri-camera-lens-line"></i>
                     <span>拍照</span>
                 </button>
-                <button class="sidebar-btn" onclick="coalesceNodes()" title="凝聚回忆">
+                <button class="sidebar-btn" id="coalesce-btn" onclick="coalesceNodes()" title="凝聚回忆">
                     <i class="ri-contract-left-line"></i>
                     <span>凝聚</span>
                 </button>
@@ -383,17 +394,6 @@
         </div>
     </div>
 </aside>
-
-<!-- Embedded Content Containers -->
-<div id="embedded-insights" class="embedded-content">
-    <button class="close-btn" onclick="closeEmbedded('insights')">×</button>
-    <iframe src="insights.html"></iframe>
-</div>
-
-<div id="embedded-data-manager" class="embedded-content">
-    <button class="close-btn" onclick="closeEmbedded('data-manager')">×</button>
-    <iframe src="data-manager.html"></iframe>
-</div>
 
 <!-- Web Vitals 性能监控 -->
 <script>
@@ -600,24 +600,13 @@ function closeSidebar() {
 
 // ==================== 功能导航 ====================
 function showInsights() {
-    document.getElementById('embedded-insights').classList.add('active');
-    closeSidebar();
+    // 直接跳转到洞察报告页面（和数据管理器一样）
+    window.location.href = 'insights.html';
 }
 
 function showDataManager() {
-    document.getElementById('embedded-data-manager').classList.add('active');
-    closeSidebar();
-}
-
-// ==================== 内嵌内容控制 ====================
-function closeEmbedded(type) {
-    if (type === 'insights') {
-        document.getElementById('embedded-insights').classList.remove('active');
-    } else if (type === 'data-manager') {
-        document.getElementById('embedded-data-manager').classList.remove('active');
-        // 刷新页面以应用数据集切换
-        setTimeout(() => location.reload(), 300);
-    }
+    // 跳转到独立的数据管理器页面
+    window.location.href = 'data-manager.html';
 }
 
 // ==================== ESC键关闭侧边栏 ====================

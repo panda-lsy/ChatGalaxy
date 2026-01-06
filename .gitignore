@@ -26,3 +26,11 @@ data.json
 
 # Docs
 docs/
+
+# Others
+CLAUDE.md 
+archive/
+.zcf/
+.spec-workflow
+.claude
+TEST_GUIDE.md

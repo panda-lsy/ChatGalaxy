@@ -1,3 +1,15 @@
+// ========== 本地日志包装器 ==========
+// 防止 Log 未定义时出错（IIFE 在 log-wrapper.js 加载前执行）
+if (!window.Log) {
+    window.Log = {
+        info: (tag, ...msg) => console.log(`[INFO] [${tag}]`, ...msg),
+        warn: (tag, ...msg) => console.warn(`[WARN] [${tag}]`, ...msg),
+        error: (tag, ...msg) => console.error(`[ERROR] [${tag}]`, ...msg),
+        debug: (tag, ...msg) => console.log(`[DEBUG] [${tag}]`, ...msg)
+    };
+}
+var Log = window.Log;
+
 // Global State
 let allMessages = []; // Raw data array
 let filteredMessages = []; // Currently visible messages
@@ -12,7 +24,7 @@ let playInterval = null;
 
 // Coalesce State
 let isCoalesced = false;
-let originalForceConfig = {};
+let originalForceConfig = null; // 🔧 改为 null，用于判断是否已保存
 
 // Audio State
 let audioCtx = null;
@@ -113,10 +125,10 @@ let highlightTimer = null;
 
 function handleNodeClick(node) {
     if (!node) return;
-    
+
     // If coalesced, any click triggers bloom
     if (isCoalesced) {
-        triggerBloom();
+        uncoalesceNodes();
         return;
     }
 
@@ -252,12 +264,43 @@ let subtitleEl = null; // Will be initialized in initApp
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     subtitleEl = document.getElementById('subtitle-overlay');
-    if (window.CHAT_DATA) {
-        initApp(window.CHAT_DATA);
-    } else {
-        loadingEl.innerHTML = '<p>数据未加载，请运行 process_data_v2.py</p>';
-    }
+
+    // 等待数据加载完成（最多等待5秒）
+    waitForData().then((data) => {
+        if (data) {
+            Log.info('Data', 'Using data from:', window.USE_INDEXEDDB_DATA ? 'IndexedDB' : 'data.js');
+            initApp(data);
+        } else {
+            loadingEl.innerHTML = '<p>数据未加载，请先在数据管理器中导入或创建数据集</p>';
+            loadingEl.innerHTML += '<br><a href="data-manager.html" style="color: #4facfe;">前往数据管理器</a>';
+        }
+    }).catch((error) => {
+        console.error('Failed to load data:', error);
+        loadingEl.innerHTML = '<p>数据加载失败: ' + error.message + '</p>';
+        loadingEl.innerHTML += '<br><a href="data-manager.html" style="color: #4facfe;">前往数据管理器</a>';
+    });
 });
+
+/**
+ * 等待数据加载完成
+ */
+function waitForData(timeout = 5000) {
+    return new Promise((resolve) => {
+        const startTime = Date.now();
+
+        const checkData = () => {
+            if (window.CHAT_DATA) {
+                resolve(window.CHAT_DATA);
+            } else if (Date.now() - startTime > timeout) {
+                resolve(null);
+            } else {
+                setTimeout(checkData, 100);
+            }
+        };
+
+        checkData();
+    });
+}
 
 function initApp(data) {
     // Decompress data
@@ -334,9 +377,7 @@ function initSettings(showModal = false) {
 
     // 🔧 只有在用户主动点击时才显示模态框
     if (showModal) {
-        console.log('📊 [DEBUG] Syncing form values and showing modal');
-    } else {
-        console.log('🔧 [DEBUG] Initializing settings without showing modal');
+        } else {
         return; // 不显示模态框
     }
 
@@ -429,21 +470,17 @@ function initSettings(showModal = false) {
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
 
-    console.log('✅ [DEBUG] Settings modal should now be visible');
-
     // 🔧 始终绑定关闭按钮和模态框点击事件（不依赖 settings-btn）
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
             modal.style.display = 'none';
-            console.log('✅ [DEBUG] Settings modal closed via close button');
-        });
+            });
     }
 
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.style.display = 'none';
-            console.log('✅ [DEBUG] Settings modal closed via overlay click');
-        }
+            }
     });
 
     // 🔧 始终绑定表情选择器按钮
@@ -588,7 +625,6 @@ function initSettings(showModal = false) {
 
     // 如果有 settings-btn 元素，为其添加点击事件（向后兼容）
     if (btn) {
-        console.log('📋 [DEBUG] Binding settings-btn click event');
         btn.addEventListener('click', () => {
             // Sync UI with current state (重复同步，确保数据一致)
             document.getElementById('bgm-vol').value = appSettings.bgmVolume;
@@ -639,8 +675,7 @@ function initSettings(showModal = false) {
             modal.style.background = 'rgba(0, 0, 0, 0.7)';
             modal.style.visibility = 'visible';
             modal.style.opacity = '1';
-            console.log('✅ [DEBUG] Settings modal opened via settings-btn');
-        });
+            });
     } else {
         console.log('📋 [DEBUG] No settings-btn element found (using direct call)');
     }
@@ -819,7 +854,7 @@ function initExperienceOverlays() {
         // Show intro after data ready
         // 🚫 禁用自动显示覆盖层以避免遮挡UI
         // setTimeout(() => showOverlay(introOverlay), 200);
-        console.log('🔧 Intro overlay auto-show disabled - UI is now accessible');
+        Log.info('UI', 'Intro overlay auto-show disabled');
         startBtn.addEventListener('click', () => hideOverlay(introOverlay));
     }
 
@@ -851,10 +886,169 @@ function getBaseForceConfig() {
     };
 }
 
-function reheatSimulation(alphaTarget = 0.4, coolDelay = 2500) {
+// ==================== Bloom/Coalesce Helpers ====================
+
+/**
+ * 保存当前的力场配置
+ * 在修改力场之前调用，确保可以恢复到修改前的状态
+ */
+function saveOriginalForceConfig() {
+    if (!Graph) {
+        console.warn('[saveOriginalForceConfig] Graph not initialized');
+        return;
+    }
+
+    const chargeForce = Graph.d3Force('charge');
+    const radialForce = Graph.d3Force('radial');
+
+    // 获取当前实际的力场值（而非基础配置值）
+    originalForceConfig = {
+        charge: chargeForce && typeof chargeForce.strength === 'function'
+            ? chargeForce.strength()
+            : getBaseForceConfig().charge,
+        radialStrength: radialForce && typeof radialForce.strength === 'function'
+            ? radialForce.strength()
+            : getBaseForceConfig().radialStrength,
+        radialRadius: radialForce && typeof radialForce.radius === 'function'
+            ? radialForce.radius()
+            : getBaseForceConfig().radialRadius
+    };
+
+    console.log('[saveOriginalForceConfig] Saved config:', originalForceConfig);
+}
+
+/**
+ * 执行凝聚操作
+ * 节点向中心聚集，形成紧密的星系团
+ */
+function performCoalesce() {
+    if (!Graph) {
+        showToast('3D图形未加载', 'error');
+        return;
+    }
+
+    // 1. 保存原始配置
+    saveOriginalForceConfig();
+
+    // 2. 释放所有节点的固定位置
+    const nodes = Graph.graphData().nodes;
+    nodes.forEach(node => {
+        node.fx = null;
+        node.fy = null;
+        node.fz = null;
+    });
+
+    // 3. 修改力场参数：减少排斥力，增强向心力
+    const chargeForce = Graph.d3Force('charge');
+    if (chargeForce && typeof chargeForce.strength === 'function') {
+        // 🔧 使用绝对值而非乘数，参考 refactor 分支
+        chargeForce.strength(-50); // 显著降低排斥力（从 -500 降至 -50）
+    }
+
+    const radialForce = Graph.d3Force('radial');
+    if (radialForce && typeof radialForce.strength === 'function') {
+        radialForce.strength(0.15); // 增强向心力（从 0.02 增至 0.15）
+    }
+    if (radialForce && typeof radialForce.radius === 'function') {
+        radialForce.radius(200); // 缩小凝聚半径
+    }
+
+    // 4. 更新状态
+    isCoalesced = true;
+    updateCoalesceButton(true);
+
+    // 5. 重新启动模拟，使节点移动到新平衡位置
+    restartSimulation();
+
+    // 6. 视觉和音效反馈
+    showToast('✨ 星系已凝聚！点击按钮可扩散', 'info');
+    playToggleSound();
+
+    console.log('[performCoalesce] Nodes coalesced');
+}
+
+/**
+ * 执行扩散操作
+ * 节点恢复到原始的分散状态，形成完整的星系
+ */
+function uncoalesceNodes() {
+    if (!Graph || !originalForceConfig) {
+        console.warn('[uncoalesceNodes] Cannot uncoalesce: Graph not ready or no saved config');
+        return;
+    }
+
+    // 1. 恢复原始力场配置
+    const chargeForce = Graph.d3Force('charge');
+    if (chargeForce && typeof chargeForce.strength === 'function') {
+        chargeForce.strength(originalForceConfig.charge);
+    }
+
+    const radialForce = Graph.d3Force('radial');
+    if (radialForce && typeof radialForce.strength === 'function') {
+        radialForce.strength(originalForceConfig.radialStrength);
+    }
+    if (radialForce && typeof radialForce.radius === 'function') {
+        radialForce.radius(originalForceConfig.radialRadius);
+    }
+
+    // 2. 更新状态
+    isCoalesced = false;
+    updateCoalesceButton(false);
+
+    // 3. 重新启动模拟，使节点扩散到新平衡位置
+    restartSimulation();
+
+    // 4. 视觉和音效反馈
+    playToggleSound();
+    showToast('🌌 星系已扩散！点击按钮可凝聚', 'info');
+
+    console.log('[uncoalesceNodes] Nodes uncoalesced');
+}
+
+/**
+ * 更新凝聚按钮的视觉状态
+ * @param {boolean} isCoalescedState - 当前是否处于凝聚状态
+ */
+function updateCoalesceButton(isCoalescedState) {
+    const btn = document.getElementById('coalesce-btn');
+    if (!btn) {
+        console.warn('[updateCoalesceButton] coalesce-btn not found');
+        return;
+    }
+
+    if (isCoalescedState) {
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="ri-expand-left-line"></i><span>扩散</span>';
+        btn.title = '点击扩散星系';
+    } else {
+        btn.classList.remove('active');
+        btn.innerHTML = '<i class="ri-contract-left-line"></i><span>凝聚</span>';
+        btn.title = '凝聚回忆';
+    }
+}
+
+// ==================== End Bloom/Coalesce Helpers ====================
+
+/**
+ * 重新启动物理模拟
+ * 🔧 通过重新设置相同的数据来触发模拟重启
+ * 避免使用 d3AlphaTarget()，兼容性更好
+ */
+function restartSimulation() {
     if (!Graph) return;
-    Graph.d3AlphaTarget(alphaTarget).restart();
-    setTimeout(() => { if (Graph) Graph.d3AlphaTarget(0); }, coolDelay);
+
+    // 通过重新设置相同的数据来触发模拟重启
+    const currentData = Graph.graphData();
+    Graph.graphData(currentData);
+}
+
+/**
+ * 重新加热模拟（备用方法，保留向后兼容）
+ * @deprecated 使用 restartSimulation() 代替
+ */
+function reheatSimulation(_alphaTarget = 0.4, _coolDelay = 2500) {
+    // 使用 restartSimulation 替代 d3AlphaTarget，避免兼容性问题
+    restartSimulation();
 }
 
 function initIdleRotation() {
@@ -898,19 +1092,38 @@ function resetIdleTimer() {
 }
 
 // --- Audio System ---
-function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+async function initAudio() {
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // 等待音频上下文准备好（解决卡死问题）
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        isMuted = false;
+
+        // 更新按钮状态（如果存在）
+        const musicBtn = document.getElementById('music-btn');
+        if (musicBtn) {
+            musicBtn.innerHTML = '<i class="ri-volume-up-line"></i>';
+            musicBtn.classList.add('active');
+        }
+
+        // 更新侧边栏开关状态
+        const musicToggle = document.getElementById('music-toggle');
+        if (musicToggle) {
+            musicToggle.checked = true;
+        }
+
+        startAmbientMusic();
+        showToast('已切换至：空灵呼吸·舒缓旋律', 'success');
+    } catch (error) {
+        console.error('音频初始化失败:', error);
+        showToast('音频初始化失败，请稍后重试', 'error');
     }
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-    isMuted = false;
-    document.getElementById('music-btn').innerHTML = '<i class="ri-volume-up-line"></i>';
-    document.getElementById('music-btn').classList.add('active');
-    
-    startAmbientMusic();
-    showToast('已切换至：空灵呼吸·舒缓旋律', 'success');
 }
 
 function startAmbientMusic() {
@@ -1105,9 +1318,9 @@ function playRevisitSound() {
 
 // --- Coalesce Logic ---
 function initCoalesceControls() {
-    const coalesceBtn = document.getElementById('coalesce-btn');
+    // 🔧 coalesce-btn 已经在 HTML 中通过 onclick="coalesceNodes()" 处理，这里不需要绑定
     const musicBtn = document.getElementById('music-btn');
-    
+
     if (musicBtn) {
         musicBtn.addEventListener('click', () => {
             if (isMuted) {
@@ -1120,80 +1333,9 @@ function initCoalesceControls() {
             }
         });
     }
-    
-    if (coalesceBtn) {
-        coalesceBtn.addEventListener('click', () => {
-            if (!Graph) return;
-            
-            if (!isCoalesced) {
-                // Coalesce
-                isCoalesced = true;
-                coalesceBtn.classList.add('active');
-                coalesceBtn.innerHTML = '<i class="ri-contract-right-line"></i>'; // Change icon
-                
-                // 0. Release fixed positions (for custom layouts)
-                const nodes = Graph.graphData().nodes;
-                nodes.forEach(node => {
-                    node.fx = null;
-                    node.fy = null;
-                    node.fz = null;
-                });
-                
-                const base = getBaseForceConfig();
-                const chargeForce = Graph.d3Force('charge');
-                if (chargeForce && typeof chargeForce.strength === 'function') {
-                    chargeForce.strength(base.charge * 0.02); // Softer repulsion during coalesce
-                }
 
-                const radialForce = Graph.d3Force('radial');
-                if (radialForce && typeof radialForce.strength === 'function') {
-                    radialForce.strength(base.radialStrength * 4); // Pull inward but not freeze
-                }
-                if (radialForce && typeof radialForce.radius === 'function') {
-                    radialForce.radius(base.radialRadius * 0.25); // Closer core
-                }
-                
-                reheatSimulation(0.45, 3500);
-                
-                showToast('回忆正在凝聚...', 'info');
-                playTone(100, 'triangle', 2.0, 0.1); // Deep hum
-                
-            } else {
-                // Bloom (Manual trigger via button, or click star)
-                triggerBloom();
-            }
-        });
-    }
-}
-
-function triggerBloom() {
-    if (!isCoalesced || !Graph) return;
-    
-    isCoalesced = false;
-    const btn = document.getElementById('coalesce-btn');
-    if (btn) {
-        btn.classList.remove('active');
-        btn.innerHTML = '<i class="ri-contract-left-line"></i>';
-    }
-    
-    const base = getBaseForceConfig();
-    const chargeForce = Graph.d3Force('charge');
-    if (chargeForce && typeof chargeForce.strength === 'function') {
-        chargeForce.strength(base.charge); // Restore repulsion
-    }
-
-    const radialForce = Graph.d3Force('radial');
-    if (radialForce && typeof radialForce.strength === 'function') {
-        radialForce.strength(base.radialStrength); // Restore pull
-    }
-    if (radialForce && typeof radialForce.radius === 'function') {
-        radialForce.radius(base.radialRadius); // Restore radius
-    }
-    
-    reheatSimulation(0.65, 2000);
-    
-    playBloomSound();
-    showToast('回忆绽放！', 'success');
+    // 🔧 coalesce-btn 已经在 HTML 中通过 onclick="coalesceNodes()" 处理
+    // 这里不再添加重复的事件监听器
 }
 
 function initTopControlExtras() {
@@ -1483,7 +1625,7 @@ function showToast(message, type = 'info') {
 function handleKeywordClick(item) {
     // If coalesced, any click triggers bloom
     if (isCoalesced) {
-        triggerBloom();
+        uncoalesceNodes();
         return;
     }
 
@@ -1590,9 +1732,10 @@ function updateStats() {
 }
 
 function getMsgObj(msgArr) {
+    const senderObj = metaData.senders[msgArr[1]];
     return {
         id: msgArr[0],
-        sender: metaData.senders[msgArr[1]],
+        sender: senderObj ? senderObj.name : 'Unknown',
         timestamp: msgArr[2],
         text: msgArr[3],
         sentiment: msgArr[4], // 0: neutral, 1: happy, 2: question, 3: sad
@@ -2806,8 +2949,8 @@ function resetPhysicsLayout() {
         node.fy = null;
         node.fz = null;
     });
-    Graph.d3AlphaTarget(0.3).restart();
-    setTimeout(() => Graph.d3AlphaTarget(0), 2000);
+    // 使用 d3ReheatSimulation 重新激活物理引擎
+    Graph.d3ReheatSimulation();
     showToast('物理引擎已重置', 'success');
 }
 
@@ -2874,6 +3017,7 @@ function importLayout(file) {
 
 /**
  * 凝聚回忆 - 切换节点凝聚状态
+ * 🔧 重写版本：使用模块化辅助函数
  * 由侧边栏按钮直接调用
  */
 function coalesceNodes() {
@@ -2883,45 +3027,11 @@ function coalesceNodes() {
     }
 
     if (!isCoalesced) {
-        // 凝聚
-        isCoalesced = true;
-
-        // 更新按钮状态（如果存在）
-        const coalesceBtn = document.getElementById('coalesce-btn');
-        if (coalesceBtn) {
-            coalesceBtn.classList.add('active');
-            coalesceBtn.innerHTML = '<i class="ri-contract-right-line"></i>';
-        }
-
-        // 释放固定位置
-        const nodes = Graph.graphData().nodes;
-        nodes.forEach(node => {
-            node.fx = null;
-            node.fy = null;
-            node.fz = null;
-        });
-
-        const base = getBaseForceConfig();
-        const chargeForce = Graph.d3Force('charge');
-        if (chargeForce && typeof chargeForce.strength === 'function') {
-            chargeForce.strength(base.charge * 0.02);
-        }
-
-        const radialForce = Graph.d3Force('radial');
-        if (radialForce && typeof radialForce.strength === 'function') {
-            radialForce.strength(base.radialStrength * 4);
-        }
-        if (radialForce && typeof radialForce.radius === 'function') {
-            radialForce.radius(base.radialRadius * 0.25);
-        }
-
-        reheatSimulation(0.45, 3500);
-        showToast('回忆正在凝聚...', 'info');
-        playTone(100, 'triangle', 2.0, 0.1);
-
+        // 凝聚节点
+        performCoalesce();
     } else {
-        // 绽放
-        triggerBloom();
+        // 扩散节点
+        uncoalesceNodes();
     }
 }
 
@@ -3039,4 +3149,4 @@ window.toggleTimeTravelPlay = toggleTimeTravelPlay;
 window.initSettings = initSettings;
 window.applySettings = applySettings;
 
-console.log('✅ 侧边栏函数已暴露到全局作用域');
+Log.info('Init', 'Sidebar functions exposed to global scope');

@@ -19,10 +19,18 @@
 }
 
 /* Reset & Base */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* 禁止页面滚动条 */
+    width: 100%;
+    height: 100%;
+}
+
 body {
-    margin: 0; padding: 0;
     font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-    display: flex; height: 100vh; overflow: hidden;
+    display: flex;
+    height: 100vh;
     background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-gradient-end) 100%);
     color: var(--text-main);
     transition: background 0.3s ease, color 0.3s ease;
@@ -153,17 +161,20 @@ body {
 
 /* Removed duplicate #sidebar definition */
 /* Layout */
-#message-sidebar { 
-    width: 600px; 
+#message-sidebar {
+    width: 380px;
     min-width: 300px;
-    max-width: 900px;
-    background: rgba(255, 255, 255, var(--glass-opacity)); 
-    display: flex; flex-direction: column; 
-    box-shadow: 0 0 20px rgba(255, 117, 140, 0.2); 
-    z-index: 10; 
+    max-width: 500px;
+    height: 100vh; /* 固定高度为视口高度 */
+    background: rgba(255, 255, 255, var(--glass-opacity));
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(255, 117, 140, 0.2);
+    z-index: 10;
     backdrop-filter: blur(10px);
     position: relative;
     transition: transform 0.3s ease, background 0.3s;
+    overflow: hidden; /* 防止侧边栏本身出现滚动条 */
 }
 
 #message-sidebar.collapsed {
@@ -172,33 +183,34 @@ body {
     height: 100%;
 }
 
-/* 折叠按钮样式 - 🔧 贴合侧边栏边缘，一半突出 */
+/* 折叠按钮样式 - 完全贴合侧边栏边缘 */
 .sidebar-collapse-btn {
     position: absolute;
-    top: 50%;
-    right: -16px; /* 🔧 一半突出在侧边栏外（按钮宽度32px的一半） */
-    transform: translateY(-50%);
-    width: 32px;
-    height: 60px;
-    background: var(--sidebar-bg);  /* 🔧 使用侧边栏背景色，与主题一致 */
-    border: 1px solid var(--sidebar-border);
-    border-radius: 0 12px 12px 0; /* 🔧 左侧平直，右侧圆角 */
+    top: 20px;
+    right: 0;
+    transform: translateX(50%);
+    width: 28px;
+    height: 28px;
+    background: white;
+    border: 2px solid rgba(255, 117, 140, 0.3);
+    border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--sidebar-text);
-    font-size: 20px;
+    color: #ff758c;
+    font-size: 16px;
     transition: all 0.2s;
     z-index: 100;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15); /* 🔧 添加阴影增强立体感 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-collapse-btn:hover {
-    width: 40px; /* 🔧 悬停时伸长 */
-    background: var(--sidebar-hover);
-    color: var(--sidebar-hover-text);
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.25);
+    background: #ff758c;
+    color: white;
+    border-color: #ff758c;
+    transform: translateX(50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 117, 140, 0.3);
 }
 
 /* 侧边栏折叠时，图标旋转 */
@@ -210,27 +222,29 @@ body {
 #message-sidebar-toggle-fixed {
     position: fixed;
     left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 32px;
-    height: 60px;
-    background: var(--card-bg);
-    border: 1px solid var(--sidebar-border);
-    border-radius: 0 12px 12px 0;
+    top: 20px;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border: 2px solid rgba(255, 117, 140, 0.3);
+    border-radius: 50%;
     cursor: pointer;
     display: none;
     align-items: center;
     justify-content: center;
-    color: var(--sidebar-text);
-    font-size: 20px;
+    color: #ff758c;
+    font-size: 16px;
     z-index: 999;
     transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #message-sidebar-toggle-fixed:hover {
-    width: 40px;
-    background: var(--sidebar-hover);
-    color: var(--sidebar-hover-text);
+    background: #ff758c;
+    color: white;
+    border-color: #ff758c;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 117, 140, 0.3);
 }
 
 /* 当侧边栏折叠时显示固定展开按钮 */
@@ -243,63 +257,22 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     display: none;
 }
 
-/* Removed #resizer styles */
+/* Removed old toggle button styles - using new circular design above */
 
-/* Toggle Buttons */
-#message-sidebar-toggle-close {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translate(50%, -50%); /* Center on border */
-    width: 24px;
-    height: 48px;
-    background: rgba(255, 255, 255, var(--glass-opacity));
-    border: 1px solid #ffd1d1;
-    border-radius: 0 12px 12px 0;
-    cursor: pointer;
+#main-view {
+    flex: 1;
+    position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    z-index: 12;
-    opacity: 0; /* Hidden by default, shown on hover of sidebar edge */
-    transition: opacity 0.2s;
+    flex-direction: column;
+    background: radial-gradient(circle at center, #1a0b2e 0%, #000000 100%);
+    overflow: hidden; /* 防止出现滚动条 */
 }
 
-#message-sidebar:hover #message-sidebar-toggle-close {
-    opacity: 1;
+#graph-container {
+    flex: 1;
+    width: 100%;
+    overflow: hidden; /* 防止出现滚动条 */
 }
-
-#message-sidebar-toggle-open {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 60px;
-    background: rgba(255, 255, 255, var(--glass-opacity));
-    border: 1px solid #ffd1d1;
-    border-radius: 0 12px 12px 0;
-    cursor: pointer;
-    display: none; /* Hidden initially */
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    box-shadow: 2px 0 10px rgba(255, 117, 140, 0.3);
-    z-index: 20;
-    font-size: 20px;
-    backdrop-filter: blur(5px);
-}
-#message-sidebar-toggle-open:hover {
-    background: #fff0f3;
-    width: 35px;
-}
-
-#main-view { flex: 1; position: relative; display: flex; flex-direction: column; background: radial-gradient(circle at center, #1a0b2e 0%, #000000 100%); }
-
-#main-view { flex: 1; position: relative; display: flex; flex-direction: column; background: radial-gradient(circle at center, #1a0b2e 0%, #000000 100%); }
-#graph-container { flex: 1; width: 100%; }
 
 /* Sidebar Header */
 #message-sidebar-header { 
@@ -422,7 +395,6 @@ body.transparent-ui .filter-btn.active {
     letter-spacing: 1px;
     justify-content: center; /* 🔧 让Title居中 */
     text-align: center;
-    position: relative; /* 为折叠按钮定位提供参考 */
     text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8); /* Improve visibility */
 }
 .app-title i { color: var(--primary-color); font-size: 28px; text-shadow: 0 0 10px rgba(255, 117, 140, 0.5); }
@@ -434,9 +406,30 @@ body.transparent-ui .filter-btn.active {
 #graph-container { flex: 1; width: 100%; }
 
 /* Sidebar Header */
+#sidebar-header {
+    padding: 25px;
+    padding-right: 35px; /* 为折叠按钮留出空间 */
+    background: rgba(255, 255, 255, var(--glass-opacity));
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 竖直居中 */
+    position: relative;
+    min-height: 120px; /* 确保有足够的高度 */
+}
+
+#message-sidebar-header {
+    padding: 25px;
+    background: rgba(255, 255, 255, var(--glass-opacity));
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 竖直居中 */
+    position: relative;
+}
+
 /* Removed duplicate #message-sidebar-header definition */
-.app-title { font-size: 20px; font-weight: 700; color: #1f1f1f; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-.app-title i { color: var(--primary-color); font-size: 24px; }
+/* Removed duplicate .app-title definition - keeping the centered version above */
 
 /* Removed duplicate #stats-bar definition */
 
@@ -826,5 +819,42 @@ body.transparent-ui .filter-btn.active {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: var(--text-main);
+}
+
+/* ==================== 自定义滚动条样式 ==================== */
+
+/* 侧边栏内容区域的滚动条 */
+#tab-content-messages::-webkit-scrollbar,
+#keyword-ranking-list::-webkit-scrollbar,
+#message-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+#tab-content-messages::-webkit-scrollbar-track,
+#keyword-ranking-list::-webkit-scrollbar-track,
+#message-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+#tab-content-messages::-webkit-scrollbar-thumb,
+#keyword-ranking-list::-webkit-scrollbar-thumb,
+#message-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 117, 140, 0.3);
+    border-radius: 3px;
+}
+
+#tab-content-messages::-webkit-scrollbar-thumb:hover,
+#keyword-ranking-list::-webkit-scrollbar-thumb:hover,
+#message-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 117, 140, 0.5);
+}
+
+/* Firefox 滚动条样式 */
+#tab-content-messages,
+#keyword-ranking-list,
+#message-sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 117, 140, 0.3) rgba(255, 255, 255, 0.1);
 }
 

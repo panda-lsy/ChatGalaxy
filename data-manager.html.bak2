@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据管理器 - ChatGalaxy</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/data-manager.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/data-manager.css">
+    <style>
+        /* 强制覆盖 style.css 的 overflow 和 height 限制 */
+        html {
+            height: auto !important;
+            overflow: auto !important;
+        }
+        body[data-manager-page] {
+            height: auto !important;
+            min-height: 100vh;
+            overflow: auto !important;
+            display: block !important;
+        }
+        
+        /* 导入面板头部文字优化 - 更明显的白色文字 */
+        .import-panel-header h3 {
+            color: #ffffff !important;
+            font-size: 22px !important;
+            font-weight: 700 !important;
+            text-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.5),
+                0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            letter-spacing: 0.5px !important;
+        }
+        
+        .import-panel-header i {
+            color: #ffffff !important;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) !important;
+        }
+    </style>
+</head>
+<body data-theme="light" data-manager-page>
+    <div class="data-manager-container">
+        <!-- 头部 -->
+        <div class="data-manager-header">
+            <h1><i class="ri-database-2-line"></i> 数据管理器</h1>
+            <p>管理您的聊天数据集，支持导入、导出、切换和编辑</p>
+        </div>
+
+        <!-- 消息提示 -->
+        <div id="alert-success" class="alert alert-success">
+            <i class="ri-checkbox-circle-line"></i>
+            <span></span>
+        </div>
+        <div id="alert-error" class="alert alert-error">
+            <i class="ri-error-warning-line"></i>
+            <span></span>
+        </div>
+        <div id="alert-warning" class="alert alert-warning">
+            <i class="ri-alert-line"></i>
+            <span></span>
+        </div>
+        <div id="alert-info" class="alert alert-info">
+            <i class="ri-information-line"></i>
+            <span></span>
+        </div>
+
+        <!-- 导入面板（内嵌式） -->
+        <div id="import-panel" class="import-panel">
+            <div class="import-panel-header" onclick="toggleImportPanel()">
+                <h3><i class="ri-upload-cloud-line"></i> 导入数据集</h3>
+                <i class="ri-arrow-down-s-line" id="import-panel-icon"></i>
+            </div>
+            
+            <div class="import-panel-content" id="import-panel-content">
+                <!-- 上传区域 -->
+                <div id="upload-zone" class="upload-zone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">拖拽JSON文件到此处，或点击选择文件</div>
+                    <div class="upload-hint">支持最大10MB的JSON文件</div>
+                    <input type="file" id="file-input" accept=".json" style="display: none;">
+                </div>
+
+                <!-- 文件信息 -->
+                <div id="file-info" style="display: none; margin-bottom: 20px;">
+                    <div class="alert alert-info show-inline">
+                        <i class="ri-file-line"></i>
+                        <span id="file-name"></span>
+                    </div>
+                </div>
+
+                <!-- 验证警告 -->
+                <div id="validation-warnings" class="validation-warnings" style="display: none;">
+                    <h4><i class="ri-alert-line"></i> 导入警告</h4>
+                    <ul id="validation-warning-list"></ul>
+                </div>
+
+                <!-- 数据集信息表单 -->
+                <div id="dataset-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">数据集名称</label>
+                        <input type="text" id="dataset-name" class="form-input" placeholder="例如：我的聊天记录">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">描述（可选）</label>
+                        <textarea id="dataset-description" class="form-textarea" placeholder="简单描述这个数据集..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">标签</label>
+                        <div class="tag-selector" id="tag-selector">
+                            <div class="tag-option" onclick="toggleTag(this)">游戏</div>
+                            <div class="tag-option" onclick="toggleTag(this)">工作</div>
+                            <div class="tag-option" onclick="toggleTag(this)">学习</div>
+                            <div class="tag-option" onclick="toggleTag(this)">生活</div>
+                            <div class="tag-option" onclick="toggleTag(this)">社交</div>
+                            <div class="tag-option" onclick="toggleTag(this)">其他</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">主题颜色</label>
+                        <div class="color-selector" id="color-selector">
+                            <div class="color-option selected" style="background: #3498db;" data-color="#3498db" onclick="selectColor(this)"></div>
+                            <div class="color-option" style="background: #10b981;" data-color="#10b981" onclick="selectColor(this)"></div>
+                            <div class="color-option" style="background: #f59e0b;" data-color="#f59e0b" onclick="selectColor(this)"></div>
+                            <div class="color-option" style="background: #ef4444;" data-color="#ef4444" onclick="selectColor(this)"></div>
+                            <div class="color-option" style="background: #8b5cf6;" data-color="#8b5cf6" onclick="selectColor(this)"></div>
+                            <div class="color-option" style="background: #ec4899;" data-color="#ec4899" onclick="selectColor(this)"></div>
+                        </div>
+                    </div>
+
+                    <!-- 进度条 -->
+                    <div id="import-progress" class="progress-container" style="display: none;">
+                        <div class="progress-bar-bg">
+                            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;">0%</div>
+                        </div>
+                        <div id="progress-text" class="progress-text">准备导入...</div>
+                    </div>
+
+                    <div class="action-buttons" style="margin-top: 20px;">
+                        <button class="action-btn primary" id="import-btn" onclick="startImport()" style="flex: 1;">
+                            <i class="ri-upload-line"></i>
+                            开始导入
+                        </button>
+                        <button class="action-btn" onclick="resetImportForm()">
+                            <i class="ri-refresh-line"></i>
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-buttons">
+            <button class="action-btn" onclick="createNewDataset()">
+                <i class="ri-add-circle-line"></i>
+                创建空数据集
+            </button>
+            <button class="action-btn" onclick="loadDemoDataset()">
+                <i class="ri-magic-line"></i>
+                加载演示数据
+            </button>
+            <button class="action-btn" onclick="refreshDatasetList()">
+                <i class="ri-refresh-line"></i>
+                刷新列表
+            </button>
+            <button class="action-btn primary" onclick="location.href='index.html'">
+                <i class="ri-arrow-go-back-line"></i>
+                返回星系
+            </button>
+        </div>
+
+        <!-- 数据集列表 -->
+        <div id="dataset-list" class="dataset-list">
+            <!-- 数据集卡片将动态生成 -->
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <div class="empty-state-text">暂无数据集</div>
+                <div class="empty-state-hint">点击上方"加载演示数据"体验，或"导入数据集"导入您自己的数据</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载脚本 -->
+    <script src="js/data-manager.js"></script>
+    <script src="js/data-import.js"></script>
+    <script src="js/processors/text-processor.js"></script>
+    <script src="js/data-manager-ui.js"></script>
+</body>
+</html>
