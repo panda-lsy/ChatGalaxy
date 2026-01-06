@@ -26,7 +26,7 @@
 
 **部署地址**: WIP
 
-**GitHub 仓库**: [https://github.com/panda-lsy/chatgalaxy](https://github.com/your-repo/chatgalaxy)
+**GitHub 仓库**: [https://github.com/panda-lsy/chatgalaxy](https://github.com/panda-lsy/chatgalaxy)
 
 ---
 
