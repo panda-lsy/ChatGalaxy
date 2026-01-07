@@ -30,6 +30,7 @@ export class MessageSidebar extends SidebarBase {
         this.keywords = [];
         this.messages = [];
         this.filteredMessages = [];
+        this.dataLoaded = false;  // 标志：数据是否已加载
 
         // UI 元素
         this.tabsElement = null;
@@ -414,12 +415,13 @@ export class MessageSidebar extends SidebarBase {
     onShow() {
         super.onShow();
 
-        // 加载初始数据
-        if (window.CHAT_DATA) {
+        // 只在首次显示时加载数据，避免重复加载导致卡顿
+        if (!this.dataLoaded && window.CHAT_DATA) {
             this.updateContent({
                 keywords: window.CHAT_DATA.meta?.ranking || [],
                 messages: window.CHAT_DATA.messages || []
             });
+            this.dataLoaded = true;
         }
     }
 }

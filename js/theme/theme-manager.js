@@ -56,7 +56,6 @@ class ThemeManager {
             // 监听 storage 事件（跨标签页同步）
             window.addEventListener('storage', (e) => {
                 if (e.key === this.STORAGE_KEY) {
-                    console.log('🔄 [ThemeManager] Settings changed in another tab');
                     this.loadSettings();
                     this.applyTheme();
                 }
@@ -92,7 +91,6 @@ class ThemeManager {
         const oldTheme = this.currentTheme;
         this.currentTheme = themeId;
 
-        console.log(`🎨 [ThemeManager] Theme changed: ${oldTheme} → ${themeId}`);
 
         // 应用新主题
         this.applyTheme();
@@ -123,7 +121,6 @@ class ThemeManager {
         const oldValue = this.currentTransparency;
         this.currentTransparency = Math.round(value * 100) / 100; // 保留两位小数
 
-        console.log(`🔍 [ThemeManager] Transparency changed: ${oldValue} → ${this.currentTransparency}`);
 
         // 重新应用主题（使用新的透明度）
         this.applyTheme();
@@ -149,7 +146,6 @@ class ThemeManager {
             return;
         }
 
-        console.log(`🎨 [ThemeManager] Applying theme: ${themeConfig.name}`);
 
         const root = document.documentElement;
 
@@ -176,7 +172,6 @@ class ThemeManager {
         document.body.classList.remove('theme-dawn', 'theme-forest', 'theme-ocean', 'theme-stardust');
         document.body.classList.add(`theme-${this.currentTheme}`);
 
-        console.log('✅ [ThemeManager] Theme applied successfully');
     }
 
     /**

@@ -167,14 +167,14 @@ export class TransparencySlider {
         // 更新显示值
         this._updateValueDisplay();
 
-        // 实时预览（防抖）
+        // 实时预览（减少防抖延迟到 10ms，更实时）
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }
 
         this.debounceTimer = setTimeout(() => {
             this._applyTransparency();
-        }, 50);
+        }, 10);
     }
 
     /**

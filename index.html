@@ -669,7 +669,6 @@ document.addEventListener('keydown', (e) => {
     }
 
     function initThemeSystem() {
-        console.log('🎨 [index.html] Initializing theme system...');
 
         // 1. 自动迁移旧设置并初始化主题
         autoMigrateAndApply();
@@ -680,7 +679,6 @@ document.addEventListener('keydown', (e) => {
                 containerId: 'theme-selector',
                 showPreview: true
             });
-            console.log('✅ [index.html] Theme selector initialized');
         } catch (error) {
             console.warn('⚠️ [index.html] Theme selector initialization skipped:', error);
         }
@@ -694,7 +692,6 @@ document.addEventListener('keydown', (e) => {
                 step: 5,
                 showValue: true
             });
-            console.log('✅ [index.html] Transparency slider initialized');
         } catch (error) {
             console.warn('⚠️ [index.html] Transparency slider initialization skipped:', error);
         }
@@ -703,7 +700,6 @@ document.addEventListener('keydown', (e) => {
         try {
             window.MessageSidebar = getMessageSidebar();
             window.SettingsSidebar = getSettingsSidebar();
-            console.log('✅ [index.html] Sidebars initialized');
         } catch (error) {
             console.warn('⚠️ [index.html] Sidebar initialization skipped:', error);
         }
@@ -711,7 +707,6 @@ document.addEventListener('keydown', (e) => {
         // 5. 监听主题变更事件
         if (window.ThemeManager) {
             window.ThemeManager.on('themeChange', (data) => {
-                console.log(`🎨 [index.html] Theme changed: ${data.oldTheme} → ${data.newTheme}`);
 
                 // 可以在这里添加主题变更后的额外处理
                 // 例如更新3D图形颜色、刷新粒子效果等

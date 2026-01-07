@@ -337,7 +337,6 @@ export class SidebarBase {
      * @param {Object} data - 主题数据
      */
     onThemeChange(data) {
-        console.log(`🎨 [${this.id}] Theme changed: ${data.oldTheme} → ${data.newTheme}`);
         this.applyTheme(data.themeConfig);
     }
 
