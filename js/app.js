@@ -338,7 +338,6 @@ function initSettings(showModal = false) {
     const sidebarTitleInput = document.getElementById('sidebar-title-input');
     const sidebarIconInput = document.getElementById('sidebar-icon-input');
     const sfxEnabled = document.getElementById('sfx-enabled');
-    const uiTransparency = document.getElementById('ui-transparency');
     const showSubtitles = document.getElementById('show-subtitles');
     const loopSubtitles = document.getElementById('loop-subtitles');
     const subtitleDuration = document.getElementById('subtitle-duration');
@@ -367,9 +366,6 @@ function initSettings(showModal = false) {
     if (sidebarTitleInput) sidebarTitleInput.value = appSettings.sidebarTitle;
     if (sidebarIconInput) sidebarIconInput.value = appSettings.sidebarIcon;
     if (sfxEnabled) sfxEnabled.checked = appSettings.sfxEnabled;
-    if (uiTransparency) uiTransparency.value = appSettings.uiTransparency || 0.95;
-    const uiTransparencyVal = document.getElementById('ui-transparency-val');
-    if (uiTransparencyVal) uiTransparencyVal.innerText = appSettings.uiTransparency || 0.95;
     if (showSubtitles) showSubtitles.checked = appSettings.showSubtitles;
     if (loopSubtitles) loopSubtitles.checked = appSettings.subtitleLoop;
     if (subtitleDuration) subtitleDuration.value = appSettings.subtitleDuration;
@@ -477,12 +473,6 @@ function initSettings(showModal = false) {
         applySettings();
     });
 
-    document.getElementById('ui-transparency').addEventListener('input', (e) => {
-        appSettings.uiTransparency = parseFloat(e.target.value);
-        document.getElementById('ui-transparency-val').innerText = appSettings.uiTransparency;
-        applySettings();
-    });
-
     document.getElementById('show-subtitles').addEventListener('change', (e) => {
         appSettings.showSubtitles = e.target.checked;
         applySettings();
@@ -578,8 +568,6 @@ function initSettings(showModal = false) {
             document.getElementById('sidebar-title-input').value = appSettings.sidebarTitle;
             document.getElementById('sidebar-icon-input').value = appSettings.sidebarIcon;
             document.getElementById('sfx-enabled').checked = appSettings.sfxEnabled;
-            document.getElementById('ui-transparency').value = appSettings.uiTransparency || 0.95;
-            document.getElementById('ui-transparency-val').innerText = appSettings.uiTransparency || 0.95;
             document.getElementById('show-subtitles').checked = appSettings.showSubtitles;
             document.getElementById('loop-subtitles').checked = appSettings.subtitleLoop;
             document.getElementById('subtitle-duration').value = appSettings.subtitleDuration;
