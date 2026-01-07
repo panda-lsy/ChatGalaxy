@@ -129,10 +129,16 @@ export class SidebarBase {
             }
         });
 
-        // 点击外部关闭
+        // 点击外部关闭（但忽略其他侧边栏的切换按钮）
         document.addEventListener('click', (e) => {
             if (this.visible && !this.element.contains(e.target) && !this.toggleButton?.contains(e.target)) {
-                this.hide();
+                // 检查点击是否在其他侧边栏的切换按钮上
+                const clickedOnOtherSidebarToggle = e.target.closest('.sidebar-toggle') && 
+                                                       !e.target.closest(`.sidebar-toggle.${this.position}`);
+                
+                if (!clickedOnOtherSidebarToggle) {
+                    this.hide();
+                }
             }
         });
 
