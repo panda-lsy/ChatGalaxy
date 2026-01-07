@@ -1,0 +1,187 @@
+/**
+ * ChatGalaxy 主题系统 - 统一透明度系统
+ * 动态透明度计算，消除硬编码
+ * @version 1.0.0
+ * @updated 2026-01-07
+ * @author 深山有密林团队
+ */
+
+/* ========== 透明度层级定义 ========== */
+:root {
+    /* 透明度级别 */
+    --transparent-none: 1;           /* 完全不透明 */
+    --transparent-low: 0.95;         /* 低透明度（默认） */
+    --transparent-medium: 0.85;      /* 中等透明度 */
+    --transparent-high: 0.7;         /* 高透明度 */
+    --transparent-ultra: 0.5;        /* 超高透明度 */
+
+    /* 组件透明度 */
+    --sidebar-alpha: var(--transparent-low);
+    --card-alpha: var(--transparent-low);
+    --overlay-alpha: var(--transparent-medium);
+    --modal-alpha: var(--transparent-none);
+}
+
+/* ========== 动态透明度变量 ========== */
+:root {
+    /* 这些变量由 JavaScript 动态计算 */
+    --sidebar-bg: rgba(255, 250, 245, 0.95);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-hover-bg: rgba(255, 255, 255, 0.9);
+    --hover-bg: rgba(255, 154, 139, 1);
+    --sidebar-border: rgba(255, 229, 220, 0.6);
+    --card-border: rgba(255, 229, 220, 0.5);
+    --bg-start-alpha: rgba(255, 229, 229, 0.95);
+    --bg-end-alpha: rgba(255, 245, 230, 0.95);
+}
+
+/* ========== 透明度模式（全局） ========== */
+
+/* 闲置模式 - 降低所有透明度 */
+body.idle-mode {
+    --sidebar-alpha: var(--transparent-medium);
+    --card-alpha: var(--transparent-medium);
+}
+
+/* 透明UI模式 - 提高对比度 */
+body.transparent-ui {
+    --sidebar-alpha: var(--transparent-none);
+    --card-alpha: var(--transparent-low);
+    --overlay-alpha: var(--transparent-high);
+}
+
+/* ========== 组件透明度应用 ========== */
+
+/* 侧边栏 */
+.sidebar,
+#message-sidebar {
+    background: var(--sidebar-bg);
+    border-color: var(--sidebar-border);
+    transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+/* 卡片 */
+.card,
+.message-item,
+.keyword-item {
+    background: var(--card-bg);
+    border-color: var(--card-border);
+    transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.card:hover,
+.message-item:hover,
+.keyword-item:hover {
+    background: var(--card-hover-bg);
+}
+
+/* 悬停状态 */
+.sidebar-btn:hover,
+.sidebar-item:hover,
+.filter-btn:hover {
+    background: var(--hover-bg);
+    color: var(--sidebar-hover-text);
+}
+
+/* ========== 覆盖层透明度 ========== */
+
+/* 模态框覆盖层 */
+.modal-overlay,
+.editor-modal__overlay {
+    background: rgba(0, 0, 0, var(--overlay-alpha));
+    backdrop-filter: blur(4px);
+}
+
+/* Toast 通知 */
+.toast {
+    background: var(--card-bg);
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(8px);
+}
+
+/* ========== 特殊效果透明度 ========== */
+
+/* 玻璃态效果 */
+.glass-effect {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+}
+
+/* 毛玻璃效果 */
+.frosted-glass {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--card-border);
+}
+
+/* ========== 过渡动画 ========== */
+
+/* 主题切换过渡 */
+body {
+    transition-property: background, color;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+}
+
+/* 透明度过渡 */
+.sidebar,
+.card,
+.message-item,
+.keyword-item {
+    transition-property: background, border-color, color, opacity;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+}
+
+/* ========== 响应式透明度调整 ========== */
+
+/* 移动端 - 提高透明度以增强可读性 */
+@media (max-width: 768px) {
+    :root {
+        --sidebar-alpha: var(--transparent-none);
+        --card-alpha: var(--transparent-low);
+    }
+}
+
+/* ========== 透明度工具类 ========== */
+
+/* 完全不透明 */
+.opacity-100 { opacity: var(--transparent-none); }
+.opacity-95 { opacity: var(--transparent-low); }
+.opacity-85 { opacity: var(--transparent-medium); }
+.opacity-70 { opacity: var(--transparent-high); }
+.opacity-50 { opacity: var(--transparent-ultra); }
+
+/* 背景透明度 */
+.bg-transparent {
+    background: transparent !important;
+}
+
+.bg-glass {
+    background: var(--card-bg) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* ========== 可访问性增强 ========== */
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    :root {
+        --sidebar-alpha: var(--transparent-none);
+        --card-alpha: var(--transparent-none);
+        --overlay-alpha: var(--transparent-none);
+    }
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}

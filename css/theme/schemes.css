@@ -1,0 +1,174 @@
+/**
+ * ChatGalaxy 主题系统 - 配色方案
+ * 4个主题的完整配色变量
+ * @version 1.0.0
+ * @updated 2026-01-07
+ * @author 深山有密林团队
+ */
+
+/* ========== 主题1: 晨曦 ========== */
+body.theme-dawn {
+    /* 主色调 */
+    --primary-color: #FF9A8B;
+    --secondary-color: #FF6A88;
+    --accent-color: #FFB347;
+
+    /* 背景渐变 */
+    --bg-color-start: #FFE5E5;
+    --bg-color-end: #FFF5E6;
+
+    /* 侧边栏 */
+    --sidebar-bg: rgba(255, 250, 245, 0.95);
+    --sidebar-text: #2D2D2D;
+    --sidebar-border: rgba(255, 229, 220, 0.6);
+    --sidebar-hover: #FF9A8B;
+    --sidebar-hover-text: #FFFFFF;
+
+    /* 卡片 */
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(255, 229, 220, 0.5);
+    --card-hover-bg: rgba(255, 245, 240, 0.9);
+
+    /* 文本 */
+    --text-main: #3D3D3D;
+    --text-secondary: #7A7A7A;
+    --text-muted: #A0A0A0;
+}
+
+/* ========== 主题2: 森林 ========== */
+body.theme-forest {
+    /* 主色调 */
+    --primary-color: #52C41A;
+    --secondary-color: #73D13D;
+    --accent-color: #95DE64;
+
+    /* 背景渐变 */
+    --bg-color-start: #F0F9FF;
+    --bg-color-end: #E6FFFB;
+
+    /* 侧边栏 */
+    --sidebar-bg: rgba(245, 255, 245, 0.95);
+    --sidebar-text: #1C2E1A;
+    --sidebar-border: rgba(217, 247, 190, 0.6);
+    --sidebar-hover: #52C41A;
+    --sidebar-hover-text: #FFFFFF;
+
+    /* 卡片 */
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(217, 247, 190, 0.5);
+    --card-hover-bg: rgba(246, 255, 237, 0.9);
+
+    /* 文本 */
+    --text-main: #2F3F2D;
+    --text-secondary: #5D6E5B;
+    --text-muted: #8B9B89;
+}
+
+/* ========== 主题3: 海洋 ========== */
+body.theme-ocean {
+    /* 主色调 */
+    --primary-color: #177DDC;
+    --secondary-color: #3C9AE8;
+    --accent-color: #69C0FF;
+
+    /* 背景渐变 */
+    --bg-color-start: #F0F5FF;
+    --bg-color-end: #E6F7FF;
+
+    /* 侧边栏 */
+    --sidebar-bg: rgba(240, 245, 255, 0.95);
+    --sidebar-text: #1A2332;
+    --sidebar-border: rgba(186, 231, 255, 0.6);
+    --sidebar-hover: #177DDC;
+    --sidebar-hover-text: #FFFFFF;
+
+    /* 卡片 */
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(186, 231, 255, 0.5);
+    --card-hover-bg: rgba(230, 247, 255, 0.9);
+
+    /* 文本 */
+    --text-main: #1D2B3A;
+    --text-secondary: #4A5A6A;
+    --text-muted: #788898;
+}
+
+/* ========== 主题4: 星尘 ========== */
+body.theme-stardust {
+    /* 主色调 */
+    --primary-color: #722ED1;
+    --secondary-color: #9254DE;
+    --accent-color: #B37FEB;
+
+    /* 背景渐变 */
+    --bg-color-start: #F9F0FF;
+    --bg-color-end: #F0F5FF;
+
+    /* 侧边栏 */
+    --sidebar-bg: rgba(249, 240, 255, 0.95);
+    --sidebar-text: #22075E;
+    --sidebar-border: rgba(239, 219, 255, 0.6);
+    --sidebar-hover: #722ED1;
+    --sidebar-hover-text: #FFFFFF;
+
+    /* 卡片 */
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(239, 219, 255, 0.5);
+    --card-hover-bg: rgba(249, 240, 255, 0.9);
+
+    /* 文本 */
+    --text-main: #1C1435;
+    --text-secondary: #392660;
+    --text-muted: #66538C;
+}
+
+/* ========== 功能色（所有主题共享） ========== */
+:root,
+body.theme-dawn,
+body.theme-forest,
+body.theme-ocean,
+body.theme-stardust {
+    /* 功能色不随主题变化 */
+    --success-color: #52C41A;
+    --warning-color: #FAAD14;
+    --error-color: #FF4D4F;
+    --info-color: #1890FF;
+}
+
+/* ========== 渐变定义 ========== */
+
+/* 晨曦渐变 */
+body.theme-dawn .gradient-primary {
+    background: linear-gradient(135deg, #FF9A8B 0%, #FF6A88 100%);
+}
+
+body.theme-dawn .gradient-secondary {
+    background: linear-gradient(135deg, #FF6A88 0%, #FFB347 100%);
+}
+
+/* 森林渐变 */
+body.theme-forest .gradient-primary {
+    background: linear-gradient(135deg, #52C41A 0%, #73D13D 100%);
+}
+
+body.theme-forest .gradient-secondary {
+    background: linear-gradient(135deg, #73D13D 0%, #95DE64 100%);
+}
+
+/* 海洋渐变 */
+body.theme-ocean .gradient-primary {
+    background: linear-gradient(135deg, #177DDC 0%, #3C9AE8 100%);
+}
+
+body.theme-ocean .gradient-secondary {
+    background: linear-gradient(135deg, #3C9AE8 0%, #69C0FF 100%);
+}
+
+/* 星尘渐变 */
+body.theme-stardust .gradient-primary {
+    background: linear-gradient(135deg, #722ED1 0%, #9254DE 100%);
+}
+
+body.theme-stardust .gradient-secondary {
+    background: linear-gradient(135deg, #9254DE 0%, #B37FEB 100%);
+}

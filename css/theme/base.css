@@ -1,0 +1,173 @@
+/**
+ * ChatGalaxy 主题系统 - 基础变量
+ * 统一的主题 CSS 变量定义
+ * @version 1.0.0
+ * @updated 2026-01-07
+ * @author 深山有密林团队
+ */
+
+:root {
+    /* ========== 主色调 ========== */
+    --primary-color: #FF9A8B;
+    --secondary-color: #FF6A88;
+    --accent-color: #FFB347;
+
+    /* ========== 背景渐变 ========== */
+    --bg-color-start: #FFE5E5;
+    --bg-color-end: #FFF5E6;
+
+    /* ========== 侧边栏 ========== */
+    --sidebar-bg: rgba(255, 250, 245, 0.95);
+    --sidebar-text: #2D2D2D;
+    --sidebar-border: rgba(255, 229, 220, 0.6);
+    --sidebar-hover: #FF9A8B;
+    --sidebar-hover-text: #FFFFFF;
+
+    /* ========== 卡片 ========== */
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(255, 229, 220, 0.5);
+    --card-hover-bg: rgba(255, 245, 240, 0.9);
+
+    /* ========== 文本 ========== */
+    --text-main: #3D3D3D;
+    --text-secondary: #7A7A7A;
+    --text-muted: #A0A0A0;
+
+    /* ========== 功能色 ========== */
+    --success-color: #52C41A;
+    --warning-color: #FAAD14;
+    --error-color: #FF4D4F;
+    --info-color: #1890FF;
+
+    /* ========== 阴影 ========== */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.2);
+
+    /* ========== 边框圆角 ========== */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    /* ========== 过渡动画 ========== */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* ========== Z-index 层级 ========== */
+    --z-base: 1;
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* ========== 主题类（用于 JavaScript 切换） ========== */
+
+/* 主题：晨曦 */
+body.theme-dawn {
+    --primary-color: #FF9A8B;
+    --secondary-color: #FF6A88;
+    --accent-color: #FFB347;
+}
+
+/* 主题：森林 */
+body.theme-forest {
+    --primary-color: #52C41A;
+    --secondary-color: #73D13D;
+    --accent-color: #95DE64;
+}
+
+/* 主题：海洋 */
+body.theme-ocean {
+    --primary-color: #177DDC;
+    --secondary-color: #3C9AE8;
+    --accent-color: #69C0FF;
+}
+
+/* 主题：星尘 */
+body.theme-stardust {
+    --primary-color: #722ED1;
+    --secondary-color: #9254DE;
+    --accent-color: #B37FEB;
+}
+
+/* ========== 全局样式重置 ========== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+        'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--text-main);
+    background: linear-gradient(135deg, var(--bg-color-start) 0%, var(--bg-color-end) 100%);
+    transition: background var(--transition-base), color var(--transition-base);
+}
+
+/* ========== 可访问性增强 ========== */
+
+/* 聚焦样式 */
+:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* 链接样式 */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--secondary-color);
+}
+
+/* 按钮基础样式 */
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: all var(--transition-base);
+}
+
+/* ========== 滚动条样式 ========== */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: var(--radius-sm);
+    opacity: 0.6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    opacity: 0.8;
+}
+
+/* Firefox 滚动条 */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--card-bg);
+}
