@@ -316,6 +316,11 @@ export class MessageSidebar extends SidebarBase {
         ];
 
         // 根据ID生成颜色索引
+        // 如果没有 senderId，使用默认颜色
+        if (!senderId) {
+            return colors[0];
+        }
+
         const hash = senderId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
         const index = hash % colors.length;
 

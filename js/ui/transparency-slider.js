@@ -128,7 +128,18 @@ export class TransparencySlider {
      * @private
      */
     _loadCurrentValue() {
-        if (!window.ThemeManager) return;
+        if (!window.ThemeManager) {
+            console.warn('⚠️ [TransparencySlider] ThemeManager not found');
+            return;
+        }
+
+        // 等待 ThemeManager 初始化完成
+        if (!window.ThemeManager._initialized) {
+            console.log('⏳ [TransparencySlider] Waiting for ThemeManager initialization...');
+            // 延迟加载，等待初始化完成
+            setTimeout(() => this._loadCurrentValue(), 100);
+            return;
+        }
 
         const transparency = window.ThemeManager.currentTransparency;
         this.currentValue = Math.round(transparency * 100);
@@ -142,6 +153,7 @@ export class TransparencySlider {
         // 更新显示值
         this._updateValueDisplay();
     }
+n        console.log(`✅ [TransparencySlider] Loaded current value: ${this.currentValue}%`);
 
     /**
      * 输入事件处理（实时）
