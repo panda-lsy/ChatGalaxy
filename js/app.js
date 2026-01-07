@@ -43,73 +43,6 @@ const COLORS = [
     '#84fab0'  // Mint (for variety)
 ];
 
-const COLOR_SCHEMES = {
-    romantic: {
-        '--primary-color': '#ff758c',
-        '--secondary-color': '#ff7eb3',
-        '--bg-color': '#2b1055',
-        '--bg-gradient-end': '#7597de',
-        '--sidebar-bg': 'rgba(255, 255, 255, 0.95)',
-        '--sidebar-text': '#1a1a1a',
-        '--sidebar-border': 'rgba(0, 0, 0, 0.15)',
-        '--sidebar-hover': '#ff758c',  // 🔧 使用粉红色，符合浪漫粉主题
-        '--sidebar-hover-text': '#fff',
-        '--card-bg': 'rgba(255, 255, 255, 0.95)',
-        '--overlay-bg': 'rgba(0, 0, 0, 0.5)',
-        '--text-main': '#2c2c2c',  // 🔧 加深文字颜色，提高可读性
-        '--text-secondary': '#555555',  // 🔧 加深次要文字颜色
-        '--border-color': '#ffd1d1'
-    },
-    deepspace: {
-        '--primary-color': '#4facfe',
-        '--secondary-color': '#00f2fe',
-        '--bg-color': '#050510',
-        '--bg-gradient-end': '#1a1a3e',
-        '--sidebar-bg': 'rgba(255, 255, 255, 0.95)',
-        '--sidebar-text': '#e0f7fa',
-        '--sidebar-border': 'rgba(79, 172, 254, 0.3)',
-        '--sidebar-hover': '#4facfe',
-        '--sidebar-hover-text': '#fff',
-        '--card-bg': 'rgba(10, 15, 30, 0.85)',
-        '--overlay-bg': 'rgba(0, 0, 0, 0.7)',
-        '--text-main': '#e0f7fa',
-        '--text-secondary': '#81d4fa',
-        '--border-color': '#1e3c72'
-    },
-    nebula: {
-        '--primary-color': '#d53369',
-        '--secondary-color': '#daae51',
-        '--bg-color': '#1e130c',
-        '--bg-gradient-end': '#4a1c2e',
-        '--sidebar-bg': 'rgba(255, 255, 255, 0.95)',
-        '--sidebar-text': '#fff8e1',
-        '--sidebar-border': 'rgba(213, 51, 105, 0.3)',
-        '--sidebar-hover': '#d53369',
-        '--sidebar-hover-text': '#fff',
-        '--card-bg': 'rgba(40, 20, 10, 0.9)',
-        '--overlay-bg': 'rgba(0, 0, 0, 0.7)',
-        '--text-main': '#fff8e1',
-        '--text-secondary': '#ffecb3',
-        '--border-color': '#bf360c'
-    },
-    midnight: {
-        '--primary-color': '#ffffff',
-        '--secondary-color': '#a0a0a0',
-        '--bg-color': '#000000',
-        '--bg-gradient-end': '#1a1a1a',
-        '--sidebar-bg': 'rgba(255, 255, 255, 0.95)',
-        '--sidebar-text': '#ffffff',
-        '--sidebar-border': 'rgba(255, 255, 255, 0.1)',
-        '--sidebar-hover': '#ffffff',
-        '--sidebar-hover-text': '#000000',
-        '--card-bg': 'rgba(20, 20, 20, 0.9)',
-        '--overlay-bg': 'rgba(0, 0, 0, 0.8)',
-        '--text-main': '#ffffff',
-        '--text-secondary': '#bbbbbb',
-        '--border-color': '#333333'
-    }
-};
-
 const FORCE_BASE = {
     charge: -600,
     radialStrength: 0.05,
@@ -224,7 +157,6 @@ let currentPage = 1;
 
 // App Settings
 let appSettings = {
-    colorScheme: 'nebula', // 🔧 默认星云紫主题，神秘梦幻
     bgmVolume: 50,
     sfxVolume: 50,
     pageTitle: 'ChatGalaxy', // 🔧 通用标题
@@ -406,7 +338,6 @@ function initSettings(showModal = false) {
     const sidebarTitleInput = document.getElementById('sidebar-title-input');
     const sidebarIconInput = document.getElementById('sidebar-icon-input');
     const sfxEnabled = document.getElementById('sfx-enabled');
-    const colorSchemeSelect = document.getElementById('color-scheme-select');
     const uiTransparency = document.getElementById('ui-transparency');
     const showSubtitles = document.getElementById('show-subtitles');
     const loopSubtitles = document.getElementById('loop-subtitles');
@@ -436,7 +367,6 @@ function initSettings(showModal = false) {
     if (sidebarTitleInput) sidebarTitleInput.value = appSettings.sidebarTitle;
     if (sidebarIconInput) sidebarIconInput.value = appSettings.sidebarIcon;
     if (sfxEnabled) sfxEnabled.checked = appSettings.sfxEnabled;
-    if (colorSchemeSelect) colorSchemeSelect.value = appSettings.colorScheme || 'nebula'; // 🔧 默认使用星云紫主题
     if (uiTransparency) uiTransparency.value = appSettings.uiTransparency || 0.95;
     const uiTransparencyVal = document.getElementById('ui-transparency-val');
     if (uiTransparencyVal) uiTransparencyVal.innerText = appSettings.uiTransparency || 0.95;
@@ -547,11 +477,6 @@ function initSettings(showModal = false) {
         applySettings();
     });
 
-    document.getElementById('color-scheme-select').addEventListener('change', (e) => {
-        appSettings.colorScheme = e.target.value;
-        applySettings();
-    });
-
     document.getElementById('ui-transparency').addEventListener('input', (e) => {
         appSettings.uiTransparency = parseFloat(e.target.value);
         document.getElementById('ui-transparency-val').innerText = appSettings.uiTransparency;
@@ -653,7 +578,6 @@ function initSettings(showModal = false) {
             document.getElementById('sidebar-title-input').value = appSettings.sidebarTitle;
             document.getElementById('sidebar-icon-input').value = appSettings.sidebarIcon;
             document.getElementById('sfx-enabled').checked = appSettings.sfxEnabled;
-            document.getElementById('color-scheme-select').value = appSettings.colorScheme || 'nebula'; // 🔧 默认使用星云紫主题
             document.getElementById('ui-transparency').value = appSettings.uiTransparency || 0.95;
             document.getElementById('ui-transparency-val').innerText = appSettings.uiTransparency || 0.95;
             document.getElementById('show-subtitles').checked = appSettings.showSubtitles;
@@ -739,44 +663,11 @@ function showEmojiPicker(btn, input) {
     setTimeout(() => document.addEventListener('click', closeHandler), 0);
 }
 
-function applyColorScheme() {
-    const scheme = COLOR_SCHEMES[appSettings.colorScheme] || COLOR_SCHEMES.nebula; // 🔧 默认使用星云紫主题
-    const root = document.documentElement;
-    const opacity = appSettings.uiTransparency !== undefined ? appSettings.uiTransparency : 0.95;
-
-    console.log(`🎨 [DEBUG] applyColorScheme: scheme=${appSettings.colorScheme}, opacity=${opacity}`);
-
-    for (const [key, value] of Object.entries(scheme)) {
-        // 🔧 如果值包含 rgba()，则替换透明度
-        if (typeof value === 'string' && value.startsWith('rgba(')) {
-            // 提取 RGB 部分并应用当前透明度
-            const match = value.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d.]+\)/);
-            if (match) {
-                const [, r, g, b] = match;
-                const finalValue = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-                root.style.setProperty(key, finalValue);
-                console.log(`  ✅ ${key}: ${finalValue}`);
-            } else {
-                root.style.setProperty(key, value);
-                console.log(`  ⚠️ ${key}: ${value} (rgba parse failed)`);
-            }
-        } else {
-            root.style.setProperty(key, value);
-            console.log(`  ✅ ${key}: ${value}`);
-        }
-    }
-
-    console.log(`✅ [DEBUG] Applied ${Object.keys(scheme).length} CSS variables`);
-}
-
 function applySettings() {
     // Save
     localStorage.setItem('appSettings', JSON.stringify(appSettings));
 
-    // 0. Color Scheme（现在包含透明度应用）
-    applyColorScheme();
-
-    // 0.1 Transparency 保留变量供其他地方使用
+    // Transparency 保留变量供其他地方使用
     const opacity = appSettings.uiTransparency !== undefined ? appSettings.uiTransparency : 0.95;
     document.documentElement.style.setProperty('--glass-opacity', opacity);
 
@@ -796,7 +687,7 @@ function applySettings() {
     } else {
         // 中等透明度 → 使用配色方案的默认文字颜色
         document.body.classList.remove('transparent-ui');
-        // 重新应用配色方案的文字颜色（已被 applyColorScheme 应用）
+        // 主题系统已由 ThemeManager 接管
     }
 
     // 1. Audio
