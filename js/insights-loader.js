@@ -6,7 +6,7 @@
  */
 
 const DB_NAME = 'ChatGalaxyDB';
-const DB_VERSION = 1;
+const DB_VERSION = window.ChatGalaxyConfig?.DB_VERSION || 2;  // 🔧 使用配置中的版本(当前为2)
 const DATASETS_STORE = 'datasets';
 const MESSAGES_STORE = 'messages';
 

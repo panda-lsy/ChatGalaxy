@@ -869,6 +869,14 @@ body.idle-mode .toast {
     opacity: 0.9;
 }
 
+/* ========== 闲置模式下的折叠按钮 ========== */
+body.idle-mode #message-sidebar-toggle-fixed {
+    /* 确保折叠按钮在闲置模式下也能正确显示 */
+    opacity: 0.7;
+    transition: opacity 1s ease-in-out;
+    z-index: 9999; /* 确保在所有元素之上 */
+}
+
 /* 闲置模式指示器（可选） */
 body.idle-mode::after {
     content: '💤 闲置漫游中';
@@ -891,6 +899,12 @@ body:not(.idle-mode) #message-sidebar {
     transition: opacity 0.3s ease-in-out;
 }
 
+body:not(.idle-mode) #message-sidebar-toggle-fixed {
+    /* 恢复正常模式时，折叠按钮完全不透明 */
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
 body:not(.idle-mode) #sidebar {
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
@@ -899,5 +913,460 @@ body:not(.idle-mode) #sidebar {
 body:not(.idle-mode) #time-travel-container {
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
+}
+
+/* ========== 移动端响应式设计 ========== */
+
+/* 平板设备 (≤768px) */
+@media (max-width: 768px) {
+    /* 侧边栏优化 */
+    #message-sidebar {
+        width: 320px;
+        min-width: 280px;
+        max-width: 100%;
+    }
+
+    /* 统计栏优化 */
+    #stats-bar {
+        padding: 10px 12px;
+        border-radius: 10px;
+    }
+
+    .stat-val {
+        font-size: 16px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    /* 顶部控制按钮 */
+    #top-controls {
+        top: 15px;
+        right: 15px;
+        gap: 10px;
+    }
+
+    #top-controls button {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    /* 应用标题 */
+    .app-title {
+        font-size: 20px;
+    }
+
+    /* 搜索框 */
+    #search-input {
+        padding: 8px 8px 8px 32px;
+        font-size: 14px;
+    }
+
+    /* 关键词列表 */
+    .keyword-item {
+        padding: 10px 12px;
+    }
+
+    .keyword-name {
+        font-size: 14px;
+    }
+
+    /* 消息气泡 */
+    .msg-bubble {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    /* Toast 通知 */
+    #toast-container {
+        left: 20px;
+        right: 20px;
+        bottom: 10px;
+    }
+
+    .toast {
+        min-width: auto;
+        width: 100%;
+        font-size: 13px;
+    }
+
+    /* ========== 平板设备闲置模式优化 ========== */
+    body.idle-mode #message-sidebar-toggle-fixed {
+        /* 平板闲置模式下，折叠按钮保持可见性 */
+        opacity: 0.7;
+        z-index: 9999;
+    }
+
+    body.message-sidebar-collapsed #message-sidebar-toggle-fixed {
+        /* 确保折叠按钮在侧边栏折叠时正确显示 */
+        display: flex !important;
+        opacity: 0.9;
+    }
+}
+
+/* 手机设备 (≤480px) */
+@media (max-width: 480px) {
+    /* 侧边栏变为全屏抽屉 */
+    #message-sidebar {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 3000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    #message-sidebar:not(.collapsed) {
+        transform: translateX(0);
+    }
+
+    /* 侧边栏头部 */
+    #message-sidebar-header {
+        padding: 15px;
+        min-height: 100px;
+    }
+
+    /* 应用标题 */
+    .app-title {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .app-title i {
+        font-size: 24px;
+    }
+
+    /* 统计栏 - 简化布局 */
+    #stats-bar {
+        padding: 8px 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .stat-item {
+        min-width: 60px;
+    }
+
+    .stat-val {
+        font-size: 14px;
+    }
+
+    .stat-label {
+        font-size: 9px;
+    }
+
+    /* 顶部控制按钮 - 缩小并调整位置 */
+    #top-controls {
+        top: 10px;
+        right: 10px;
+        gap: 8px;
+    }
+
+    #top-controls button {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    #top-controls #controls-toggle-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    /* 时间轴容器 - 已在708-726行定义，这里补充优化 */
+    #time-travel-container {
+        width: 95%;
+        min-width: unset;
+        padding: 12px 15px;
+        gap: 8px;
+        border-radius: 15px;
+    }
+
+    .time-label {
+        font-size: 14px;
+        min-width: unset;
+    }
+
+    /* 搜索框 */
+    .search-box {
+        margin-bottom: 12px;
+    }
+
+    #search-input {
+        padding: 10px 10px 10px 36px;
+        font-size: 14px;
+        border-radius: 18px;
+    }
+
+    /* 搜索图标 */
+    .search-box i {
+        left: 10px;
+        font-size: 14px;
+    }
+
+    /* 标签页按钮 */
+    .tab-btn {
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    /* 关键词列表 */
+    #keyword-ranking-list {
+        padding: 15px;
+    }
+
+    .keyword-item {
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 14px;
+    }
+
+    .keyword-rank {
+        width: 20px;
+        font-size: 14px;
+    }
+
+    .keyword-name {
+        font-size: 13px;
+    }
+
+    .keyword-count {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
+
+    /* 过滤按钮 */
+    .filter-btn {
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    /* 消息列表 */
+    #chat-list-content {
+        padding: 15px;
+    }
+
+    .message-item {
+        margin-bottom: 15px;
+        gap: 10px;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+
+    .msg-bubble {
+        padding: 10px 12px;
+        font-size: 13px;
+        border-radius: 14px;
+        border-top-left-radius: 4px;
+    }
+
+    .msg-header {
+        font-size: 11px;
+    }
+
+    /* 信息覆盖层 */
+    #info-overlay {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: none;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    #info-overlay h3 {
+        font-size: 18px;
+    }
+
+    #info-overlay p {
+        font-size: 13px;
+    }
+
+    /* 副标题覆盖层 */
+    #subtitle-overlay {
+        font-size: 18px;
+        bottom: 20%;
+        padding: 10px 20px;
+        max-width: 85%;
+    }
+
+    /* Toast 通知 */
+    #toast-container {
+        left: 10px;
+        right: 10px;
+        bottom: 80px; /* 避开时间轴 */
+    }
+
+    .toast {
+        padding: 12px 15px;
+        font-size: 13px;
+        border-radius: 10px;
+    }
+
+    .toast i {
+        font-size: 16px;
+    }
+
+    /* 体验覆盖层 */
+    .experience-overlay .overlay-inner {
+        max-width: 90%;
+        padding: 30px 25px;
+        border-radius: 20px;
+    }
+
+    .experience-overlay h1 {
+        font-size: 28px;
+    }
+
+    .experience-overlay .subtext {
+        font-size: 14px;
+    }
+
+    .experience-overlay button {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    /* 侧边栏折叠按钮 */
+    .sidebar-collapse-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+    }
+
+    #message-sidebar-toggle-fixed {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+    }
+
+    /* ========== 移动端闲置模式优化 ========== */
+    body.idle-mode #message-sidebar-toggle-fixed {
+        /* 移动端闲置模式下，折叠按钮稍微缩小但保持可见 */
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        top: 15px; /* 调整位置避免与其他元素重叠 */
+        opacity: 0.6;
+        z-index: 9999; /* 确保在所有元素之上 */
+    }
+
+    /* 移动端闲置模式下，固定按钮的位置不受影响 */
+    body.message-sidebar-collapsed #message-sidebar-toggle-fixed {
+        display: flex !important; /* 强制显示 */
+        opacity: 0.8;
+    }
+}
+
+/* 小屏手机 (≤375px) */
+@media (max-width: 375px) {
+    /* 应用标题进一步缩小 */
+    .app-title {
+        font-size: 16px;
+    }
+
+    .app-title i {
+        font-size: 20px;
+    }
+
+    /* 统计值 */
+    .stat-val {
+        font-size: 12px;
+    }
+
+    .stat-label {
+        font-size: 8px;
+    }
+
+    /* 顶部控制按钮 */
+    #top-controls button {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    /* 关键词 */
+    .keyword-name {
+        font-size: 12px;
+    }
+
+    .keyword-count {
+        font-size: 10px;
+        padding: 1px 5px;
+    }
+
+    /* 消息气泡 */
+    .msg-bubble {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+
+    /* 时间轴 */
+    .time-label {
+        font-size: 12px;
+    }
+}
+
+/* 触摸设备优化 - 增大触摸区域 */
+@media (hover: none) and (pointer: coarse) {
+    /* 按钮、链接等交互元素最小尺寸 44x44px */
+    .filter-btn,
+    .tab-btn,
+    .keyword-item,
+    .message-item,
+    #top-controls button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* 禁用hover效果 */
+    .filter-btn:hover,
+    .keyword-item:hover,
+    .message-item:hover,
+    #top-controls button:hover {
+        transform: none;
+    }
+
+    /* 使用active状态代替hover */
+    .filter-btn:active,
+    .keyword-item:active,
+    .message-item:active,
+    #top-controls button:active {
+        transform: scale(0.98);
+        opacity: 0.8;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 768px) and (orientation: landscape) {
+    /* 时间轴移到顶部避免遮挡 */
+    #time-travel-container {
+        bottom: auto;
+        top: 60px;
+        width: 50%;
+        padding: 8px 20px;
+    }
+
+    /* 侧边栏缩小高度 */
+    #message-sidebar-header {
+        padding: 15px;
+        min-height: 80px;
+    }
+
+    /* Toast 通知位置调整 */
+    #toast-container {
+        bottom: 10px;
+    }
 }
 

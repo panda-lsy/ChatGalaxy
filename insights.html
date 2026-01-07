@@ -2,7 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
     <title>聊天洞察报告 - ChatGalaxy</title>
     <script src="js/lib/chart.umd.min.js"></script>
     <style>
@@ -446,6 +449,7 @@
         }
 
         /* 响应式 */
+        /* 平板设备 (≤768px) */
         @media (max-width: 768px) {
             .title {
                 font-size: 36px;
@@ -469,6 +473,343 @@
 
             .heatmap-grid {
                 grid-template-columns: repeat(12, 1fr);
+            }
+
+            /* 统计卡片优化 */
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            /* 图表容器高度调整 */
+            .chart-container {
+                height: 300px;
+            }
+
+            /* 开始按钮 */
+            .start-btn {
+                padding: 15px 40px;
+                font-size: 20px;
+            }
+
+            /* 内容区域内边距 */
+            .content-section {
+                padding: 40px 15px;
+            }
+
+            /* 分享按钮 */
+            .share-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .share-btn {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+        }
+
+        /* 手机设备 (≤480px) */
+        @media (max-width: 480px) {
+            /* 封面区域 */
+            .cover-section {
+                padding: 30px 15px;
+            }
+
+            .logo {
+                font-size: 36px;
+                margin-bottom: 15px;
+            }
+
+            .title {
+                font-size: 28px;
+                margin-bottom: 15px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+                margin-bottom: 40px;
+            }
+
+            /* 统计网格 */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                max-width: 300px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 32px;
+            }
+
+            .stat-label {
+                font-size: 14px;
+            }
+
+            /* 开始按钮 */
+            .start-btn {
+                padding: 12px 30px;
+                font-size: 18px;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            /* 内容区域 */
+            .content-section {
+                padding: 30px 12px;
+            }
+
+            .section-title {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+
+            .card {
+                padding: 15px;
+                border-radius: 16px;
+                margin-bottom: 20px;
+            }
+
+            .card-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+
+            .card-title .icon {
+                font-size: 28px;
+            }
+
+            /* 情感分析 */
+            .sentiment-overview {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .sentiment-item {
+                padding: 15px;
+            }
+
+            .sentiment-emoji {
+                font-size: 36px;
+            }
+
+            .sentiment-percent {
+                font-size: 28px;
+            }
+
+            .sentiment-label {
+                font-size: 14px;
+            }
+
+            /* 关键词网格 */
+            .keywords-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .keyword-item {
+                padding: 12px 15px;
+            }
+
+            .keyword-word {
+                font-size: 14px;
+            }
+
+            .keyword-count {
+                font-size: 12px;
+            }
+
+            /* 热力图 */
+            .heatmap-container {
+                grid-template-columns: 60px 1fr;
+                gap: 8px;
+            }
+
+            .heatmap-label {
+                font-size: 12px;
+            }
+
+            .heatmap-grid {
+                grid-template-columns: repeat(12, 1fr);
+            }
+
+            /* 话题分析 */
+            .topics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .topic-item {
+                padding: 20px;
+            }
+
+            .topic-name {
+                font-size: 18px;
+            }
+
+            .topic-relevance {
+                font-size: 13px;
+            }
+
+            .topic-keyword {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+
+            /* 标签卡片 */
+            .tags-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .tag-card {
+                padding: 20px;
+            }
+
+            .tag-icon {
+                font-size: 36px;
+                margin-bottom: 10px;
+            }
+
+            .tag-name {
+                font-size: 20px;
+            }
+
+            .tag-desc {
+                font-size: 13px;
+            }
+
+            /* 图表容器 */
+            .chart-container {
+                height: 250px;
+                margin: 15px 0;
+            }
+
+            /* 特殊时刻文本 */
+            #most-active-day {
+                font-size: 18px !important;
+            }
+
+            #longest-message {
+                font-size: 14px !important;
+            }
+
+            /* 分享按钮 */
+            .share-buttons {
+                gap: 12px;
+                margin-top: 30px;
+            }
+
+            .share-btn {
+                padding: 12px 20px;
+                font-size: 15px;
+            }
+
+            /* 页脚 */
+            footer {
+                padding: 30px 20px;
+            }
+
+            footer p {
+                font-size: 14px !important;
+            }
+        }
+
+        /* 小屏手机 (≤375px) */
+        @media (max-width: 375px) {
+            .title {
+                font-size: 24px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .card-title {
+                font-size: 18px;
+            }
+
+            .keyword-word {
+                font-size: 13px;
+            }
+
+            .tag-name {
+                font-size: 18px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 禁用hover效果 */
+            .stat-card:hover,
+            .sentiment-item:hover,
+            .keyword-item:hover,
+            .heatmap-cell:hover,
+            .topic-item:hover,
+            .tag-card:hover,
+            .share-btn:hover {
+                transform: none;
+            }
+
+            /* 使用active状态 */
+            .stat-card:active,
+            .sentiment-item:active,
+            .keyword-item:active,
+            .topic-item:active,
+            .tag-card:active {
+                transform: scale(0.98);
+                opacity: 0.9;
+            }
+
+            .share-btn:active {
+                transform: scale(0.98);
+            }
+
+            /* 增大触摸区域 */
+            .keyword-item,
+            .topic-item,
+            .tag-card,
+            .share-btn,
+            .start-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* 横屏模式优化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .cover-section {
+                padding: 20px 15px;
+                min-height: 100vh;
+            }
+
+            .stats-grid {
+                margin-bottom: 30px;
+            }
+
+            .start-btn {
+                margin-bottom: 20px;
+            }
+
+            .section-title {
+                margin-bottom: 30px;
+            }
+
+            .card {
+                margin-bottom: 20px;
             }
         }
     </style>

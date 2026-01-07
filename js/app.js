@@ -1121,14 +1121,14 @@ function enterIdleRotation() {
 
     isIdleRotating = true;
 
-    // 保存当前侧边栏状态
+    // ========== 保存右侧功能侧边栏状态 ==========
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.querySelector('.sidebar-toggle');
     const sidebarOverlay = document.querySelector('.sidebar-overlay');
     if (sidebar) {
         // 检查侧边栏是否打开
         const wasOpen = sidebar.classList.contains('active');
-        sessionStorage.setItem('idle_sidebar_was_open', wasOpen ? 'true' : 'false');
+        sessionStorage.setItem('idle_right_sidebar_was_open', wasOpen ? 'true' : 'false');
 
         // 隐藏右侧功能侧边栏（如果打开了）
         if (wasOpen) {
@@ -1140,6 +1140,20 @@ function enterIdleRotation() {
         // 隐藏侧边栏切换按钮
         if (sidebarToggle) {
             sidebarToggle.style.display = 'none';
+        }
+    }
+
+    // ========== 保存左侧消息侧边栏状态（移动端重要） ==========
+    const messageSidebar = document.getElementById('message-sidebar');
+    if (messageSidebar) {
+        const wasCollapsed = messageSidebar.classList.contains('collapsed');
+        sessionStorage.setItem('idle_left_sidebar_was_collapsed', wasCollapsed ? 'true' : 'false');
+
+        // 在闲置模式下，如果左侧边栏是展开的，则折叠它以提供更好的视觉体验
+        if (!wasCollapsed) {
+            messageSidebar.classList.add('collapsed');
+            // 同时更新 body 的状态类
+            document.body.classList.add('message-sidebar-collapsed');
         }
     }
 
@@ -1179,7 +1193,7 @@ function exitIdleRotation() {
         Graph.controls().autoRotateSpeed = appSettings.rotateSpeed;
     }
 
-    // 恢复右侧功能侧边栏状态
+    // ========== 恢复右侧功能侧边栏状态 ==========
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.querySelector('.sidebar-toggle');
     const sidebarOverlay = document.querySelector('.sidebar-overlay');
@@ -1190,8 +1204,8 @@ function exitIdleRotation() {
     }
 
     // 恢复侧边栏之前的状态
-    const wasOpen = sessionStorage.getItem('idle_sidebar_was_open') === 'true';
-    if (sidebar && wasOpen) {
+    const wasRightSidebarOpen = sessionStorage.getItem('idle_right_sidebar_was_open') === 'true';
+    if (sidebar && wasRightSidebarOpen) {
         sidebar.classList.add('active');
         sidebar.style.right = '0';
         if (sidebarOverlay) sidebarOverlay.classList.add('active');
@@ -1201,6 +1215,28 @@ function exitIdleRotation() {
         sidebar.style.right = '-280px';
         isSidebarOpen = false;
     }
+
+    // ========== 恢复左侧消息侧边栏状态（移动端重要） ==========
+    const messageSidebar = document.getElementById('message-sidebar');
+    if (messageSidebar) {
+        const wasLeftSidebarCollapsed = sessionStorage.getItem('idle_left_sidebar_was_collapsed') === 'true';
+
+        if (wasLeftSidebarCollapsed) {
+            // 如果之前是折叠的，保持折叠状态
+            messageSidebar.classList.add('collapsed');
+            document.body.classList.add('message-sidebar-collapsed');
+        } else {
+            // 如果之前是展开的，恢复展开状态
+            messageSidebar.classList.remove('collapsed');
+            document.body.classList.remove('message-sidebar-collapsed');
+        }
+
+        // 清除 sessionStorage 中的状态
+        sessionStorage.removeItem('idle_left_sidebar_was_collapsed');
+    }
+
+    // 清除右侧边栏的状态
+    sessionStorage.removeItem('idle_right_sidebar_was_open');
 
     // 移除闲置模式样式
     document.body.classList.remove('idle-mode');

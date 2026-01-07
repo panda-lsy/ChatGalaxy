@@ -355,6 +355,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* 响应式 */
+/* 平板设备 (≤768px) */
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;
@@ -364,11 +365,476 @@ input:checked + .toggle-slider:before {
     .sidebar-toggle {
         right: 16px;
         top: auto;
-        bottom: 20px;
+        bottom: 80px; /* 🔧 上移避免与时间轴（40px高度 + 20px padding + 20px margin = 80px）重叠 */
         transform: none;
+        z-index: 1600; /* 🔧 确保在时间轴（z-index: 1500）之上 */
     }
 
     .sidebar.active ~ .sidebar-toggle {
         display: none !important;  /* 🔧 移动端也隐藏功能按钮 */
     }
+
+    /* 侧边栏头部 */
+    .sidebar-header {
+        padding: 20px 16px;
+    }
+
+    .sidebar-header h2 {
+        font-size: 18px;
+    }
+
+    /* 功能按钮网格 */
+    .sidebar-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .sidebar-btn {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+
+    .sidebar-btn i {
+        font-size: 20px;
+    }
+
+    /* 侧边栏关闭按钮 */
+    .sidebar-close {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+    }
+
+    /* 侧边栏内容 */
+    .sidebar-content {
+        padding: 12px 0;
+    }
+
+    /* 功能分组 */
+    .sidebar-section {
+        margin-bottom: 20px;
+        padding: 0 12px;
+    }
+
+    .sidebar-section-title {
+        font-size: 11px;
+        margin-bottom: 10px;
+        padding-left: 6px;
+    }
+
+    /* 功能列表项 */
+    .sidebar-item {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .sidebar-item i {
+        font-size: 18px;
+    }
+
+    /* 开关控件 */
+    .sidebar-switch {
+        padding: 10px 12px;
+    }
+
+    .switch-label {
+        font-size: 13px;
+    }
+
+    .switch-label i {
+        font-size: 16px;
+    }
+
+    /* 自定义开关 */
+    .toggle-switch {
+        width: 44px;
+        height: 24px;
+    }
+
+    .toggle-slider:before {
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }
+
+    /* 侧边栏底部 */
+    .sidebar-footer {
+        padding: 16px 12px;
+    }
+
+    .sidebar-info {
+        font-size: 11px;
+        padding: 10px;
+    }
 }
+
+/* 手机设备 (≤480px) */
+@media (max-width: 480px) {
+    /* 侧边栏 */
+    .sidebar {
+        width: 100%;
+        right: -100% !important; /* 🔧 确保完全隐藏 */
+        border-radius: 0;
+    }
+
+    /* 🔧 确保侧边栏关闭时不可见 */
+    .sidebar:not(.active) {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* 侧边栏切换按钮 - 增大触摸区域 */
+    .sidebar-toggle {
+        right: 12px;
+        bottom: 90px; /* 🔧 进一步上移，避开时间轴 */
+        width: 52px;
+        height: 52px;
+        font-size: 22px;
+        z-index: 1600; /* 🔧 确保在时间轴之上 */
+    }
+
+    /* 侧边栏头部 */
+    .sidebar-header {
+        padding: 16px 12px;
+    }
+
+    .sidebar-header h2 {
+        font-size: 16px;
+    }
+
+    .sidebar-close {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+    }
+
+    /* 功能按钮网格 - 保持2列但调整间距 */
+    .sidebar-grid {
+        gap: 6px;
+    }
+
+    .sidebar-btn {
+        padding: 10px 8px;
+        font-size: 11px;
+        gap: 6px;
+    }
+
+    .sidebar-btn i {
+        font-size: 18px;
+    }
+
+    /* 侧边栏内容 */
+    .sidebar-content {
+        padding: 10px 0;
+    }
+
+    /* 功能分组 */
+    .sidebar-section {
+        margin-bottom: 16px;
+        padding: 0 10px;
+    }
+
+    .sidebar-section-title {
+        font-size: 10px;
+        margin-bottom: 8px;
+        padding-left: 4px;
+    }
+
+    /* 功能列表项 */
+    .sidebar-list {
+        gap: 6px;
+    }
+
+    .sidebar-item {
+        padding: 8px 10px;
+        font-size: 12px;
+        gap: 10px;
+    }
+
+    .sidebar-item i {
+        font-size: 16px;
+    }
+
+    /* 开关控件 */
+    .sidebar-switch {
+        padding: 8px 10px;
+    }
+
+    .switch-label {
+        font-size: 12px;
+        gap: 8px;
+    }
+
+    .switch-label i {
+        font-size: 14px;
+    }
+
+    /* 自定义开关 */
+    .toggle-switch {
+        width: 40px;
+        height: 22px;
+    }
+
+    .toggle-slider:before {
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(18px);
+    }
+
+    /* 侧边栏底部 */
+    .sidebar-footer {
+        padding: 12px 10px;
+    }
+
+    .sidebar-info {
+        font-size: 10px;
+        padding: 8px;
+        line-height: 1.5;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    /* 增大所有可交互元素的触摸区域 */
+    .sidebar-toggle,
+    .sidebar-close,
+    .sidebar-btn,
+    .sidebar-item {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* 禁用hover效果 */
+    .sidebar-btn:hover,
+    .sidebar-item:hover,
+    .sidebar-toggle:hover,
+    .sidebar-close:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* 使用active状态代替hover */
+    .sidebar-btn:active {
+        background: var(--sidebar-hover);
+        color: var(--sidebar-hover-text);
+        border-color: var(--sidebar-hover);
+        transform: none;
+        opacity: 0.9;
+    }
+
+    .sidebar-item:active {
+        background: var(--sidebar-hover);
+        color: var(--sidebar-hover-text);
+        border-color: var(--sidebar-hover);
+        transform: none;
+        opacity: 0.9;
+    }
+
+    .sidebar-toggle:active {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+
+    .sidebar-close:active {
+        background: rgba(0, 0, 0, 0.1);
+        transform: scale(0.95);
+    }
+}
+
+/* 小屏手机 (≤375px) */
+@media (max-width: 375px) {
+    /* 侧边栏头部 */
+    .sidebar-header h2 {
+        font-size: 15px;
+    }
+
+    /* 功能按钮 */
+    .sidebar-btn {
+        padding: 8px 6px;
+        font-size: 10px;
+    }
+
+    .sidebar-btn i {
+        font-size: 16px;
+    }
+
+    /* 功能列表项 */
+    .sidebar-item {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+
+    .sidebar-item i {
+        font-size: 14px;
+    }
+
+    /* 开关标签 */
+    .switch-label {
+        font-size: 11px;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 768px) and (orientation: landscape) {
+    /* 侧边栏切换按钮移到顶部 */
+    .sidebar-toggle {
+        top: 10px;
+        bottom: auto;
+        right: 10px;
+    }
+
+    /* 侧边栏头部 */
+    .sidebar-header {
+        padding: 12px 10px;
+        min-height: 60px;
+    }
+
+    .sidebar-header h2 {
+        font-size: 14px;
+    }
+
+    /* 功能分组 */
+    .sidebar-section {
+        margin-bottom: 12px;
+    }
+
+    /* 侧边栏底部 */
+    .sidebar-footer {
+        padding: 10px;
+    }
+
+    .sidebar-info {
+        display: none; /* 横屏时隐藏底部信息以节省空间 */
+    }
+}
+
+/* ========== 透明度模式优化 ========== */
+
+/* 闲置模式下的侧边栏样式 */
+body.idle-mode .sidebar {
+    /* 保持可见性，不随body透明度变化 */
+    opacity: 1 !important;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* 透明UI模式下的侧边栏增强 */
+body.transparent-ui .sidebar {
+    background: rgba(30, 30, 40, 0.95) !important; /* 增加不透明度 */
+    border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.6) !important; /* 增强阴影 */
+}
+
+body.transparent-ui .sidebar-header {
+    background: rgba(30, 30, 40, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+body.transparent-ui .sidebar-header h2 {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+body.transparent-ui .sidebar-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+body.transparent-ui .sidebar-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.transparent-ui .sidebar-section-title {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+body.transparent-ui .sidebar-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+body.transparent-ui .sidebar-btn i {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.transparent-ui .sidebar-btn:hover {
+    background: rgba(102, 126, 234, 0.3) !important;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+body.transparent-ui .sidebar-item {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+body.transparent-ui .sidebar-item i {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.transparent-ui .sidebar-item:hover {
+    background: rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.5);
+    color: #ffffff;
+}
+
+body.transparent-ui .sidebar-switch {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.transparent-ui .switch-label {
+    color: #ffffff;
+}
+
+body.transparent-ui .switch-label i {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.transparent-ui .toggle-slider {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+body.transparent-ui input:checked + .toggle-slider {
+    background-color: var(--accent-color);
+}
+
+body.transparent-ui .sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.transparent-ui .sidebar-info {
+    background: rgba(102, 126, 234, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+body.transparent-ui .sidebar-info strong {
+    color: #ffffff;
+}
+
+/* 移动端透明度模式优化 */
+@media (max-width: 768px) {
+    body.transparent-ui .sidebar {
+        background: rgba(20, 20, 30, 0.98) !important;
+    }
+
+    body.transparent-ui .sidebar-toggle {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)) !important;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+    }
+}
+
+
