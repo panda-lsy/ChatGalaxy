@@ -30,6 +30,11 @@ export class MessageSidebar extends SidebarBase {
         this.keywords = [];
         this.messages = [];
         this.filteredMessages = [];
+        
+        // 分页加载状态
+        this.pageSize = 50;  // 每次加载50条
+        this.currentPage = 0;
+        this.isLoadingMore = false;
         this.dataLoaded = false;  // 标志：数据是否已加载
 
         // UI 元素
@@ -59,7 +64,29 @@ export class MessageSidebar extends SidebarBase {
         // 初始化搜索功能
         this._initSearch();
 
+        // 初始化滚动加载
+        this._initScrollLoad();
+
         console.log('✅ [MessageSidebar] UI initialized');
+    }
+
+    /**
+     * 初始化滚动加载
+     * @private
+     */
+    _initScrollLoad() {
+        if (!this.messagesListElement) return;
+
+        this.messagesListElement.addEventListener('scroll', () => {
+            const scrollTop = this.messagesListElement.scrollTop;
+            const scrollHeight = this.messagesListElement.scrollHeight;
+            const clientHeight = this.messagesListElement.clientHeight;
+
+            // 滚动到底部附近时加载更多
+            if (scrollTop + clientHeight >= scrollHeight - 50 && !this.isLoadingMore) {
+                this._loadMoreMessages();
+            }
+        });
     }
 
     /**
@@ -194,35 +221,52 @@ export class MessageSidebar extends SidebarBase {
     loadMessages(messages) {
         this.messages = messages || [];
         this.filteredMessages = [...this.messages];
+        this.currentPage = 0;
 
         if (!this.messagesListElement) {
             console.warn('⚠️ [MessageSidebar] Messages list element not found');
             return;
         }
 
-        // 渲染消息列表
-        this._renderMessages();
-
-        console.log(`✅ [MessageSidebar] Loaded ${this.messages.length} messages`);
+        // 清空列表，加载第一批
+        this.messagesListElement.innerHTML = '';
+        this._loadMoreMessages();
     }
 
     /**
-     * 渲染消息列表
+     * 加载更多消息
      * @private
      */
-    _renderMessages() {
-        // 清空现有列表
-        this.messagesListElement.innerHTML = '';
+    _loadMoreMessages() {
+        if (this.isLoadingMore) return;
+        
+        const startIndex = this.currentPage * this.pageSize;
+        const endIndex = startIndex + this.pageSize;
+        
+        if (startIndex >= this.filteredMessages.length) {
+            return;  // 已全部加载
+        }
 
-        // 渲染消息
+        this.isLoadingMore = true;
+
+        // 渲染一批消息
+        const messagesToLoad = this.filteredMessages.slice(startIndex, endIndex);
         const fragment = document.createDocumentFragment();
 
-        this.filteredMessages.forEach(message => {
+        messagesToLoad.forEach(message => {
             const item = this._createMessageItem(message);
             fragment.appendChild(item);
         });
 
         this.messagesListElement.appendChild(fragment);
+        this.currentPage++;
+
+        // 显示加载状态（可选）
+        if (endIndex < this.filteredMessages.length) {
+            // 可以在这里添加"加载中..."提示
+        }
+
+        this.isLoadingMore = false;
     }
 
     /**

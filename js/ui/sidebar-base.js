@@ -79,10 +79,12 @@ export class SidebarBase {
      * @private
      */
     _initToggleButton() {
-        const toggleClass = this.position === 'left'
-            ? '.sidebar-toggle-open'
-            : '.sidebar-toggle';
+        // 右侧边栏不使用 toggle 按钮，只通过功能按钮打开
+        if (this.position === 'right') {
+            return;
+        }
 
+        const toggleClass = '.sidebar-toggle-open';
         this.toggleButton = document.querySelector(toggleClass);
 
         // 如果没有切换按钮，创建一个
@@ -97,13 +99,18 @@ export class SidebarBase {
     }
 
     /**
-     * 创建切换按钮
+     * 创建切换按钮（仅左侧边栏）
      * @private
      */
     _createToggleButton() {
+        // 只有左侧边栏需要 toggle 按钮
+        if (this.position !== 'left') {
+            return;
+        }
+
         this.toggleButton = document.createElement('button');
-        this.toggleButton.className = `sidebar-toggle ${this.position}`;
-        this.toggleButton.innerHTML = '<i class="ri-menu-line"></i>';
+        this.toggleButton.className = 'sidebar-toggle-open';
+        this.toggleButton.innerHTML = '<i class="ri-arrow-left-s-line"></i>';
         this.toggleButton.setAttribute('aria-label', '切换侧边栏');
         this.toggleButton.setAttribute('type', 'button');
 
@@ -122,25 +129,22 @@ export class SidebarBase {
             closeBtn.addEventListener('click', () => this.hide());
         }
 
-        // ESC 键关闭
+        // ESC 键关闭（两侧边栏都支持）
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.visible) {
                 this.hide();
             }
         });
 
-        // 点击外部关闭（但忽略其他侧边栏的切换按钮）
-        document.addEventListener('click', (e) => {
-            if (this.visible && !this.element.contains(e.target) && !this.toggleButton?.contains(e.target)) {
-                // 检查点击是否在其他侧边栏的切换按钮上
-                const clickedOnOtherSidebarToggle = e.target.closest('.sidebar-toggle') && 
-                                                       !e.target.closest(`.sidebar-toggle.${this.position}`);
-                
-                if (!clickedOnOtherSidebarToggle) {
+        // 点击外部关闭（仅左侧边栏）
+        // 右侧边栏只通过叉号关闭，不支持点击外部关闭
+        if (this.position === 'left') {
+            document.addEventListener('click', (e) => {
+                if (this.visible && !this.element.contains(e.target) && !this.toggleButton?.contains(e.target)) {
                     this.hide();
                 }
-            }
-        });
+            });
+        }
 
         // 监听主题变更
         if (window.ThemeManager) {
