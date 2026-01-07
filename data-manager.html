@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="css/data-manager.css">
     <link rel="stylesheet" href="css/processing-mode-selector.css">
     <link rel="stylesheet" href="css/share-modal.css">
+
+    <!-- 🆕 主题系统 CSS -->
+    <link rel="stylesheet" href="css/theme/base.css">
+    <link rel="stylesheet" href="css/theme/schemes.css">
+    <link rel="stylesheet" href="css/theme/transparency.css">
 </head>
 <body>
     <!-- 背景装饰 - 与主页面一致 -->
@@ -397,6 +402,22 @@
     <!-- 分享和导入分享模态框组件 -->
     <share-modal></share-modal>
     <import-share-modal></import-share-modal>
+
+    <!-- 🆕 主题系统 JavaScript -->
+    <script type="module">
+        import { ThemeManager } from './js/theme/theme-manager.js';
+
+        // 初始化主题
+        ThemeManager.initialize().then(() => {
+            console.log('✅ [data-manager.html] Theme system initialized');
+
+            // 监听主题变更
+            ThemeManager.on('themeChange', (data) => {
+                console.log(`🎨 [data-manager.html] Theme changed: ${data.oldTheme} → ${data.newTheme}`);
+                // 可以在这里更新数据表格样式等
+            });
+        });
+    </script>
 
 </body>
 </html>

@@ -11,6 +11,10 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
     <link rel="stylesheet" href="css/intro.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+
+    <!-- 🆕 主题系统 CSS -->
+    <link rel="stylesheet" href="css/theme/base.css">
+    <link rel="stylesheet" href="css/theme/schemes.css">
 </head>
 <body>
     <!-- 星空背景 Canvas -->
@@ -64,5 +68,31 @@
     </div>
 
     <script src="js/intro.js"></script>
+
+    <!-- 🆕 主题系统 JavaScript -->
+    <script type="module">
+        import { ThemeManager } from './js/theme/theme-manager.js';
+
+        // 初始化主题（intro页面通常只展示，不需要主题切换功能）
+        ThemeManager.initialize().then(() => {
+            console.log('✅ [intro.html] Theme system initialized');
+
+            // intro 页面应用当前主题背景
+            applyThemeBackground();
+        });
+
+        // 应用主题背景
+        function applyThemeBackground() {
+            const theme = ThemeManager.getCurrentThemeConfig();
+            if (!theme) return;
+
+            // 更新星空背景色
+            const canvas = document.getElementById('starfield');
+            if (canvas) {
+                // 使用主题的背景渐变色
+                canvas.style.background = `linear-gradient(135deg, ${theme.colors.bgStart} 0%, ${theme.colors.bgEnd} 100%)`;
+            }
+        }
+    </script>
 </body>
 </html>

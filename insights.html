@@ -813,6 +813,11 @@
             }
         }
     </style>
+
+    <!-- 🆕 主题系统 CSS -->
+    <link rel="stylesheet" href="css/theme/base.css">
+    <link rel="stylesheet" href="css/theme/schemes.css">
+    <link rel="stylesheet" href="css/theme/transparency.css">
 </head>
 <body>
     <!-- 加载页面 -->
@@ -1065,5 +1070,34 @@
 
     <!-- 4. UI 逻辑脚本 -->
     <script src="js/insights-ui.js?v=20260106"></script>
+
+    <!-- 🆕 主题系统 JavaScript -->
+    <script type="module">
+        import { ThemeManager } from './js/theme/theme-manager.js';
+
+        // 初始化主题
+        ThemeManager.initialize().then(() => {
+            console.log('✅ [insights.html] Theme system initialized');
+
+            // 监听主题变更
+            ThemeManager.on('themeChange', (data) => {
+                console.log(`🎨 [insights.html] Theme changed: ${data.oldTheme} → ${data.newTheme}`);
+                // 重新渲染图表以适应新主题
+                refreshCharts();
+            });
+        });
+
+        // 刷新图表函数（主题变更后调用）
+        function refreshCharts() {
+            // Chart.js 实例会自动响应CSS变量变化
+            // 这里可以添加额外的刷新逻辑
+            const charts = Chart.instances;
+            Object.values(charts).forEach(chart => {
+                if (chart) {
+                    chart.update();
+                }
+            });
+        }
+    </script>
 </body>
 </html>
