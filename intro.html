@@ -71,15 +71,11 @@
 
     <!-- 🆕 主题系统 JavaScript -->
     <script type="module">
+        import { autoMigrateAndApply } from './js/theme/migration.js';
         import { ThemeManager } from './js/theme/theme-manager.js';
 
-        // 初始化主题（intro页面通常只展示，不需要主题切换功能）
-        ThemeManager.initialize().then(() => {
-            console.log('✅ [intro.html] Theme system initialized');
-
-            // intro 页面应用当前主题背景
-            applyThemeBackground();
-        });
+        // 自动迁移并初始化主题
+        autoMigrateAndApply();
 
         // 应用主题背景
         function applyThemeBackground() {
@@ -92,6 +88,13 @@
                 // 使用主题的背景渐变色
                 canvas.style.background = `linear-gradient(135deg, ${theme.colors.bgStart} 0%, ${theme.colors.bgEnd} 100%)`;
             }
+        }
+
+        // 监听主题变更
+        if (window.ThemeManager) {
+            window.ThemeManager.on('themeChange', () => {
+                applyThemeBackground();
+            });
         }
     </script>
 </body>

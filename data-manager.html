@@ -405,18 +405,19 @@
 
     <!-- 🆕 主题系统 JavaScript -->
     <script type="module">
+        import { autoMigrateAndApply } from './js/theme/migration.js';
         import { ThemeManager } from './js/theme/theme-manager.js';
 
-        // 初始化主题
-        ThemeManager.initialize().then(() => {
-            console.log('✅ [data-manager.html] Theme system initialized');
+        // 自动迁移并初始化主题
+        autoMigrateAndApply();
 
-            // 监听主题变更
-            ThemeManager.on('themeChange', (data) => {
+        // 监听主题变更
+        if (window.ThemeManager) {
+            window.ThemeManager.on('themeChange', (data) => {
                 console.log(`🎨 [data-manager.html] Theme changed: ${data.oldTheme} → ${data.newTheme}`);
-                // 可以在这里更新数据表格样式等
+                // 主题变更后，CSS变量会自动更新，表格样式会随之变化
             });
-        });
+        }
     </script>
 
 </body>

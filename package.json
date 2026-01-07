@@ -1,6 +1,7 @@
 {
   "name": "chatgalaxy-pages",
   "version": "1.0.0",
+  "type": "module",
   "description": "ChatGalaxy - 阿里云 ESA Pages 部署",
   "scripts": {
     "dev": "python ../chat_viz/server.py",
