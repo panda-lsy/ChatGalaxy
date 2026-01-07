@@ -1,0 +1,351 @@
+/**
+ * ChatGalaxy 主题控件样式
+ * 主题选择器和透明度滑块
+ * @version 1.0.0
+ * @updated 2026-01-07
+ * @author 深山有密林团队
+ */
+
+/* ========== 主题选择器 ========== */
+
+.theme-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+}
+
+.theme-option {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    background: var(--card-bg);
+    border: 2px solid var(--sidebar-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    overflow: hidden;
+}
+
+.theme-option:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.theme-option.active {
+    border-color: var(--primary-color);
+    background: var(--card-hover-bg);
+    box-shadow: 0 0 0 3px var(--accent-color);
+}
+
+.theme-preview {
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.theme-preview::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%);
+    border-radius: 8px;
+}
+
+.theme-info {
+    text-align: center;
+}
+
+.theme-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+
+.theme-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* 激活指示器 */
+.theme-option.active::before {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========== 透明度滑块 ========== */
+
+.transparency-wrapper {
+    padding: 16px;
+}
+
+.transparency-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sidebar-text);
+    margin-bottom: 12px;
+}
+
+.transparency-label i {
+    font-size: 18px;
+    color: var(--primary-color);
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.transparency-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--card-hover-bg);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+/* 滑块轨道 */
+.transparency-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(to right,
+        var(--card-border) 0%,
+        var(--primary-color) 100%
+    );
+    border-radius: 3px;
+}
+
+.transparency-slider::-moz-range-track {
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(to right,
+        var(--card-border) 0%,
+        var(--primary-color) 100%
+    );
+    border-radius: 3px;
+}
+
+/* 滑块滑块 */
+.transparency-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.transparency-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.transparency-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+}
+
+.transparency-slider:hover::-moz-range-thumb {
+    transform: scale(1.2);
+}
+
+.transparency-slider:active::-webkit-slider-thumb {
+    transform: scale(1.1);
+}
+
+.transparency-slider:active::-moz-range-thumb {
+    transform: scale(1.1);
+}
+
+/* 透明度值显示 */
+.transparency-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-color);
+    min-width: 45px;
+    text-align: right;
+    padding: 4px 8px;
+    background: var(--card-hover-bg);
+    border-radius: 6px;
+}
+
+/* ========== 组合布局 ========== */
+
+/* 主题和透明度组合 */
+.theme-controls-group {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.theme-controls-section {
+    background: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding-left: 4px;
+}
+
+/* ========== 预设透明度按钮 ========== */
+
+.transparency-presets {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.transparency-preset-btn {
+    flex: 1;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.transparency-preset-btn:hover {
+    background: var(--card-hover-bg);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.transparency-preset-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* ========== 响应式设计 ========== */
+
+/* 平板设备 (≤768px) */
+@media (max-width: 768px) {
+    .theme-selector {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .theme-option {
+        flex-direction: row;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .theme-preview {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 0;
+    }
+
+    .theme-info {
+        text-align: left;
+        flex: 1;
+    }
+
+    .transparency-wrapper {
+        padding: 12px;
+    }
+}
+
+/* 手机设备 (≤480px) */
+@media (max-width: 480px) {
+    .theme-option {
+        padding: 10px 12px;
+    }
+
+    .theme-name {
+        font-size: 13px;
+    }
+
+    .theme-desc {
+        font-size: 10px;
+    }
+
+    .transparency-value {
+        font-size: 12px;
+        min-width: 40px;
+        padding: 4px 6px;
+    }
+}
+
+/* ========== 触摸设备优化 ========== */
+
+@media (hover: none) and (pointer: coarse) {
+    .theme-option,
+    .transparency-preset-btn {
+        min-height: 44px;
+    }
+
+    .theme-option:active,
+    .transparency-preset-btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+
+    .transparency-slider {
+        height: 8px;
+    }
+
+    .transparency-slider::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+    }
+
+    .transparency-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+    }
+}

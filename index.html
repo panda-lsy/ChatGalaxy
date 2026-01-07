@@ -53,6 +53,7 @@
     <link rel="stylesheet" href="css/theme/schemes.css">
     <link rel="stylesheet" href="css/theme/transparency.css">
     <link rel="stylesheet" href="css/components/sidebar.css">
+    <link rel="stylesheet" href="css/components/theme-controls.css">
 </head>
 <body data-theme="light">
 
@@ -353,6 +354,17 @@
     </div>
 
     <div class="sidebar-content">
+        <!-- 🆕 外观设置 -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">外观设置</div>
+
+            <!-- 主题选择器 -->
+            <div id="theme-selector" class="theme-selector"></div>
+
+            <!-- 透明度滑块 -->
+            <div id="transparency-slider-container" class="transparency-wrapper"></div>
+        </div>
+
         <!-- 3D控制 -->
         <div class="sidebar-section">
             <div class="sidebar-section-title">3D控制</div>
@@ -659,6 +671,8 @@ document.addEventListener('keydown', (e) => {
     import { autoMigrateAndApply } from './js/theme/migration.js';
     import { getMessageSidebar } from './js/ui/left-sidebar.js';
     import { getSettingsSidebar } from './js/ui/right-sidebar.js';
+    import { createThemeSelector } from './js/ui/theme-selector.js';
+    import { createTransparencySlider } from './js/ui/transparency-slider.js';
 
     // 等待 DOM 加载完成
     if (document.readyState === 'loading') {
@@ -673,7 +687,32 @@ document.addEventListener('keydown', (e) => {
         // 1. 自动迁移旧设置并初始化主题
         autoMigrateAndApply();
 
-        // 2. 初始化侧边栏（如果需要）
+        // 2. 初始化主题选择器
+        try {
+            createThemeSelector({
+                containerId: 'theme-selector',
+                showPreview: true
+            });
+            console.log('✅ [index.html] Theme selector initialized');
+        } catch (error) {
+            console.warn('⚠️ [index.html] Theme selector initialization skipped:', error);
+        }
+
+        // 3. 初始化透明度滑块
+        try {
+            createTransparencySlider({
+                containerId: 'transparency-slider-container',
+                min: 50,
+                max: 100,
+                step: 5,
+                showValue: true
+            });
+            console.log('✅ [index.html] Transparency slider initialized');
+        } catch (error) {
+            console.warn('⚠️ [index.html] Transparency slider initialization skipped:', error);
+        }
+
+        // 4. 初始化侧边栏（如果需要）
         try {
             window.MessageSidebar = getMessageSidebar();
             window.SettingsSidebar = getSettingsSidebar();
@@ -682,7 +721,7 @@ document.addEventListener('keydown', (e) => {
             console.warn('⚠️ [index.html] Sidebar initialization skipped:', error);
         }
 
-        // 3. 监听主题变更事件
+        // 5. 监听主题变更事件
         if (window.ThemeManager) {
             window.ThemeManager.on('themeChange', (data) => {
                 console.log(`🎨 [index.html] Theme changed: ${data.oldTheme} → ${data.newTheme}`);
