@@ -334,6 +334,11 @@ export class MessageSidebar extends SidebarBase {
      * @returns {string} 格式化后的时间
      */
     _formatTime(timestamp) {
+        // 检查时间戳有效性
+        if (!timestamp || isNaN(timestamp)) {
+            return '未知时间';
+        }
+
         const date = new Date(timestamp);
         const now = new Date();
         const diff = now - date;

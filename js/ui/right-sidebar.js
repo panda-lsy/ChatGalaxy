@@ -55,42 +55,21 @@ export class SettingsSidebar extends SidebarBase {
      */
     _initControls() {
         // 初始化主题选择器
-        this._initThemeSelector();
-
-        // 初始化透明度滑块
-        this._initTransparencySlider();
+        // ⚠️ 主题选择器和透明度滑块已在 index.html 中静态定义
+        // 不需要动态创建，避免重复
+        // this._initThemeSelector();
+        // this._initTransparencySlider();
 
         // 初始化功能按钮
         this._initFeatureButtons();
     }
 
-    /**
-     * 初始化主题选择器
-     * @private
-     */
+    /** ⚠️ 已禁用 - 主题选择器已在 index.html 中静态定义 */
+    /*
     _initThemeSelector() {
-        // 创建主题选择器容器
-        const container = this.element?.querySelector('.sidebar-content');
-        if (!container) {
-            console.warn('⚠️ [SettingsSidebar] Sidebar content not found');
-            return;
-        }
-
-        // 创建"外观"功能组
-        const appearanceSection = document.createElement('div');
-        appearanceSection.className = 'sidebar-section';
-        appearanceSection.innerHTML = `
-            <div class="sidebar-section-title">外观设置</div>
-            <div class="sidebar-grid" id="theme-selector"></div>
-        `;
-
-        // 插入到内容区域顶部
-        container.insertBefore(appearanceSection, container.firstChild);
-
-        // 初始化主题选择器
-        this.themeSelector = appearanceSection.querySelector('#theme-selector');
-        this._renderThemeOptions();
+        // ... (代码已禁用)
     }
+    */
 
     /**
      * 渲染主题选项
@@ -177,44 +156,12 @@ export class SettingsSidebar extends SidebarBase {
         });
     }
 
-    /**
-     * 初始化透明度滑块
-     * @private
-     */
+    /** ⚠️ 已禁用 - 透明度滑块已在 index.html 中静态定义 */
+    /*
     _initTransparencySlider() {
-        // 找到或创建透明度控件容器
-        const appearanceSection = this.element?.querySelector('.sidebar-section');
-        if (!appearanceSection) return;
-
-        // 创建透明度控件
-        const transparencyControl = document.createElement('div');
-        transparencyControl.className = 'sidebar-switch';
-        transparencyControl.innerHTML = `
-            <div class="switch-label">
-                <i class="ri-contrast-line"></i>
-                <span>透明度</span>
-            </div>
-            <div class="transparency-slider-wrapper">
-                <input type="range" id="transparency-slider" class="transparency-slider"
-                       min="0" max="100" value="95" step="5">
-                <span id="transparency-value" class="transparency-value">95%</span>
-            </div>
-        `;
-
-        appearanceSection.appendChild(transparencyControl);
-
-        // 初始化控件引用
-        this.transparencySlider = transparencyControl.querySelector('#transparency-slider');
-        this.transparencyValue = transparencyControl.querySelector('#transparency-value');
-
-        // 绑定事件
-        this.transparencySlider?.addEventListener('input', (e) => {
-            this._onTransparencyChange(e.target.value);
-        });
-
-        // 加载当前透明度
-        this._loadTransparency();
+        // ... (代码已禁用)
     }
+    */
 
     /**
      * 加载当前透明度
