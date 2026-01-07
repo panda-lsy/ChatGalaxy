@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGalaxy - 探索你的聊天宇宙</title>
+    <link rel="stylesheet" href="css/intro.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+</head>
+<body>
+    <!-- 星空背景 Canvas -->
+    <canvas id="starfield"></canvas>
+
+    <!-- 中心内容 -->
+    <div class="intro-container">
+        <div class="intro-content">
+            <!-- Logo -->
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="ri-planet-line"></i>
+                </div>
+                <h1 class="logo-title">ChatGalaxy</h1>
+                <p class="logo-subtitle">探索你的聊天宇宙</p>
+            </div>
+
+            <!-- 开始按钮 -->
+            <button id="startBtn" class="start-button">
+                <span class="btn-text">开始探索</span>
+                <span class="btn-shine"></span>
+                <i class="ri-arrow-right-line"></i>
+            </button>
+
+            <!-- 或加载已有数据集 -->
+            <div class="divider">
+                <span>或</span>
+            </div>
+
+            <button id="loadDatasetBtn" class="secondary-button">
+                <i class="ri-database-2-line"></i>
+                <span>加载数据集</span>
+            </button>
+        </div>
+
+        <!-- 底部提示 -->
+        <div class="intro-footer">
+            <p>聊天记录智能分析与 3D 可视化</p>
+        </div>
+    </div>
+
+    <!-- 音效控制按钮 -->
+    <button id="soundToggle" class="sound-toggle">
+        <i class="ri-volume-up-line"></i>
+    </button>
+
+    <!-- 加载指示器（隐藏） -->
+    <div id="loadingIndicator" class="loading-indicator hidden">
+        <div class="loading-ring"></div>
+        <p>正在进入宇宙...</p>
+    </div>
+
+    <script src="js/intro.js"></script>
+</body>
+</html>

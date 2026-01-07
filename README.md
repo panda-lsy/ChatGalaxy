@@ -1,351 +1,289 @@
-# ChatGalaxy 聊天记录智能分析平台
+# ChatGalaxy - 聊天记录智能分析与可视化平台
 
-> **阿里云 ESA Pages 边缘开发大赛**参赛作品
+> **阿里云 ESA Pages 边缘开发大赛参赛作品**
 >
 > 本项目由[阿里云ESA](https://www.aliyun.com/product/esa)提供加速、计算和保护
 >
 > ![](https://img.alicdn.com/imgextra/i3/O1CN01H1UU3i1Cti9lYtFrs_!!6000000000139-2-tps-7534-844.png)
+>
+> 将你的聊天记录转化为可探索的 3D 星系宇宙 ✨
 
 ---
 
 ## 📋 项目简介
 
-**ChatGalaxy** 是一款面向大众的聊天记录智能分析与可视化平台，通过创新的 3D 星系可视化技术，将用户的聊天记录转化为可探索的数字宇宙。
+**ChatGalaxy** 是一款创新的聊天记录可视化分析平台，通过 3D 星系技术将对话转化为数字宇宙，让每个人都能从日常聊天中发现有趣的故事和洞察。
 
 ### 核心特性
 
-✨ **3D 星系可视化** - 将聊天关键词构建成可探索的宇宙
-📊 **智能洞察报告** - 自动生成聊天习惯分析、情感趋势、活跃度统计
-⏰ **时间轴回放** - 沉浸式回顾对话历史
-🎨 **视觉增强系统** - 5 种主题、粒子特效、动画过渡
-🚀 **边缘计算优化** - 基于阿里云 ESA Pages 全球加速
+- 🌌 **3D 星系可视化** - 关键词化作星辰，对话构成星河
+- 📊 **智能洞察报告** - 自动生成年度账单式数据分析
+- ⏰ **时间轴回放** - 沉浸式回顾对话历史
+- 📦 **多数据集管理** - 支持创建、切换、编辑多个数据集
+- 🔗 **数据集分享** - 分享码系统，轻松与好友分享
+- ⚡ **双模式处理** - 快速模式 / 精确模式自由选择
+- 🎨 **5种主题配色** - 星云紫、深空蓝、浪漫粉、午夜黑
+- 🚀 **边缘计算优化** - 基于阿里云 ESA 全球加速
 
 ---
 
 ## 🌐 在线体验
 
-**部署地址**: WIP
-
-**GitHub 仓库**: [https://github.com/panda-lsy/chatgalaxy](https://github.com/panda-lsy/chatgalaxy)
-
----
-
-## 🎯 三大评选亮点
-
-### 💡 创意卓越
-
-**独特的可视化概念**：
-
-- 将抽象的聊天数据转化为具象的 3D 星系
-- 每个关键词都是一颗星星，每条对话都是一条星河
-- 提供沉浸式的"星际漫游"体验，让用户在星海中回顾对话
-
-**视觉设计亮点**：
-
-- 黑色宇宙背景，营造深邃的星际氛围
-- 动态粒子特效，模拟宇宙尘埃和星云
-- 流畅的 3D 交互，支持拖拽、缩放、旋转
-
-### 🔧 应用价值
-
-**广泛的适用场景**：
-
-- **社交达人** - 回顾微信群聊，发现有趣的聊天模式
-- **家庭用户** - 珍藏与亲友的对话时光，制作年度账单式报告
-- **兴趣社群** - 分析社群讨论热点，追踪话题演变
-- **个人回忆** - 将聊天记录转化为可视化纪念册
-
-**开箱即用**：
-
-- 支持微信、QQ 等主流聊天软件导出格式
-- 一键式数据处理和可视化生成
-- 无需编程知识，普通用户也能轻松使用
-
-### ⚙️ 技术探索
-
-**完整的边缘生态应用**：
-
-- **静态托管** (ESA Pages) - 全球 CDN 加速，毫秒级响应
-- **边缘函数** (Edge Functions) - 实时洞察生成，智能数据处理
-- **缓存优化** - 分层缓存策略，30 天静态资源缓存
-- **性能监控** - Web Vitals 集成，实时追踪用户体验
-
-**技术实现深度**：
-
-- Three.js + 3D Force Graph - 构建 3D 力导向图
-- Intl.Segmenter - 浏览器原生中文分词，无需后端
-- TypeScript 边缘函数 - 类型安全，易于维护
-- 智能懒加载 - defer 属性优化脚本加载
-- Gzip/Brotli 压缩 - 减小传输体积 60-80%
+- **GitHub**: [https://github.com/panda-lsy/chatgalaxy](https://github.com/panda-lsy/chatgalaxy)
+- **演示地址**: [https://chatgalaxy.89b52195.er.aliyun-esa.net/](https://chatgalaxy.89b52195.er.aliyun-esa.net/)
 
 ---
 
+## 🚀 快速开始
 
+### 方式 1：浏览器导入（推荐新手）
 
-## 📊 项目结构
+```bash
+# 1. 启动本地服务器
+npx serve . -p 8000
 
-```
-ChatGalaxy/
-├── index.html                  # 3D 星系可视化主页
-├── insights.html               # 洞察报告页面
-├── data-manager.html           # 数据管理页面
-│
-├── README.md                   # 项目文档
-├── LICENSE                     # MIT 开源协议
-├── .gitignore                  # Git 忽略配置
-│
-├── js/                         # JavaScript 文件
-│   ├── app.js                 # 核心逻辑 (2646 行)
-│   ├── visual-enhancer.js     # 视觉增强系统
-│   ├── time-travel.js         # 时间轴回放
-│   ├── particle-system.js     # 粒子系统
-│   ├── data-import.js         # 数据导入
-│   ├── data.js                # 可视化数据 (1.6 MB)
-│   └── insights.js            # 洞察数据 (4.5 KB)
-│
-├── css/                        # 样式文件
-│   └── main.css               # 主样式表
-│
-├── functions/                  # 边缘函数源码（可选）
-│   └── api/
-│       ├── generate-insights.ts  # 洞察生成
-│       └── health.ts             # 健康检查
-│
-├── dist/                       # 编译后的边缘函数
-│   └── api/
-│       ├── generate-insights.js
-│       └── health.js
-│
-├── package.json                # NPM 配置
-├── tsconfig.json               # TypeScript 配置
-│
-└── docs/                       # 文档目录
-    ├── DEPLOYMENT_GUIDE.md     # 部署指南
-    ├── PRE_DEPLOY_CHECKLIST.md # 部署检查清单
-    └── QUICK_REFERENCE.md      # 快速参考
+# 2. 访问数据管理页面
+open http://localhost:8000/data-manager.html
+
+# 3. 上传 JSON 文件导入数据集
 ```
 
-**注意**：数据文件 `data.js` 和 `insights.js` 需要使用本地工具生成。如需自定义数据，请使用主仓库的 Python 脚本处理。
+### 方式 2：Python 预处理（适合大数据集）
+
+```bash
+# 1. 安装依赖
+pip install jieba snownlp numpy pandas
+
+# 2. 数据预处理
+python process_data_v2.py
+
+# 3. 启动服务器
+npx serve . -p 8000
+```
 
 ---
 
-## 🛠️ 本地开发
+## 📥 数据导入指南
 
-### 环境准备
+### 支持的聊天软件
 
-```bash
-# 安装 Python 依赖
-pip install jieba snownlp numpy pandas networkx
+- ✅ **QQ** - 支持 [QQChatExporter V5](https://github.com/shuakami/qq-chat-exporter) 导出的数据
+- ✅ 通用 JSON 格式（自定义格式）
+- 🚧 微信（计划中）
+- 🚧 Telegram（计划中）
 
-# （可选）安装开发依赖
-pip install jupyter matplotlib
-```
+### QQ 数据导入步骤
 
-### 快速启动
+1. 下载 [QQChatExporter V5](https://github.com/shuakami/qq-chat-exporter)
+2. 导出聊天记录为 JSON 格式
+3. 在数据管理器中上传导出的文件
+4. 系统自动识别并处理数据
 
-```bash
-# 1. 数据预处理
-python chat_viz/process_data_v2.py
+### 数据格式要求
 
-# 2. 生成洞察报告
-python chat_viz/generate_insights.py
-
-# 3. 启动本地服务器
-python chat_viz/server.py
-
-# 4. 访问 http://localhost:8000
-```
-
-### NPM 脚本
-
-```bash
-cd pages
-npm run serve      # 启动本地服务器
-npm run process    # 处理数据
-npm run insights   # 生成洞察
+```json
+{
+  "messages": [
+    {
+      "sender": {"name": "张三"},
+      "content": {"text": "大家早上好！"},
+      "timestamp": "2024-01-15T09:00:00"
+    }
+  ]
+}
 ```
 
 ---
 
 ## 🎨 功能展示
 
-### 主页面（3D 星系可视化）
+### 1. 主页面 - 3D 星系可视化
 
 - **关键词星球** - 每个关键词是一颗星，大小代表出现频率
-- **对话星河** - 关键词之间的连线表示共现关系
-- **时间旅行** - 拖动时间轴，回顾历史对话
-- **交互探索** - 点击星球查看相关消息，缩放、旋转星系
+- **对话星河** - 星星间的连线表示词语共现关系
+- **时间旅行** - 拖动时间轴回顾历史对话
+- **交互探索** - 点击星球查看消息，缩放、旋转星系
+- **闲置漫游** - 闲置时自动漫游模式，隐藏侧边栏
 
-### 洞察报告（年度账单风格）
+### 2. 洞察报告 - 年度账单风格
 
 - **聊天活跃度** - 按小时/星期/月份统计
-- **情感趋势分析** - 整体情感曲线和分布
+- **情感趋势分析** - 情感曲线和分布
 - **关键词热度** - Top 50 关键词排行
-- **特殊时刻** - 最活跃的一天、最长的消息等
+- **特殊时刻** - 最活跃的一天、最长消息
 
-### 数据管理
+### 3. 数据管理器 - v3.0
 
-- **数据集切换** - 支持多个群组数据独立管理
-- **一键处理** - 自动数据导入和处理
-- **备份恢复** - 数据集自动备份机制
+- **数据集管理** - 创建、切换、删除、编辑数据集
+- **智能导入** - 拖拽上传，自动验证和格式转换
+- **消息编辑** - 单条编辑，批量操作
+- **数据导出** - 导出为 JSON 文件
+
+### 4. 数据集分享 - v3.2
+
+- **创建分享** - 生成分享码，设置权限和有效期
+- **导入分享** - 输入分享码，一键导入好友数据
+- **访问控制** - 密码保护、过期时间、访问次数限制
+
+---
+
+## ⚙️ 双模式数据处理
+
+### 快速模式（前端处理）
+
+- ✅ 浏览器原生分词（Intl.Segmenter）
+- ✅ 适合小数据集（< 1,000 条消息）
+- ✅ 秒级响应，无需服务器
+
+### 精确模式（边缘函数）
+
+- ✅ jieba 精确分词
+- ✅ SnowNLP 情感分析
+- ✅ 适合大数据集
+- ✅ 准确率 95%
+
+---
+
+## 🏗️ 技术架构
+
+### 前端技术栈
+
+- **3D 渲染**: Three.js r149 + 3d-force-graph v1.73.1
+- **图表展示**: Chart.js v4.4.0
+- **UI 框架**: Vanilla JS + Web Components
+- **图标库**: RemixIcon v3.5.0
+
+### 边缘计算
+
+- **托管平台**: 阿里云 ESA Pages
+- **边缘函数**: Node.js (nodejieba)
+- **CDN 加速**: 全球节点，毫秒级响应
+- **缓存策略**: 30 天静态资源缓存
+
+### 数据处理
+
+- **本地预处理**: Python 3.x (jieba + SnowNLP)
+- **浏览器分词**: Intl.Segmenter API
+- **存储方案**: IndexedDB + LocalStorage
+
+---
+
+## 📁 项目结构
+
+```
+ChatGalaxy/
+├── index.html              # 主页面（3D 星系）
+├── insights.html           # 洞察报告
+├── intro.html              # 介绍页面
+├── data-manager.html       # 数据管理器
+│
+├── css/                    # 样式文件
+│   ├── style.css           # 主样式
+│   ├── sidebar.css         # 侧边栏
+│   ├── data-manager.css    # 数据管理器
+│   └── ...
+│
+├── js/                     # JavaScript 核心代码
+│   ├── app.js              # 主应用逻辑
+│   ├── data-manager.js     # 数据集管理器
+│   ├── data-import.js      # 数据导入
+│   ├── data-share.js       # 数据分享
+│   ├── processors/         # 数据处理器
+│   ├── workers/            # Web Workers
+│   └── ui/                 # UI 组件
+│
+├── esa-functions/          # 边缘函数
+│   └── process-chat/       # Node.js 处理函数
+│       ├── index.js        # 函数入口
+│       ├── index.py        # Python 版本
+│       └── requirements.txt
+│
+├── process_data_v2.py      # Python 预处理脚本
+├── generate_insights.py    # 洞察报告生成
+└── test-data/              # 测试数据
+```
 
 ---
 
 ## ⚡ 性能优化
 
-### 缓存策略
-
-| 资源类型    | 缓存时间 | 说明                       |
-| ----------- | -------- | -------------------------- |
-| JS/CSS 文件 | 30 天    | 长期缓存，不变内容         |
-| HTML 文件   | 1 小时   | 短期缓存，支持快速更新     |
-| 数据文件    | 1 天     | 中期缓存，平衡性能与新鲜度 |
-
-### 加载优化
-
-- ✅ 所有脚本使用 `defer` 属性异步加载
-- ✅ 启用 Gzip/Brotli 压缩（> 1KB 文件）
-- ✅ 加载动画提升用户体验
-- ✅ 阿里云全球 CDN 边缘加速
-
-### Web Vitals 监控
-
-**监控指标**：
-
-- **LCP** (Largest Contentful Paint) - 最大内容绘制
-- **FID** (First Input Delay) - 首次输入延迟
-- **CLS** (Cumulative Layout Shift) - 累积布局偏移
-- **FCP** (First Contentful Paint) - 首次内容绘制
-
-**查看方式**：打开浏览器开发者工具（F12）→ Console 标签页
+- ✅ 所有脚本使用 `defer` 异步加载
+- ✅ Gzip/Brotli 压缩（> 1KB 文件）
+- ✅ Web Worker 后台处理
+- ✅ 虚拟滚动（大列表优化）
+- ✅ 分层缓存策略
+- ✅ CDN 静态资源加速
 
 ---
 
-## 📖 技术栈
+## 🔧 配置说明
 
-### 前端技术
+### 边缘函数配置
 
-- **Three.js** (r149) - 3D 图形渲染
-- **D3.js** (v7.8.5) - 数据可视化
-- **3d-force-graph** (v1.73.1) - 3D 力导向图
-- **RemixIcon** (v3.5.0) - 图标库
-- **Chart.js** (v4.4.0) - 图表绘制
+在数据管理器中配置边缘函数 URL：
 
-### 后端技术（本地）
-
-- **Python** - 数据处理和洞察生成
-- **jieba** - 中文分词
-- **SnowNLP** - 情感分析
-- **multiprocessing** - 并行处理
-
-### 边缘计算
-
-- **阿里云 ESA Pages** - 静态网站托管
-- **Edge Functions** (TypeScript) - 边缘函数
-- **Node.js 20** - 运行时环境
-- **Intl.Segmenter** - 浏览器原生分词 API
-
----
-
-## 📚 数据导入指南
-
-### 支持的聊天软件
-
-- ✅ QQ（PC 端导出）
-- 🚧 微信（计划中）
-- 🚧 Telegram（计划中）
-- 🚧 WhatsApp（计划中）
-
-### 数据格式要求
-
-```json
-[
-  {
-    "sender_name": "发送者名称",
-    "timestamp": "2025-12-11 12:00:00",
-    "content": "消息内容",
-    "msg_type": 1
-  }
-]
+```javascript
+// 配置示例
+window.EdgeFunctionConfig.setUrl('processChat', 'https://your-function-url');
 ```
 
-**字段说明**：
+### 主题配色
 
-- `sender_name`: 发送者名称或昵称
-- `timestamp`: 时间戳（支持多种格式）
-- `content`: 消息文本内容
-- `msg_type`: 消息类型（1=文本，其他类型会被忽略）
+支持 4 种主题，可在设置中切换：
 
----
-
-## 🔧 故障排查
-
-### 问题：3D 图形不显示
-
-**原因**：浏览器不支持 WebGL
-**解决**：使用最新版 Chrome/Firefox/Edge
-
-### 问题：数据加载失败
-
-**原因**：data.js 文件未生成或路径错误
-**解决**：运行 `npm run process` 重新生成数据
-
-### 问题：页面空白
-
-**原因**：CDN 资源加载失败
-**解决**：
-
-1. 检查网络连接
-2. 强制刷新浏览器（Ctrl+F5）
-3. 查看控制台错误信息
+- 💜 **星云紫** (默认) - 神秘梦幻
+- 🌌 **深空蓝** - 科技感
+- 💖 **浪漫粉** - 温暖可爱
+- 🌑 **午夜黑** - 极简黑白
 
 ---
 
-## 🎁 后续规划
+## 📊 版本历史
 
-### 短期优化（1-2 周）
-
-- [ ] 实现数据增量更新功能
-- [ ] 添加多数据集管理界面
-- [ ] 优化移动端响应式布局
-- [ ] 添加 PWA 离线支持
-
-### 中期规划（1-3 个月）
-
-- [ ] 接入阿里云边缘存储服务
-- [ ] 完善边缘函数数据处理
-- [ ] 添加用户认证系统
-- [ ] 实现数据导出功能（PDF/Excel）
-
-### 长期愿景（3 个月+）
-
-- [ ] WebAssembly 高性能分词
-- [ ] AI 洞察功能（聊天摘要、情感预测）
-- [ ] 多语言支持（i18n）
-- [ ] 数据隐私加密和权限管理
+- **v3.2** (2026-01-07) - 数据集分享功能
+- **v3.1** (2026-01-07) - 边缘函数集成，双模式处理
+- **v3.0** (2026-01-06) - 数据集管理系统
+- **v2.0** - 时间轴回放，视觉增强
+- **v1.0** - 初始版本，基础 3D 可视化
 
 ---
 
-## 📞 技术支持
+## 🤝 贡献指南
 
-- **项目主页**：[GitHub Repository](https://github.com/panda-lsy/chatgalaxy)
-- **问题反馈**：[Issues](https://github.com/panda-lsy/chatgalaxy/issues)
+欢迎提交 Issue 和 Pull Request！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
 
 ---
 
-## 📄 开源协议
+## 📄 许可证
 
-MIT License
+本项目基于 MIT 许可证开源 - 详见 [LICENSE](LICENSE) 文件
 
 ---
 
-**参赛信息**：
+## 👥 团队
 
-- 赛事：阿里云 ESA Pages 边缘开发大赛
-- 参赛者：深山有密林团队
-- 提交时间：2026-01-05
-- 作品类别：实用工具 + 数据可视化
+**深山有密林团队**
 
-**本作品由[阿里云ESA](https://www.aliyun.com/product/esa)提供加速、计算和保护**
+- 阿里云 ESA Pages 边缘开发大赛参赛作品
 
-![](https://img.alicdn.com/imgextra/i3/O1CN01H1UU3i1Cti9lYtFrs_!!6000000000139-2-tps-7534-844.png)
+---
+
+## 📮 联系方式
+
+- **GitHub Issues**: [提交问题](https://github.com/panda-lsy/chatgalaxy/issues)
+
+---
+
+<div align="center">
+
+**如果这个项目对你有帮助，请给个 ⭐️ Star 支持一下！**
+
+Made with ❤️ by ChatGalaxy Team
+
+</div>

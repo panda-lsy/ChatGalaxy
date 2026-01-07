@@ -68,6 +68,14 @@ class IndexedDBHelper {
                     messageStore.createIndex('datasetId', 'datasetId', { unique: false });
                     messageStore.createIndex('timestamp', 'timestamp', { unique: false });
                 }
+
+                // 创建分享记录存储
+                if (!db.objectStoreNames.contains('dataset_shares')) {
+                    const shareStore = db.createObjectStore('dataset_shares', { keyPath: 'id' });
+                    shareStore.createIndex('shareCode', 'shareCode', { unique: true });
+                    shareStore.createIndex('datasetId', 'datasetId', { unique: false });
+                    shareStore.createIndex('createdAt', 'createdAt', { unique: false });
+                }
             };
         });
     }
@@ -103,6 +111,11 @@ class IndexedDBHelper {
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
         });
+    }
+
+    async update(storeName, data) {
+        // update 和 put 功能相同，都是插入或替换
+        return this.put(storeName, data);
     }
 
     async delete(storeName, key) {
@@ -190,12 +203,13 @@ async function createDataset(datasetInfo) {
         description: datasetInfo.description || '',
         createdAt: now,
         updatedAt: now,
-        messageCount: 0,
-        participantCount: 0,
+        messageCount: datasetInfo.messageCount || 0,
+        participantCount: datasetInfo.participantCount || 0,
         tags: datasetInfo.tags || [],
         color: datasetInfo.color || '#3498db',
         isLocal: true,
-        processMode: 'fast'
+        processMode: 'fast',
+        readonly: datasetInfo.readonly || false // 🔧 新增：只读标志（用于分享权限控制）
     };
 
     await dbHelper.add(window.ChatGalaxyConfig.DATASETS_STORE, dataset);
@@ -243,6 +257,18 @@ async function saveMessages(datasetId, messages, onProgress) {
             onProgress(end, total);
         }
     }
+}
+
+/**
+ * 批量添加消息（saveMessages 的别名）
+ * @param {string} datasetId - 数据集ID
+ * @param {Array} messages - 消息数组
+ * @param {Function} onProgress - 进度回调
+ * @returns {Promise<void>}
+ */
+async function addMessages(datasetId, messages, onProgress) {
+    // addMessages 是 saveMessages 的别名，提供一致的 API
+    return saveMessages(datasetId, messages, onProgress);
 }
 
 /**
@@ -673,6 +699,7 @@ window.DatasetManagerV3 = {
     getMessage, // 🔧 新增：获取单条消息
     updateMessage, // 🔧 新增：更新单条消息
     saveMessages,
+    addMessages, // 🔧 新增：批量添加消息（saveMessages 的别名）
     updateDatasetStatistics,
     cacheDatasetList,
     getCachedDatasets

@@ -1,0 +1,375 @@
+/* ========== 全局样式 ========== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: radial-gradient(ellipse at center, #0a0e1a 0%, #000000 100%);
+    color: #fff;
+}
+
+/* ========== 星空 Canvas ========== */
+
+#starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* ========== 星云背景层 ========== */
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 30%, rgba(76, 29, 149, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 70%, rgba(147, 51, 234, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 50% at 30% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    animation: nebulaPulse 8s ease-in-out infinite;
+}
+
+@keyframes nebulaPulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* ========== 主容器 ========== */
+
+.intro-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+.intro-container.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ========== Logo 区域 ========== */
+
+.intro-content {
+    text-align: center;
+    animation: fadeInUp 1.2s ease-out;
+    position: relative;
+    z-index: 10;
+}
+
+/* 内容背景遮罩 - 提高文字辨识度 */
+.intro-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo-container {
+    margin-bottom: 60px;
+}
+
+.logo-icon {
+    font-size: 80px;
+    color: #8b9dff;
+    animation: pulse 3s ease-in-out infinite;
+    text-shadow:
+        0 0 30px rgba(139, 157, 255, 0.8),
+        0 0 60px rgba(139, 157, 255, 0.4);
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px rgba(139, 157, 255, 0.6));
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.logo-title {
+    font-size: 64px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #8b9dff 0%, #a78bfa 50%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    /* 使用滤镜代替 text-shadow，因为 background-clip: text 不支持 text-shadow */
+    filter: drop-shadow(0 0 20px rgba(139, 157, 255, 0.6)) drop-shadow(0 0 40px rgba(192, 132, 252, 0.4));
+    position: relative;
+    z-index: 2;
+}
+
+.logo-subtitle {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(102, 126, 234, 0.3);
+    position: relative;
+    z-index: 2;
+}
+
+/* ========== 按钮样式 ========== */
+
+.start-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 48px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    margin-bottom: 30px;
+}
+
+.start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
+}
+
+.start-button:active {
+    transform: translateY(0);
+}
+
+.start-button .btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.start-button:hover .btn-shine {
+    left: 100%;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 30px 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(139, 157, 255, 0.4), transparent);
+}
+
+.divider span {
+    padding: 0 20px;
+}
+
+.secondary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.secondary-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* ========== 底部提示 ========== */
+
+.intro-footer {
+    position: absolute;
+    bottom: 40px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ========== 加载指示器 ========== */
+
+.loading-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+.loading-indicator.hidden {
+    display: none;
+}
+
+.loading-ring {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(102, 126, 234, 0.2);
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-indicator p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+/* ========== 音效控制按钮 ========== */
+
+.sound-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 20px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sound-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.sound-toggle:active {
+    transform: scale(0.95);
+}
+
+/* ========== 响应式 ========== */
+
+@media (max-width: 768px) {
+    .logo-icon {
+        font-size: 60px;
+    }
+
+    .logo-title {
+        font-size: 48px;
+    }
+
+    .logo-subtitle {
+        font-size: 16px;
+    }
+
+    .start-button {
+        padding: 15px 36px;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-title {
+        font-size: 36px;
+    }
+
+    .start-button {
+        padding: 12px 28px;
+        font-size: 16px;
+    }
+
+    .secondary-button {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+}

@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGalaxy - 聊天星系可视化</title>
+    <script>
+        // 只在首次访问时跳转到intro页面（除非URL参数强制跳过）
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceSkip = urlParams.has('skip') || urlParams.has('nointro');
+
+            // 检查 sessionStorage 是否已经看过 intro
+            const hasSeenIntro = sessionStorage.getItem('chatgalaxy_intro_seen');
+
+            console.log('🔍 检查跳转逻辑:', {
+                forceSkip,
+                hasSeenIntro,
+                referrer: document.referrer,
+                pathname: window.location.pathname
+            });
+
+            // 只有首次访问才跳转（URL参数强制跳过或已看过intro则不跳转）
+            if (!forceSkip && !hasSeenIntro) {
+                console.log('✅ 首次访问，跳转到 intro.html');
+                window.location.href = 'intro.html';
+            } else {
+                console.log('⏭️ 跳过 intro 页面（URL参数强制或已看过）');
+                // 标记已经看过 intro（下次访问不再显示）
+                sessionStorage.setItem('chatgalaxy_intro_seen', 'true');
+            }
+        })();
+    </script>
     <!-- Load Three.js (r149 - Stable for 3d-force-graph) -->
     <script src="https://unpkg.com/three@0.149.0/build/three.min.js" defer></script>
     <!-- Load D3.js -->
@@ -165,9 +192,9 @@
                 <div class="setting-item">
                     <label>界面配色</label>
                     <select id="color-scheme-select">
-                        <option value="deepspace">🌌 深空蓝 (默认)</option>
+                        <option value="nebula">💜 星云紫 (默认)</option>
+                        <option value="deepspace">🌌 深空蓝</option>
                         <option value="romantic">💖 浪漫粉</option>
-                        <option value="nebula">💜 星云紫</option>
                         <option value="midnight">🌑 午夜黑</option>
                     </select>
                 </div>
@@ -235,14 +262,14 @@
                 </div>
                 <div class="setting-item checkbox-row">
                     <input type="checkbox" id="idle-rotation-enabled" checked>
-                    <label for="idle-rotation-enabled">开启闲置自动旋转</label>
+                    <label for="idle-rotation-enabled">开启闲置自动漫游</label>
                 </div>
                 <div class="setting-item">
-                    <label>闲置自动旋转检测 (秒) <span id="idle-time-val">10s</span></label>
+                    <label>闲置自动漫游检测 (秒) <span id="idle-time-val">10s</span></label>
                     <input type="range" id="idle-time" min="5" max="60" value="10">
                 </div>
                 <div class="setting-item">
-                    <label>闲置旋转速度 <span id="idle-speed-val">0.2</span></label>
+                    <label>闲置漫游速度 <span id="idle-speed-val">0.2</span></label>
                     <input type="range" id="idle-speed" min="0.1" max="2.0" step="0.1" value="0.2">
                 </div>
             </div>
@@ -379,7 +406,7 @@
                     <span>氛围音效</span>
                 </div>
                 <label class="toggle-switch">
-                    <input type="checkbox" id="music-toggle" onchange="toggleMusic()">
+                    <input type="checkbox" id="music-toggle" checked onchange="toggleMusic()">
                     <span class="toggle-slider"></span>
                 </label>
             </div>

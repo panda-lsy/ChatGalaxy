@@ -192,8 +192,10 @@ window.ChatGalaxyConfig.DB_NAME = 'ChatGalaxyDB';
 
 /**
  * IndexedDB 数据库版本
+ * v1: 初始版本（datasets, messages）
+ * v2: 添加 dataset_shares store（数据分享功能）
  */
-window.ChatGalaxyConfig.DB_VERSION = 1;
+window.ChatGalaxyConfig.DB_VERSION = 2;
 
 /**
  * 数据集存储名称

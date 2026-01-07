@@ -3,34 +3,53 @@ node_modules/
 package-lock.json
 
 # Build outputs
-# dist/
+dist/
+build/
+
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*.swo
+.claude/
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Local data
+# Local data (user uploaded data)
 *.jsonl
 data.json
+*.json
 
 # Temporary files
 *.tmp
 *.bak
+*~
 
-# Docs
+# Test data (keep test files for validation)
+# test-data/ is included in repo for reference
+
+# Archive
+archive/
+
+# ZCF plans (personal planning)
+.zcf/
+
+# Spec workflow (spec management)
+.spec-workflow/
+
+# ESA functions deployment (optional, can be deployed separately)
+# esa-functions/node_modules/
+# esa-functions/dist/
 docs/
 
-# Others
-CLAUDE.md 
-archive/
-.zcf/
-.spec-workflow
-.claude
-TEST_GUIDE.md
+CLAUDE.md

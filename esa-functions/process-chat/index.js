@@ -1,17 +1,16 @@
 /**
- * ChatGalaxy 聊天数据处理边缘函数 (Node.js 版本 v2.0)
+ * ChatGalaxy 聊天数据处理边缘函数 (Node.js 版本 v2.1)
  * 部署在阿里云 ESA (Edge Script Functions)
  *
- * 功能：
- * - nodejieba 精确分词（与 Python 版本一致）
- * - 改进的情感分析（参考 process_data_v2.py）
- * - TF-IDF 关键词提取（带词性过滤）
- * - 批量处理支持
+ * 算法统一：使用 text-processor.js 的规则引擎方法
+ * - 分词：nodejieba (Node.js 版 jieba)
+ * - 情感分析：规则引擎 (积极/消极/疑问词库 + 阈值)
+ * - 关键词提取：简化版 TF-IDF
  *
  * 作者: ChatGalaxy Team
- * 版本: 2.0.0
+ * 版本: 2.1.0
  * 日期: 2026-01-07
- * 参考: process_data_v2.py
+ * 参考: text-processor.js
  */
 
 'use strict';
@@ -20,31 +19,67 @@
 
 const nodejieba = require('nodejieba');
 
-// ========== 停用词（与 process_data_v2.py 一致） ==========
+// ========== 疑问词库 ==========
+
+const QUESTION_WORDS = new Set([
+    '什么', '怎么', '为什么', '哪', '谁', '多少', '几', '吗', '呢', '吧',
+    '如何', '怎样', '是否', '能否', '可否', '难道', '岂', '哎'
+]);
+
+// ========== 情感词库 ==========
+
+const POSITIVE_WORDS = new Set([
+    '好', '棒', '优秀', '厉害', '强', '喜欢', '爱', '开心', '快乐', '高兴',
+    '幸福', '满意', '赞', '支持', '感谢', '谢谢', '不错', '可以', '行',
+    '对', '是', '成功', '胜利', '棒极了', '太好了', '优秀', '完美', '漂亮',
+    '美好', '精彩', '出色', '卓越', '杰出', '超赞', '好评', '给力', '牛',
+    '哈哈', '嘻嘻', '呵呵', '加油', '努力', '坚持', '相信', '希望', '期待',
+    '美丽', '可爱', '温柔', '善良', '友好', '热情', '真诚', '感动', '温暖',
+    '舒服', '轻松', '自由', '愉快', '欢乐', '祥和', '和谐', '平静', '安宁',
+    '兴奋', '激动', '惊喜', '陶醉', '沉迷', '享受', '满足', '充实', '丰富'
+]);
+
+const NEGATIVE_WORDS = new Set([
+    '不好', '差', '坏', '烂', '糟糕', '讨厌', '恨', '烦', '烦躁', '生气',
+    '愤怒', '难过', '伤心', '痛苦', '失望', '绝望', '郁闷', '压抑', '沉重',
+    '累', '疲惫', '疲倦', '困', '饿', '痛', '难受', '不舒服', '病', '伤',
+    '错', '错误', '失误', '失败', '输', '败', '惨', '惨痛', '糟糕', '完蛋',
+    '不行', '不可以', '不能', '没用', '无用', '垃圾', '废物', '废柴', '笨',
+    '蠢', '傻', '傻逼', '白痴', '弱智', '脑残', '神经病', '疯子', '变态',
+    '恶心', '反胃', '呕吐', '厌恶', '憎恨', '鄙视', '轻视', '看不起', '瞧不起',
+    '害怕', '恐惧', '担心', '忧虑', '焦虑', '紧张', '慌', '慌张', '惊慌'
+]);
+
+const INTENSIFIERS = new Set([
+    '非常', '特别', '很', '超', '超级', '极其', '十分', '万分', '格外',
+    '相当', '挺', '蛮', '有点', '一些', '太', '更', '最', '比较', '稍微'
+]);
+
+// ========== 停用词表 ==========
 
 const STOP_WORDS = new Set([
-    "图片", "表情", "语音", "视频", "通话", "位置", "文件", "引用",
-    "现在", "可以", "知道", "觉得", "感觉", "时候", "什么", "怎么",
-    "因为", "所以", "虽然", "但是", "如果", "就是", "还是", "那个",
-    "这个", "一个", "一下", "一点", "一些", "已经", "可能", "真的",
-    "没有", "不是", "不用", "不要", "不好", "不行", "不错", "好吧",
-    "好的", "收到", "嗯嗯", "哈哈", "嘻嘻", "呵呵", "哦哦", "嘿嘿",
-    "ok", "OK", "Ok", "http", "https", "www", "com", "cn"
+    '的', '了', '是', '在', '和', '与', '或', '及', '等', '着', '过',
+    '啊', '呀', '哦', '嗯', '哼', '唉', '哎', '吧', '呢', '嘛',
+    '这', '那', '这个', '那个', '这些', '那些', '某', '各', '每',
+    '我', '你', '他', '她', '它', '我们', '你们', '他们', '她们', '它们',
+    '自己', '人家', '大家', '咱们',
+    '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+    '个', '些', '件', '种', '次', '回', '趟', '遍', '番', '声',
+    '来', '去', '上', '下', '进', '出', '回', '过', '到',
+    '把', '被', '让', '叫', '使', '由', '对', '向', '往', '从',
+    '就', '都', '也', '还', '再', '又', '才', '不', '没', '别',
+    '能', '可以', '会', '要', '想', '愿', '肯', '敢', '得', '该',
+    '说', '道', '讲', '问', '答', '告诉', '表示', '认为', '觉得',
+    '有', '无', '非', '未', '否',
+    // 媒体占位符
+    '图片', '表情', '语音', '视频', '通话', '位置', '文件', '引用'
 ]);
 
 // ========== 配置类 ==========
 
 class Config {
-    /**
-     * 边缘函数配置（与 process_data_v2.py 保持一致）
-     */
-    static get TOP_K() {
-        return 3; // 提取前3个关键词（与Python版本一致）
-    }
-
-    static get ALLOW_POS() {
-        // 允许的词性（与Python版本一致）
-        return ['n', 'nz', 'v', 'vd', 'vn', 'l', 'a', 'd'];
+    static get TOP_N() {
+        return 10; // 提取前10个关键词（与 text-processor.js 一致）
     }
 
     static get BATCH_SIZE() {
@@ -59,7 +94,7 @@ class Config {
 // ========== 工具函数 ==========
 
 /**
- * 移除回复引用标记（与 process_data_v2.py 一致）
+ * 移除回复引用标记
  * @param {string} text - 输入文本
  * @returns {string} - 清理后的文本
  */
@@ -74,170 +109,215 @@ function stripReplyReference(text) {
 }
 
 /**
- * 分析情感（参考 process_data_v2.py 的实现）
- * @param {string} text - 文本内容
- * @returns {number} - 情感标签 (0=中性, 1=积极, 2=疑问, 3=消极)
- *
- * 注意：返回值与 process_data_v2.py 相反
- * Python: 0=neutral, 1=happy, 2=question, 3=sad
- * JS: 0=中性, 1=积极, 2=疑问, 3=消极
+ * 移除中括号内容（黑名单）
+ * @param {string} text - 输入文本
+ * @returns {string} - 清理后的文本
  */
-function analyzeSentiment(text) {
-    if (!text || typeof text !== 'string') {
-        return 0; // 默认中性
+function removeBracketedContent(text) {
+    if (!text) {
+        return text;
     }
-
-    // 1. 规则检查：疑问句（与 process_data_v2.py 一致）
-    const QUESTION_PATTERNS = ['?', '？', '什么', '怎么', '为何', 'what', 'how'];
-    if (QUESTION_PATTERNS.some(pattern => text.includes(pattern))) {
-        return 2; // 疑问
-    }
-
-    // 2. 基于词典的情感分析（简化版 SnowNLP）
-    let positiveScore = 0;
-    let negativeScore = 0;
-
-    // 积极词库（扩充版）
-    const POSITIVE_WORDS = [
-        '好', '棒', '赞', '爱', '喜', '开心', '快乐', '高兴', '幸福', '满意',
-        '成功', '胜利', '完美', '漂亮', '美好', '精彩', '厉害', '优秀', '出色',
-        '卓越', '杰出', '超赞', '好评', '给力', '加油', '努力', '坚持', '相信',
-        '希望', '期待', '美丽', '可爱', '温柔', '善良', '友好', '热情', '真诚',
-        '感动', '温暖', '舒服', '轻松', '自由', '愉快', '欢乐', '祥和', '和谐',
-        '平静', '安宁', '兴奋', '激动', '惊喜', '陶醉', '享受', '满足', '充实',
-        '丰富', '可以', '不错', '很好', '挺好', '太棒', '真棒', '支持', '感谢',
-        '谢谢', '好的', '是的', '棒极了', '太好了', '非常好', '特别好', '很不错',
-        '没问题', '没关系', '哈哈', '嘻嘻', '呵呵'
-    ];
-
-    // 消极词库（扩充版）
-    const NEGATIVE_WORDS = [
-        '差', '坏', '烂', '糟', '恨', '烦', '怒', '痛', '累', '错', '不好',
-        '糟糕', '讨厌', '烦躁', '生气', '愤怒', '难过', '伤心', '痛苦', '失望',
-        '绝望', '郁闷', '压抑', '沉重', '疲惫', '疲倦', '难受', '不舒服', '错误',
-        '失误', '失败', '惨痛', '完蛋', '不行', '没用', '无用', '垃圾', '废物',
-        '废柴', '蠢笨', '傻逼', '白痴', '弱智', '脑残', '神经', '疯子', '变态',
-        '恶心', '反胃', '呕吐', '厌恶', '憎恨', '鄙视', '轻视', '害怕', '恐惧',
-        '担心', '忧虑', '焦虑', '紧张', '慌张', '惊慌', '不喜欢', '很难过', '特别糟',
-        '太差了', '不可以', '不能', '不要'
-    ];
-
-    // 程度副词
-    const INTENSIFIERS = ['非常', '特别', '很', '超', '超级', '极其', '十分', '万分', '格外', '相当', '挺', '蛮', '有点', '一些', '太', '更', '最', '比较', '稍微'];
-
-    // 统计积极词和消极词数量
-    for (const word of POSITIVE_WORDS) {
-        if (text.includes(word)) {
-            positiveScore++;
-        }
-    }
-
-    for (const word of NEGATIVE_WORDS) {
-        if (text.includes(word)) {
-            negativeScore++;
-        }
-    }
-
-    // 检查是否有程度副词
-    let hasIntensifier = false;
-    for (const word of INTENSIFIERS) {
-        if (text.includes(word)) {
-            hasIntensifier = true;
-            break;
-        }
-    }
-
-    // 如果有程度副词，权重加倍
-    if (hasIntensifier) {
-        positiveScore *= 2;
-        negativeScore *= 2;
-    }
-
-    // 计算情感分数（0-1）
-    if (positiveScore === 0 && negativeScore === 0) {
-        return 0; // 中性
-    }
-
-    const total = positiveScore + negativeScore;
-    const score = positiveScore / total;
-
-    // 根据 process_data_v2.py 的阈值：
-    // score > 0.6 → happy (1)
-    // score < 0.4 → sad (3)
-    // else → neutral (0)
-    if (score > 0.6) {
-        return 1; // 积极
-    } else if (score < 0.4) {
-        return 3; // 消极
-    } else {
-        return 0; // 中性
-    }
+    return text.replace(/\[[^\]]*\]/g, '').trim();
 }
 
-/**
- * 提取关键词（参考 process_data_v2.py 的实现）
- * @param {string} text - 文本内容
- * @returns {string[]} - 关键词列表
- */
-function extractKeywords(text) {
-    try {
-        // 1. 过滤纯占位符消息（与 process_data_v2.py 一致）
-        if (/^\[.*?\]$/.test(text)) {
-            return [];
-        }
-
-        // 2. 移除回复引用
-        text = stripReplyReference(text);
-
-        // 3. 使用 jieba TF-IDF 提取关键词（与 process_data_v2.py 一致）
-        // topK=3, allowPOS=['n', 'nz', 'v', 'vd', 'vn', 'l', 'a', 'd']
-        const keywordsWithTags = nodejieba.extract(text, Config.TOP_K);
-
-        // 4. 过滤停用词和长度（与 process_data_v2.py 一致）
-        const keywords = keywordsWithTags
-            .filter(kw => kw && kw.word && !STOP_WORDS.has(kw.word) && kw.word.length > 1)
-            .map(kw => kw.word);
-
-        return keywords;
-
-    } catch (error) {
-        console.error('Keyword extraction failed:', error);
-        return [];
-    }
-}
+// ========== 中文分词 ==========
 
 /**
- * 中文分词（与 process_data_v2.py 一致）
+ * 中文分词（使用 nodejieba）
  * @param {string} text - 文本内容
  * @returns {string[]} - 分词结果
  */
 function segmentText(text) {
     try {
-        // 精确模式
-        return nodejieba.cut(text, false);
+        // 精确模式分词
+        const words = nodejieba.cut(text, true);
+
+        // 过滤掉空白和标点
+        return words.filter(word => {
+            // 只保留中文、英文、数字
+            return /^[\u4e00-\u9fa5a-zA-Z0-9]+$/.test(word) && word.trim().length > 0;
+        });
     } catch (error) {
         console.error('Segmentation failed:', error);
         // 降级到单字符分割
-        return text.split('');
+        return text.split('').filter(c => /^[\u4e00-\u9fa5a-zA-Z0-9]$/.test(c));
     }
 }
 
+// ========== 情感分析 ==========
+
 /**
- * 处理单条消息（参考 process_data_v2.py 的 process_chunk 逻辑）
+ * 情感分析（规则引擎，与 text-processor.js 一致）
+ * @param {string} text - 文本内容
+ * @returns {number} - 情感标签：0=消极, 1=中性, 2=积极, 3=疑问
+ */
+function analyzeSentiment(text) {
+    if (!text || typeof text !== 'string') {
+        return 1; // 默认中性
+    }
+
+    // 分词
+    const words = segmentText(text);
+
+    let positiveScore = 0;
+    let negativeScore = 0;
+    let questionScore = 0;
+    let hasIntensifier = false;
+
+    // 分析每个词
+    for (const word of words) {
+        // 检测疑问词
+        if (QUESTION_WORDS.has(word)) {
+            questionScore += 2;
+        }
+
+        // 检测增强词（程度副词）
+        if (INTENSIFIERS.has(word)) {
+            hasIntensifier = true;
+        }
+
+        // 检测积极词
+        if (POSITIVE_WORDS.has(word)) {
+            positiveScore += hasIntensifier ? 2 : 1;
+        }
+
+        // 检测消极词
+        if (NEGATIVE_WORDS.has(word)) {
+            negativeScore += hasIntensifier ? 2 : 1;
+        }
+    }
+
+    // 判断情感类别（与 text-processor.js 一致）
+    if (questionScore > 0) {
+        return 3; // 疑问
+    }
+
+    const sentimentScore = positiveScore - negativeScore;
+
+    if (sentimentScore > 1) {
+        return 2; // 积极
+    } else if (sentimentScore < -1) {
+        return 0; // 消极
+    } else {
+        return 1; // 中性
+    }
+}
+
+// ========== 关键词提取 ==========
+
+/**
+ * 过滤停用词
+ * @param {string[]} words - 分词数组
+ * @returns {string[]} - 过滤后的词数组
+ */
+function filterStopWords(words) {
+    return words.filter(word => {
+        // 过滤单字
+        if (word.length === 1) {
+            return false;
+        }
+
+        // 过滤停用词
+        if (STOP_WORDS.has(word)) {
+            return false;
+        }
+
+        // 过滤纯数字
+        if (/^\d+$/.test(word)) {
+            return false;
+        }
+
+        return true;
+    });
+}
+
+/**
+ * 计算词频（TF）
+ * @param {string[]} words - 分词数组
+ * @returns {Map<string, number>} - 词频映射
+ */
+function calculateTermFrequency(words) {
+    const freq = new Map();
+
+    for (const word of words) {
+        const count = freq.get(word) || 0;
+        freq.set(word, count + 1);
+    }
+
+    return freq;
+}
+
+/**
+ * 提取关键词（简化版 TF-IDF，与 text-processor.js 一致）
+ * @param {string} text - 文本内容
+ * @param {number} topN - 返回前N个关键词
+ * @returns {Array<{word: string, score: number}>} - 关键词数组
+ */
+function extractKeywords(text, topN = 10) {
+    if (!text || typeof text !== 'string') {
+        return [];
+    }
+
+    // 0. 先移除中括号内容（在分词之前）
+    text = removeBracketedContent(text);
+
+    // 检查是否是纯占位符
+    if (/^\[.*?\]$/.test(text)) {
+        return [];
+    }
+
+    // 1. 移除回复引用
+    text = stripReplyReference(text);
+
+    // 2. 分词
+    const words = segmentText(text);
+
+    // 3. 过滤停用词
+    const filteredWords = filterStopWords(words);
+
+    if (filteredWords.length === 0) {
+        return [];
+    }
+
+    // 4. 计算词频
+    const tf = calculateTermFrequency(filteredWords);
+
+    // 5. 计算简化版 TF-IDF（与 text-processor.js 一致）
+    const keywords = [];
+    for (const [word, count] of tf.entries()) {
+        // score = TF × log(词长)
+        const score = count * Math.log(word.length);
+
+        keywords.push({
+            word: word,
+            score: score
+        });
+    }
+
+    // 6. 排序并返回 TopN
+    keywords.sort((a, b) => b.score - a.score);
+
+    return keywords.slice(0, topN);
+}
+
+// ========== 消息处理 ==========
+
+/**
+ * 处理单条消息
  * @param {Object} message - 原始消息对象
  * @param {number} index - 消息索引
  * @returns {Object} - 处理后的消息
  */
 function processMessage(message, index) {
     try {
-        // 提取文本内容（与 process_data_v2.py 一致）
+        // 提取文本内容
         const content = message.content || {};
         let text = content.text || '';
 
         // 移除回复引用
         text = stripReplyReference(text);
 
-        // 跳过空消息或占位符（与 process_data_v2.py 一致）
+        // 跳过空消息或占位符
         if (!text || text.length < 2) {
             return null;
         }
@@ -250,20 +330,21 @@ function processMessage(message, index) {
         // 分词
         const words = segmentText(text);
 
-        // 情感分析（与 process_data_v2.py 逻辑一致）
+        // 情感分析（使用规则引擎）
         const sentiment = analyzeSentiment(text);
 
-        // 关键词提取（与 process_data_v2.py 一致）
-        const keywords = extractKeywords(text);
+        // 关键词提取（topN=10）
+        const keywordObjects = extractKeywords(text, 10);
+        const keywords = keywordObjects.map(k => k.word);
 
-        // 发送者名称（与 process_data_v2.py 一致）
+        // 发送者名称
         const sender = message.sender || {};
         const senderName = sender.name || 'Unknown';
 
-        // 时间戳（保持原样）
+        // 时间戳
         const timestamp = message.timestamp || Date.now();
 
-        // 返回处理结果（与 process_data_v2.py 的格式对应）
+        // 返回处理结果
         return {
             id: message.id || `msg_${index}`,
             senderName: senderName,
@@ -282,7 +363,7 @@ function processMessage(message, index) {
 }
 
 /**
- * 批量处理消息（参考 process_data_v2.py 的多进程处理逻辑）
+ * 批量处理消息
  * @param {Array} messages - 消息列表
  * @returns {Array} - 处理后的消息列表
  */
@@ -354,7 +435,7 @@ function handler(event, context) {
             };
         }
 
-        console.log(`Processing ${messages.length} messages with process_data_v2.py logic...`);
+        console.log(`Processing ${messages.length} messages with text-processor.js algorithm...`);
 
         // 处理消息
         const results = processMessagesBatch(messages);
@@ -441,6 +522,12 @@ if (require.main === module) {
             sender: { name: '测试' },
             content: { text: '[图片]' },
             timestamp: 1704508980
+        },
+        {
+            id: 'msg_5',
+            sender: { name: '赵六' },
+            content: { text: '这个真的太棒了！非常赞！' },
+            timestamp: 1704509040
         }
     ];
 
@@ -454,7 +541,7 @@ if (require.main === module) {
 
     // 打印结果
     console.log('='.repeat(60));
-    console.log('边缘函数测试结果 (process_data_v2.py 逻辑):');
+    console.log('边缘函数测试结果 (text-processor.js 算法):');
     console.log('='.repeat(60));
     const responseBody = JSON.parse(result.body);
     console.log(JSON.stringify(responseBody, null, 2));
@@ -462,4 +549,15 @@ if (require.main === module) {
     console.log(`- 总消息数: ${responseBody.stats.total}`);
     console.log(`- 处理成功: ${responseBody.stats.processed}`);
     console.log(`- 过滤占位符: ${responseBody.stats.filtered}`);
+
+    // 打印每条消息的情感和关键词
+    if (responseBody.success && responseBody.results) {
+        console.log('\n详细结果:');
+        responseBody.results.forEach((msg, i) => {
+            const sentimentLabels = ['消极', '中性', '积极', '疑问'];
+            console.log(`\n[消息 ${i + 1}] ${msg.senderName}: ${msg.text}`);
+            console.log(`  情感: ${sentimentLabels[msg.sentiment]} (${msg.sentiment})`);
+            console.log(`  关键词: ${msg.keywords.join(', ')}`);
+        });
+    }
 }

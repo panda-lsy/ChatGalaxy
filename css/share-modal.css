@@ -1,0 +1,501 @@
+/**
+ * ChatGalaxy 分享模态框样式 v1.0
+ *
+ * @version 1.0.0
+ * @updated 2026-01-07
+ */
+
+/* ========== 分享模态框 ========== */
+
+.share-modal,
+.import-share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+}
+
+.share-modal__overlay,
+.import-share-modal__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.share-modal__dialog,
+.import-share-modal__dialog {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    background: var(--bg-secondary, #16213e);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ========== 头部 ========== */
+
+.share-modal__header,
+.import-share-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.share-modal__title,
+.import-share-modal__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color, #b8c1ec);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-modal__title i,
+.import-share-modal__title i {
+    color: var(--accent-color, #667eea);
+}
+
+.share-modal__close,
+.import-share-modal__close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: var(--text-secondary, rgba(184, 193, 236, 0.7));
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.2s ease;
+}
+
+.share-modal__close:hover,
+.import-share-modal__close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger-color, #ef4444);
+    transform: rotate(90deg);
+}
+
+/* ========== 内容区 ========== */
+
+.share-modal__body,
+.import-share-modal__body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* 自定义滚动条 */
+.share-modal__body::-webkit-scrollbar,
+.import-share-modal__body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.share-modal__body::-webkit-scrollbar-track,
+.import-share-modal__body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.share-modal__body::-webkit-scrollbar-thumb,
+.import-share-modal__body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.share-modal__body::-webkit-scrollbar-thumb:hover,
+.import-share-modal__body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ========== 步骤 ========== */
+
+.share-modal__step,
+.import-share-modal__step {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ========== 区块 ========== */
+
+.share-modal__section,
+.import-share-modal__section {
+    margin-bottom: 24px;
+}
+
+.share-modal__section-title,
+.import-share-modal__section-title {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color, #b8c1ec);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-modal__section-title i,
+.import-share-modal__section-title i {
+    color: var(--accent-color, #667eea);
+}
+
+/* ========== 字段 ========== */
+
+.share-modal__field,
+.import-share-modal__field {
+    margin-bottom: 16px;
+}
+
+.share-modal__label,
+.import-share-modal__label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color, #b8c1ec);
+}
+
+.share-modal__label .required,
+.import-share-modal__label .required {
+    color: var(--danger-color, #ef4444);
+}
+
+.share-modal__label .hint,
+.import-share-modal__label .hint {
+    color: var(--text-secondary, rgba(184, 193, 236, 0.5));
+    font-weight: 400;
+}
+
+.share-modal__input,
+.import-share-modal__input,
+.share-modal__select,
+.import-share-modal__select,
+.share-modal__textarea,
+.import-share-modal__textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--text-color, #b8c1ec);
+    background: var(--bg-color, #1a1a2e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.share-modal__input:focus,
+.import-share-modal__input:focus,
+.share-modal__select:focus,
+.import-share-modal__select:focus,
+.share-modal__textarea:focus,
+.import-share-modal__textarea:focus {
+    outline: none;
+    border-color: var(--accent-color, #667eea);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.share-modal__textarea,
+.import-share-modal__textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ========== 权限选项 ========== */
+
+.share-modal__permission-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.share-modal__permission-option {
+    cursor: pointer;
+}
+
+.share-modal__permission-option input[type="radio"] {
+    display: none;
+}
+
+.permission-card {
+    padding: 16px;
+    background: var(--bg-color, #1a1a2e);
+    border: 2px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.share-modal__permission-option input[type="radio"]:checked + .permission-card {
+    border-color: var(--accent-color, #667eea);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.permission-card i {
+    font-size: 24px;
+    color: var(--accent-color, #667eea);
+}
+
+.permission-card span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color, #b8c1ec);
+}
+
+/* ========== 密码输入框 ========== */
+
+.share-modal__password-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.share-modal__password-wrapper .share-modal__input {
+    flex: 1;
+}
+
+.share-modal__icon-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: var(--accent-color, #667eea);
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.share-modal__icon-btn:hover {
+    background: var(--accent-hover, #5568d3);
+    transform: scale(1.05);
+}
+
+/* ========== 分享码显示 ========== */
+
+.share-modal__share-code-display {
+    margin-bottom: 20px;
+}
+
+.share-code-box {
+    background: var(--bg-color, #1a1a2e);
+    border: 2px dashed var(--accent-color, #667eea);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 12px;
+}
+
+.share-code {
+    display: block;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: var(--accent-color, #667eea);
+    letter-spacing: 2px;
+}
+
+/* ========== 分享信息列表 ========== */
+
+.share-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.share-info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg-color, #1a1a2e);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text-secondary, rgba(184, 193, 236, 0.7));
+}
+
+.share-info-item i {
+    color: var(--accent-color, #667eea);
+    font-size: 16px;
+}
+
+.share-info-item strong {
+    color: var(--text-color, #b8c1ec);
+    margin-left: auto;
+}
+
+/* ========== 数据集信息卡片 ========== */
+
+.dataset-info-card {
+    background: var(--bg-color, #1a1a2e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.dataset-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+    font-size: 14px;
+}
+
+.dataset-info-row:last-child {
+    border-bottom: none;
+}
+
+.dataset-info-row i {
+    color: var(--accent-color, #667eea);
+    font-size: 16px;
+    width: 20px;
+}
+
+.dataset-info-row .label {
+    color: var(--text-secondary, rgba(184, 193, 236, 0.7));
+}
+
+.dataset-info-row strong,
+.dataset-info-row span {
+    color: var(--text-color, #b8c1ec);
+    margin-left: auto;
+    text-align: right;
+}
+
+/* ========== 按钮 ========== */
+
+.share-modal__actions,
+.import-share-modal__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.share-modal__btn,
+.import-share-modal__btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.share-modal__btn--primary,
+.import-share-modal__btn--primary {
+    background: var(--accent-color, #667eea);
+    color: #ffffff;
+}
+
+.share-modal__btn--primary:hover,
+.import-share-modal__btn--primary:hover {
+    background: var(--accent-hover, #5568d3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.share-modal__btn--secondary,
+.import-share-modal__btn--secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color, #b8c1ec);
+}
+
+.share-modal__btn--secondary:hover,
+.import-share-modal__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.share-modal__btn:disabled,
+.import-share-modal__btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ========== 提示文本 ========== */
+
+.hint {
+    color: var(--text-secondary, rgba(184, 193, 236, 0.5));
+    font-size: 12px;
+}
+
+/* ========== 响应式设计 ========== */
+
+@media (max-width: 768px) {
+    .share-modal__dialog,
+    .import-share-modal__dialog {
+        margin: 0;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .share-modal__overlay,
+    .import-share-modal__overlay {
+        padding: 0;
+    }
+
+    .share-modal__permission-options {
+        grid-template-columns: 1fr;
+    }
+
+    .share-modal__actions,
+    .import-share-modal__actions {
+        flex-direction: column-reverse;
+    }
+
+    .share-modal__btn,
+    .import-share-modal__btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -7,6 +7,7 @@
     <link href="js/lib/remixicon/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="css/data-manager.css">
     <link rel="stylesheet" href="css/processing-mode-selector.css">
+    <link rel="stylesheet" href="css/share-modal.css">
 </head>
 <body>
     <!-- 背景装饰 - 与主页面一致 -->
@@ -34,6 +35,10 @@
                     <button class="action-btn secondary" onclick="createNewDataset()">
                         <i class="ri-add-circle-line"></i>
                         <span>创建空数据集</span>
+                    </button>
+                    <button class="action-btn secondary" onclick="openImportShare()">
+                        <i class="ri-download-cloud-line"></i>
+                        <span>导入分享</span>
                     </button>
                     <button class="action-btn secondary" onclick="loadDemoDataset()">
                         <i class="ri-magic-line"></i>
@@ -284,10 +289,15 @@
     <script src="js/logger.js"></script>
     <script src="js/error-handler.js"></script>
     <script src="js/data-manager.js"></script>
+    <script src="js/data-share.js"></script>
     <script src="js/data-import.js"></script>
     <script src="js/processors/text-processor.js"></script>
     <script src="js/edge-function-config.js"></script>
     <script src="js/data-manager-ui.js?v=1.1.0-session-storage"></script>
+
+    <!-- 分享功能 UI 组件 -->
+    <script src="js/ui/share-modal.js"></script>
+    <script src="js/ui/import-share-modal.js"></script>
 
     <!-- 边缘函数配置UI逻辑 -->
     <script>
@@ -365,6 +375,25 @@
 
         // 在控制台提供便捷的配置方法
         window.configureEdgeFunction = configureEdgeFunction;
+
+        // 打开导入分享模态框
+        function openImportShare() {
+            document.dispatchEvent(new CustomEvent('importShare'));
+        }
+        window.openImportShare = openImportShare;
+
+        // 打开分享模态框
+        function openShareModal(datasetId) {
+            document.dispatchEvent(new CustomEvent('shareDataset', {
+                detail: { datasetId }
+            }));
+        }
+        window.openShareModal = openShareModal;
     </script>
+
+    <!-- 分享和导入分享模态框组件 -->
+    <share-modal></share-modal>
+    <import-share-modal></import-share-modal>
+
 </body>
 </html>

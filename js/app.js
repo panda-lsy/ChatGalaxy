@@ -28,7 +28,7 @@ let originalForceConfig = null; // 🔧 改为 null，用于判断是否已保�
 
 // Audio State
 let audioCtx = null;
-let isMuted = true;
+let isMuted = false; // 默认开启氛围音效
 let ambientGain = null;
 let ambientNodes = [];
 let melodyTimer = null;
@@ -224,7 +224,7 @@ let currentPage = 1;
 
 // App Settings
 let appSettings = {
-    colorScheme: 'deepspace', // 🔧 改为深空主题，更适合大众
+    colorScheme: 'nebula', // 🔧 默认星云紫主题，神秘梦幻
     bgmVolume: 50,
     sfxVolume: 50,
     pageTitle: 'ChatGalaxy', // 🔧 通用标题
@@ -340,13 +340,30 @@ function initApp(data) {
     initSidebarControls();
 
     loadingEl.style.display = 'none';
-    
+
     // Start at the beginning (First Day)
     const slider = document.getElementById('time-slider');
     if (slider) {
         slider.value = 0;
         // Trigger input event manually to update graph
         slider.dispatchEvent(new Event('input'));
+    }
+
+    // 自动初始化音效（在用户首次交互时）
+    if (!isMuted) {
+        const initAudioOnInteraction = () => {
+            initAudio();
+            console.log('🔊 氛围音效已自动初始化');
+            // 移除监听器（只需初始化一次）
+            document.removeEventListener('click', initAudioOnInteraction);
+            document.removeEventListener('touchstart', initAudioOnInteraction);
+            document.removeEventListener('keydown', initAudioOnInteraction);
+        };
+
+        // 监听用户的首次交互
+        document.addEventListener('click', initAudioOnInteraction, { once: true });
+        document.addEventListener('touchstart', initAudioOnInteraction, { once: true });
+        document.addEventListener('keydown', initAudioOnInteraction, { once: true });
     }
 }
 
@@ -419,7 +436,7 @@ function initSettings(showModal = false) {
     if (sidebarTitleInput) sidebarTitleInput.value = appSettings.sidebarTitle;
     if (sidebarIconInput) sidebarIconInput.value = appSettings.sidebarIcon;
     if (sfxEnabled) sfxEnabled.checked = appSettings.sfxEnabled;
-    if (colorSchemeSelect) colorSchemeSelect.value = appSettings.colorScheme || 'deepspace'; // 🔧 默认使用深空主题
+    if (colorSchemeSelect) colorSchemeSelect.value = appSettings.colorScheme || 'nebula'; // 🔧 默认使用星云紫主题
     if (uiTransparency) uiTransparency.value = appSettings.uiTransparency || 0.95;
     const uiTransparencyVal = document.getElementById('ui-transparency-val');
     if (uiTransparencyVal) uiTransparencyVal.innerText = appSettings.uiTransparency || 0.95;
@@ -636,7 +653,7 @@ function initSettings(showModal = false) {
             document.getElementById('sidebar-title-input').value = appSettings.sidebarTitle;
             document.getElementById('sidebar-icon-input').value = appSettings.sidebarIcon;
             document.getElementById('sfx-enabled').checked = appSettings.sfxEnabled;
-            document.getElementById('color-scheme-select').value = appSettings.colorScheme || 'deepspace'; // 🔧 默认使用深空主题
+            document.getElementById('color-scheme-select').value = appSettings.colorScheme || 'nebula'; // 🔧 默认使用星云紫主题
             document.getElementById('ui-transparency').value = appSettings.uiTransparency || 0.95;
             document.getElementById('ui-transparency-val').innerText = appSettings.uiTransparency || 0.95;
             document.getElementById('show-subtitles').checked = appSettings.showSubtitles;
@@ -723,7 +740,7 @@ function showEmojiPicker(btn, input) {
 }
 
 function applyColorScheme() {
-    const scheme = COLOR_SCHEMES[appSettings.colorScheme] || COLOR_SCHEMES.deepspace; // 🔧 默认使用深空主题
+    const scheme = COLOR_SCHEMES[appSettings.colorScheme] || COLOR_SCHEMES.nebula; // 🔧 默认使用星云紫主题
     const root = document.documentElement;
     const opacity = appSettings.uiTransparency !== undefined ? appSettings.uiTransparency : 0.95;
 
@@ -781,15 +798,14 @@ function applySettings() {
         document.body.classList.remove('transparent-ui');
         // 重新应用配色方案的文字颜色（已被 applyColorScheme 应用）
     }
-    
+
     // 1. Audio
     if (ambientGain) {
-        // Base gain was 0.15, now scaled by volume
-        // Max 0.3
-        const base = 0.3;
+        // 🔧 更新基础音量（从0.3降到0.2，避免削波）
+        const base = 0.2;
         ambientGain.gain.setTargetAtTime(base * (appSettings.bgmVolume / 100), audioCtx.currentTime, 0.1);
     }
-    
+
     // 2. Appearance
     document.title = appSettings.pageTitle;
     setFavicon(appSettings.pageIcon);
@@ -1105,6 +1121,28 @@ function enterIdleRotation() {
 
     isIdleRotating = true;
 
+    // 保存当前侧边栏状态
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebarOverlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) {
+        // 检查侧边栏是否打开
+        const wasOpen = sidebar.classList.contains('active');
+        sessionStorage.setItem('idle_sidebar_was_open', wasOpen ? 'true' : 'false');
+
+        // 隐藏右侧功能侧边栏（如果打开了）
+        if (wasOpen) {
+            sidebar.classList.remove('active');
+            sidebar.style.right = '-280px';
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        }
+
+        // 隐藏侧边栏切换按钮
+        if (sidebarToggle) {
+            sidebarToggle.style.display = 'none';
+        }
+    }
+
     // 启用漫游模式（替代自动旋转，因为旋转效果不明显）
     if (Graph && !isRoaming) {
         startRoaming();
@@ -1141,6 +1179,29 @@ function exitIdleRotation() {
         Graph.controls().autoRotateSpeed = appSettings.rotateSpeed;
     }
 
+    // 恢复右侧功能侧边栏状态
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+    // 显示侧边栏切换按钮
+    if (sidebarToggle) {
+        sidebarToggle.style.display = 'flex';
+    }
+
+    // 恢复侧边栏之前的状态
+    const wasOpen = sessionStorage.getItem('idle_sidebar_was_open') === 'true';
+    if (sidebar && wasOpen) {
+        sidebar.classList.add('active');
+        sidebar.style.right = '0';
+        if (sidebarOverlay) sidebarOverlay.classList.add('active');
+        isSidebarOpen = true;
+    } else if (sidebar) {
+        // 如果之前是关闭的，确保保持关闭状态
+        sidebar.style.right = '-280px';
+        isSidebarOpen = false;
+    }
+
     // 移除闲置模式样式
     document.body.classList.remove('idle-mode');
 
@@ -1155,28 +1216,35 @@ async function initAudio() {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
-        // 等待音频上下文准备好（解决卡死问题）
+        // 🔧 确保音频上下文始终运行（解决卡顿问题）
         if (audioCtx.state === 'suspended') {
             await audioCtx.resume();
+            console.log('🔊 AudioContext resumed');
         }
 
-        isMuted = false;
+        // 🔧 双重检查：确保上下文正在运行
+        if (audioCtx.state === 'running') {
+            isMuted = false;
 
-        // 更新按钮状态（如果存在）
-        const musicBtn = document.getElementById('music-btn');
-        if (musicBtn) {
-            musicBtn.innerHTML = '<i class="ri-volume-up-line"></i>';
-            musicBtn.classList.add('active');
+            // 更新按钮状态（如果存在）
+            const musicBtn = document.getElementById('music-btn');
+            if (musicBtn) {
+                musicBtn.innerHTML = '<i class="ri-volume-up-line"></i>';
+                musicBtn.classList.add('active');
+            }
+
+            // 更新侧边栏开关状态
+            const musicToggle = document.getElementById('music-toggle');
+            if (musicToggle) {
+                musicToggle.checked = true;
+            }
+
+            startAmbientMusic();
+            showToast('已切换至：空灵呼吸·舒缓旋律', 'success');
+        } else {
+            console.warn('⚠️ AudioContext state:', audioCtx.state);
+            showToast('音频启动失败，请点击页面重试', 'error');
         }
-
-        // 更新侧边栏开关状态
-        const musicToggle = document.getElementById('music-toggle');
-        if (musicToggle) {
-            musicToggle.checked = true;
-        }
-
-        startAmbientMusic();
-        showToast('已切换至：空灵呼吸·舒缓旋律', 'success');
     } catch (error) {
         console.error('音频初始化失败:', error);
         showToast('音频初始化失败，请稍后重试', 'error');
@@ -1185,32 +1253,42 @@ async function initAudio() {
 
 function startAmbientMusic() {
     if (isMuted || !audioCtx) return;
+
+    // 🔧 确保AudioContext正在运行
+    if (audioCtx.state !== 'running') {
+        console.warn('⚠️ AudioContext not running, state:', audioCtx.state);
+        audioCtx.resume().catch(console.error);
+    }
+
     stopAmbientMusic();
-    
+
     // Master Ambient Chain: Nodes -> Filter -> Gain -> Destination
     ambientGain = audioCtx.createGain();
-    
-    // Apply Volume Setting
-    const base = 0.3;
+
+    // 🔧 降低基础音量避免削波（从0.3降到0.2）
+    const base = 0.2;
     ambientGain.gain.value = base * (appSettings.bgmVolume / 100);
-    
+
     // Lowpass filter for "muffled/ethereal" sound
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.value = 600; // Reduced from 800 for softer tone
-    
+
     ambientGain.connect(filter);
     filter.connect(audioCtx.destination);
-    
+
     // 1. Breathing Pad (Background Chords)
     // Chord: Cmaj9 (C, E, G, B, D) spread out
     const padNotes = [130.81, 196.00, 246.94, 293.66]; // C3, G3, B3, D4
     padNotes.forEach((freq, i) => {
         createBreathingDrone(freq, filter, i * 500);
     });
-    
+
     // 2. Ethereal Melody (Random notes)
     playEtherealMelody(filter);
+
+    // 🔧 启动定期状态检查（每5秒检查一次）
+    startAudioHealthCheck();
 }
 
 function createBreathingDrone(freq, destination, delay) {
@@ -1292,6 +1370,12 @@ function playEtherealMelody(destination) {
 }
 
 function stopAmbientMusic() {
+    // 🔧 停止健康检查
+    if (window.audioHealthCheckTimer) {
+        clearInterval(window.audioHealthCheckTimer);
+        window.audioHealthCheckTimer = null;
+    }
+
     if (melodyTimer) clearTimeout(melodyTimer);
     ambientNodes.forEach(n => {
         if (n.timer) clearTimeout(n.timer);
@@ -1304,34 +1388,56 @@ function stopAmbientMusic() {
     }
 }
 
+// 🔧 新增：音频健康检查机制（每5秒检查一次AudioContext状态）
+let audioHealthCheckTimer = null;
+function startAudioHealthCheck() {
+    // 清除旧的定时器
+    if (window.audioHealthCheckTimer) {
+        clearInterval(window.audioHealthCheckTimer);
+    }
+
+    window.audioHealthCheckTimer = setInterval(() => {
+        if (audioCtx && !isMuted) {
+            if (audioCtx.state === 'suspended') {
+                console.warn('⚠️ AudioContext suspended, attempting resume...');
+                audioCtx.resume().catch(err => {
+                    console.error('❌ Failed to resume AudioContext:', err);
+                });
+            }
+        }
+    }, 5000); // 每5秒检查一次
+}
+
 function playTone(freq, type, duration, vol = 0.1) {
     if (!appSettings.sfxEnabled || isMuted) return;
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+
+    // 🔧 确保AudioContext运行（使用async方式）
     if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+        audioCtx.resume().catch(err => console.warn('⚠️ Resume failed:', err));
     }
-    
+
     // Apply SFX Volume Setting
     const sfxScale = appSettings.sfxVolume / 100;
     const finalVol = vol * sfxScale;
-    
+
     if (finalVol <= 0.001) return;
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    
+
     osc.type = type;
     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    
+
     gain.gain.setValueAtTime(finalVol, audioCtx.currentTime);
     // Use linear ramp to 0 to avoid click at the end
     gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-    
+
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    
+
     osc.start();
     osc.stop(audioCtx.currentTime + duration + 0.1);
 }

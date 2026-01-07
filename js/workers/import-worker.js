@@ -1,200 +1,54 @@
 /**
- * ChatGalaxy 数据导入 Web Worker
+ * ChatGalaxy 数据导入 Web Worker v2.1
  * 异步处理大量数据，避免阻塞UI线程
  *
+ * 算法统一：使用 text-processor.js 的规则引擎方法
+ * - 分词：Intl.Segmenter (浏览器原生 API)
+ * - 情感分析：规则引擎 (积极/消极/疑问词库 + 阈值)
+ * - 关键词提取：简化版 TF-IDF
+ *
  * 使用方式：
- * const worker = new Worker('js/workers/import-worker.js');
+ * const worker = new Worker('js/workers/import-worker.js', { type: 'module' });
  * worker.postMessage({ type: 'process', data: messages });
  * worker.onmessage = (e) => { handleResult(e.data); };
  *
- * @version 1.0.0
- * @updated 2026-01-06
+ * @version 2.1.0
+ * @updated 2026-01-07
+ * @reference text-processor.js
  */
 
-// ========== 中文分词（Worker环境）==========
+// ========== 中文分词（Intl.Segmenter）==========
 
 /**
- * 统计分词算法（基于互信息和N-gram）
- * 不依赖词典，自动从文本中发现词汇
+ * 中文分词器（浏览器原生 API）
+ * 注意：Worker 环境支持 Intl.Segmenter
  */
+const segmenter = new Intl.Segmenter('zh', { granularity: 'word' });
 
 /**
- * 提取所有可能的候选词（基于统计规律）
- * @param {string} text - 输入文本
- * @returns {Map<string, number>} - 词频统计
- */
-function extractCandidates(text) {
-    // 移除中括号内容
-    text = text.replace(/\[[^\]]*\]/g, '');
-
-    // 移除特殊字符，保留中文、英文、数字
-    const cleanText = text.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, ' ');
-
-    // 统计2-4字的词频
-    const freq = new Map();
-    const chars = cleanText.split('');
-
-    for (let i = 0; i < chars.length; i++) {
-        // 单个字符（英文单词）
-        if (/[a-zA-Z0-9]/.test(chars[i])) {
-            // 提取完整单词
-            let word = '';
-            let j = i;
-            while (j < chars.length && /[a-zA-Z0-9]/.test(chars[j])) {
-                word += chars[j];
-                j++;
-            }
-            if (word.length >= 2) {
-                freq.set(word, (freq.get(word) || 0) + 1);
-            }
-            i = j - 1;
-            continue;
-        }
-
-        // 2-4字的中文词
-        for (let len = 2; len <= 4 && i + len <= chars.length; len++) {
-            const candidate = chars.slice(i, i + len).join('');
-
-            // 检查是否全是中文
-            if (/^[\u4e00-\u9fa5]+$/.test(candidate)) {
-                freq.set(candidate, (freq.get(candidate) || 0) + 1);
-            }
-        }
-    }
-
-    return freq;
-}
-
-/**
- * 计算互信息，过滤有意义的词
- * @param {Map} freq - 词频统计
- * @returns {Array} - 有意义的词列表
- */
-function filterMeaningfulWords(freq) {
-    const words = [];
-
-    for (const [word, count] of freq.entries()) {
-        // 过滤条件：
-        // 1. 频次 >= 2
-        // 2. 长度 >= 2
-        if (count >= 2 && word.length >= 2) {
-            words.push({ word, count });
-        }
-    }
-
-    // 按频次和长度排序
-    words.sort((a, b) => {
-        // 长度优先，然后频次
-        if (a.word.length !== b.word.length) {
-            return b.word.length - a.word.length;
-        }
-        return b.count - a.count;
-    });
-
-    return words;
-}
-
-/**
- * 智能分词（基于统计）
+ * 分词函数（与 text-processor.js 一致）
  * @param {string} text - 输入文本
  * @returns {string[]} - 分词数组
  */
-function statisticalSegment(text) {
+function segmentText(text) {
     if (!text || typeof text !== 'string') {
         return [];
     }
 
-    // 移除中括号内容
-    text = text.replace(/\[[^\]]*\]/g, '');
-
-    // 提取候选词
-    const freq = extractCandidates(text);
-    const meaningfulWords = filterMeaningfulWords(freq);
-
-    // 构建词典（只保留高频词）
-    const dict = new Set(meaningfulWords.slice(0, 200).map(w => w.word));
-
-    // 使用词典进行分词（最大匹配）
+    const segments = segmenter.segment(text);
     const words = [];
-    let i = 0;
-    const MAX_WORD_LENGTH = 4;
 
-    while (i < text.length) {
-        let matched = false;
-
-        // 从最大长度开始匹配
-        for (let len = MAX_WORD_LENGTH; len >= 2; len--) {
-            if (i + len > text.length) continue;
-
-            const candidate = text.slice(i, i + len);
-
-            // 检查是否在词典中
-            if (dict.has(candidate)) {
-                words.push(candidate);
-                i += len;
-                matched = true;
-                break;
-            }
-        }
-
-        // 如果没有匹配到
-        if (!matched) {
-            const char = text[i];
-
-            // 跳过标点符号和空格
-            if (/[\u4e00-\u9fa5a-zA-Z0-9]/.test(char)) {
-                // 英文单词
-                if (/[a-zA-Z0-9]/.test(char)) {
-                    let word = '';
-                    let j = i;
-                    while (j < text.length && /[a-zA-Z0-9]/.test(text[j])) {
-                        word += text[j];
-                        j++;
-                    }
-                    if (word.length >= 2) {
-                        words.push(word);
-                    }
-                    i = j;
-                } else {
-                    // 单个汉字（跳过）
-                    i++;
-                }
-            } else {
-                i++;
-            }
+    for (const { segment, isWordLike } of segments) {
+        // 只保留词性为词语的内容
+        if (isWordLike) {
+            words.push(segment.trim());
         }
     }
 
     return words;
 }
 
-/**
- * 简化版中文分词
- * 使用统计方法 + 规则
- * @param {string} text - 输入文本
- * @returns {string[]} - 分词数组
- */
-function simpleSegment(text) {
-    if (!text || typeof text !== 'string') {
-        return [];
-    }
-
-    // 使用统计分词
-    const words = statisticalSegment(text);
-
-    // 过滤结果
-    return words.filter(word => {
-        // 保留双字及以上词汇
-        if (word.length >= 2) return true;
-
-        // 保留英文单词
-        if (/^[a-zA-Z]{2,}$/.test(word)) return true;
-
-        return false;
-    });
-}
-
-// ========== 情感分析（复制自主线程） ==========
+// ========== 情感词库（与 text-processor.js 一致）==========
 
 const QUESTION_WORDS = new Set([
     '什么', '怎么', '为什么', '哪', '谁', '多少', '几', '吗', '呢', '吧',
@@ -202,37 +56,25 @@ const QUESTION_WORDS = new Set([
 ]);
 
 const POSITIVE_WORDS = new Set([
-    // 单字词
-    '好', '棒', '赞', '爱', '喜', '对', '是', '行', '强', '牛',
-
-    // 双字词
-    '优秀', '厉害', '喜欢', '开心', '快乐', '高兴', '幸福', '满意', '成功',
-    '胜利', '完美', '漂亮', '美好', '精彩', '出色', '卓越', '杰出', '超赞',
-    '好评', '给力', '加油', '努力', '坚持', '相信', '希望', '期待', '美丽',
-    '可爱', '温柔', '善良', '友好', '热情', '真诚', '感动', '温暖', '舒服',
-    '轻松', '自由', '愉快', '欢乐', '祥和', '和谐', '平静', '安宁', '兴奋',
-    '激动', '惊喜', '陶醉', '享受', '满足', '充实', '丰富', '可以', '不错',
-    '很好', '挺好', '太棒', '真棒', '支持', '感谢', '谢谢', '好的', '是的',
-
-    // 三字及以上
-    '棒极了', '太好了', '非常好', '特别好', '很不错', '没问题', '没关系',
-    '哈哈', '嘻嘻', '呵呵'
+    '好', '棒', '优秀', '厉害', '强', '喜欢', '爱', '开心', '快乐', '高兴',
+    '幸福', '满意', '赞', '支持', '感谢', '谢谢', '不错', '可以', '行',
+    '对', '是', '成功', '胜利', '棒极了', '太好了', '优秀', '完美', '漂亮',
+    '美好', '精彩', '出色', '卓越', '杰出', '超赞', '好评', '给力', '牛',
+    '哈哈', '嘻嘻', '呵呵', '加油', '努力', '坚持', '相信', '希望', '期待',
+    '美丽', '可爱', '温柔', '善良', '友好', '热情', '真诚', '感动', '温暖',
+    '舒服', '轻松', '自由', '愉快', '欢乐', '祥和', '和谐', '平静', '安宁',
+    '兴奋', '激动', '惊喜', '陶醉', '沉迷', '享受', '满足', '充实', '丰富'
 ]);
 
 const NEGATIVE_WORDS = new Set([
-    // 单字词
-    '差', '坏', '烂', '糟', '恨', '烦', '怒', '痛', '累', '错',
-
-    // 双字词
-    '不好', '糟糕', '讨厌', '烦躁', '生气', '愤怒', '难过', '伤心', '痛苦',
-    '失望', '绝望', '郁闷', '压抑', '沉重', '疲惫', '疲倦', '难受', '不舒服',
-    '错误', '失误', '失败', '失败', '惨痛', '完蛋', '不行', '没用', '无用',
-    '垃圾', '废物', '废柴', '蠢笨', '傻逼', '白痴', '弱智', '脑残', '神经',
-    '疯子', '变态', '恶心', '反胃', '呕吐', '厌恶', '憎恨', '鄙视', '轻视',
-    '害怕', '恐惧', '担心', '忧虑', '焦虑', '紧张', '慌张', '惊慌', '害怕',
-
-    // 三字及以上
-    '不喜欢', '很难过', '特别糟', '太差了', '不可以', '不能', '不要'
+    '不好', '差', '坏', '烂', '糟糕', '讨厌', '恨', '烦', '烦躁', '生气',
+    '愤怒', '难过', '伤心', '痛苦', '失望', '绝望', '郁闷', '压抑', '沉重',
+    '累', '疲惫', '疲倦', '困', '饿', '痛', '难受', '不舒服', '病', '伤',
+    '错', '错误', '失误', '失败', '输', '败', '惨', '惨痛', '糟糕', '完蛋',
+    '不行', '不可以', '不能', '没用', '无用', '垃圾', '废物', '废柴', '笨',
+    '蠢', '傻', '傻逼', '白痴', '弱智', '脑残', '神经病', '疯子', '变态',
+    '恶心', '反胃', '呕吐', '厌恶', '憎恨', '鄙视', '轻视', '看不起', '瞧不起',
+    '害怕', '恐惧', '担心', '忧虑', '焦虑', '紧张', '慌', '慌张', '惊慌'
 ]);
 
 const INTENSIFIERS = new Set([
@@ -240,56 +82,7 @@ const INTENSIFIERS = new Set([
     '相当', '挺', '蛮', '有点', '一些', '太', '更', '最', '比较', '稍微'
 ]);
 
-/**
- * 情感分析
- * @param {string} text - 输入文本
- * @returns {number} - 情感值
- */
-function analyzeSentiment(text) {
-    if (!text || typeof text !== 'string') {
-        return 1;
-    }
-
-    const words = simpleSegment(text);
-    let positiveScore = 0;
-    let negativeScore = 0;
-    let questionScore = 0;
-    let hasIntensifier = false;
-
-    for (const word of words) {
-        if (QUESTION_WORDS.has(word)) {
-            questionScore += 2;
-        }
-
-        if (INTENSIFIERS.has(word)) {
-            hasIntensifier = true;
-        }
-
-        if (POSITIVE_WORDS.has(word)) {
-            positiveScore += hasIntensifier ? 2 : 1;
-        }
-
-        if (NEGATIVE_WORDS.has(word)) {
-            negativeScore += hasIntensifier ? 2 : 1;
-        }
-    }
-
-    if (questionScore > 0) {
-        return 3;
-    }
-
-    const sentimentScore = positiveScore - negativeScore;
-
-    if (sentimentScore > 1) {
-        return 2;
-    } else if (sentimentScore < -1) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-// ========== 关键词提取 ==========
+// ========== 停用词表（与 text-processor.js 一致）==========
 
 const STOP_WORDS = new Set([
     '的', '了', '是', '在', '和', '与', '或', '及', '等', '着', '过',
@@ -298,38 +91,74 @@ const STOP_WORDS = new Set([
     '我', '你', '他', '她', '它', '我们', '你们', '他们', '她们', '它们',
     '自己', '人家', '大家', '咱们', '谁', '什么', '哪', '哪儿', '哪里',
     '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
-    '个', '些', '件', '种', '次', '回', '趟', '遍', '番', '声'
+    '个', '些', '件', '种', '次', '回', '趟', '遍', '番', '声',
+    '来', '去', '上', '下', '进', '出', '回', '过', '到', '在',
+    '把', '被', '让', '叫', '使', '由', '对', '向', '往', '从',
+    '很', '太', '更', '最', '非常', '特别', '十分', '比较', '稍微',
+    '就', '都', '也', '还', '再', '又', '才', '不', '没', '别',
+    '能', '可以', '会', '要', '想', '愿', '肯', '敢', '得', '该',
+    '说', '道', '讲', '问', '答', '告诉', '说', '表示', '认为', '觉得',
+    '有', '无', '没', '没', '不', '非', '未', '否'
 ]);
 
-/**
- * 过滤停用词
- * @param {string[]} words - 分词数组
- * @returns {string[]} - 过滤后的词数组
- */
-function filterStopWords(words) {
-    return words.filter(word => {
-        if (word.length < 2) return false;
-        if (STOP_WORDS.has(word)) return false;
-        if (/^\d+$/.test(word)) return false;
-        return true;
-    });
-}
+// ========== 情感分析（与 text-processor.js 一致）==========
 
 /**
- * 过滤黑名单词
- * @param {string[]} words - 分词数组
- * @returns {string[]} - 过滤后的词数组
+ * 情感分析函数（规则引擎，与 text-processor.js 一致）
+ * @param {string} text - 输入文本
+ * @returns {number} - 情感值：0=消极, 1=中性, 2=积极, 3=疑问
  */
-function filterBlacklistWords(words) {
-    return words.filter(word => {
-        // 只过滤用中括号括起来的词
-        if (/^\[.+\]$/.test(word)) {
-            return false;
+function analyzeSentiment(text) {
+    if (!text || typeof text !== 'string') {
+        return 1; // 默认中性
+    }
+
+    const words = segmentText(text);
+    let positiveScore = 0;
+    let negativeScore = 0;
+    let questionScore = 0;
+    let hasIntensifier = false;
+
+    // 分析每个词
+    for (const word of words) {
+        // 检测疑问词
+        if (QUESTION_WORDS.has(word)) {
+            questionScore += 2;
         }
 
-        return true;
-    });
+        // 检测增强词（程度副词）
+        if (INTENSIFIERS.has(word)) {
+            hasIntensifier = true;
+        }
+
+        // 检测积极词
+        if (POSITIVE_WORDS.has(word)) {
+            positiveScore += hasIntensifier ? 2 : 1;
+        }
+
+        // 检测消极词
+        if (NEGATIVE_WORDS.has(word)) {
+            negativeScore += hasIntensifier ? 2 : 1;
+        }
+    }
+
+    // 判断情感类别（与 text-processor.js 一致）
+    if (questionScore > 0) {
+        return 3; // 疑问
+    }
+
+    const sentimentScore = positiveScore - negativeScore;
+
+    if (sentimentScore > 1) {
+        return 2; // 积极
+    } else if (sentimentScore < -1) {
+        return 0; // 消极
+    } else {
+        return 1; // 中性
+    }
 }
+
+// ========== 黑名单过滤 ==========
 
 /**
  * 从文本中移除中括号内容
@@ -342,44 +171,89 @@ function removeBracketedContent(text) {
 }
 
 /**
- * 提取关键词
+ * 过滤停用词（与 text-processor.js 一致）
+ * @param {string[]} words - 分词数组
+ * @returns {string[]} - 过滤后的词数组
+ */
+function filterStopWords(words) {
+    return words.filter(word => {
+        // 过滤单字（除非是特殊符号）
+        if (word.length === 1) {
+            return false;
+        }
+
+        // 过滤停用词
+        if (STOP_WORDS.has(word)) {
+            return false;
+        }
+
+        // 过滤纯数字
+        if (/^\d+$/.test(word)) {
+            return false;
+        }
+
+        return true;
+    });
+}
+
+// ========== 关键词提取（与 text-processor.js 一致）==========
+
+/**
+ * 计算词频（TF）
+ * @param {string[]} words - 分词数组
+ * @returns {Map<string, number>} - 词频映射
+ */
+function calculateTermFrequency(words) {
+    const freq = new Map();
+
+    for (const word of words) {
+        const count = freq.get(word) || 0;
+        freq.set(word, count + 1);
+    }
+
+    return freq;
+}
+
+/**
+ * 提取关键词（简化版 TF-IDF，与 text-processor.js 一致）
  * @param {string} text - 输入文本
  * @param {number} topN - 返回前N个关键词
- * @returns {Array<{word: string, score: number}>}
+ * @returns {Array<{word: string, score: number}>} - 关键词数组
  */
-function extractKeywords(text, topN = 5) {
+function extractKeywords(text, topN = 10) {
     if (!text || typeof text !== 'string') {
         return [];
     }
 
-    // 先移除中括号内容
+    // 0. 先移除中括号内容（在分词之前）
     text = removeBracketedContent(text);
 
-    const words = simpleSegment(text);
-    let filteredWords = filterStopWords(words);
-    filteredWords = filterBlacklistWords(filteredWords);
+    // 1. 分词
+    const words = segmentText(text);
+
+    // 2. 过滤停用词
+    const filteredWords = filterStopWords(words);
 
     if (filteredWords.length === 0) {
         return [];
     }
 
-    // 计算词频
-    const freq = new Map();
-    for (const word of filteredWords) {
-        const count = freq.get(word) || 0;
-        freq.set(word, count + 1);
-    }
+    // 3. 计算词频
+    const tf = calculateTermFrequency(filteredWords);
 
-    // 计算TF-IDF简化版
+    // 4. 计算简化版 TF-IDF（与 text-processor.js 一致）
     const keywords = [];
-    for (const [word, count] of freq.entries()) {
+    for (const [word, count] of tf.entries()) {
+        // score = TF × log(词长)
         const score = count * Math.log(word.length);
+
         keywords.push({
             word: word,
             score: score
         });
     }
 
+    // 5. 排序并返回 TopN
     keywords.sort((a, b) => b.score - a.score);
 
     return keywords.slice(0, topN);
@@ -390,28 +264,72 @@ function extractKeywords(text, topN = 5) {
 /**
  * 处理单条消息
  * @param {Object} msg - 原始消息
+ * @param {number} index - 消息索引
  * @returns {Object} - 处理后的消息
  */
-function processMessage(msg) {
-    let text = msg.text || msg.content || '';
+function processMessage(msg, index) {
+    let text = msg.text || msg.content?.text || '';
 
-    // 移除中括号内容
-    text = removeBracketedContent(text);
+    // 检测黑名单内容
+    const blacklistCheck = detectBlacklistContent(text);
+
+    // 根据策略处理黑名单消息（默认只过滤）
+    if (blacklistCheck.isBlacklisted) {
+        // 移除中括号内容
+        text = removeBracketedContent(text);
+    }
 
     return {
         ...msg,
+        id: msg.id || `msg_${index}`,
         sentiment: analyzeSentiment(text),
-        keywords: extractKeywords(text, 5).map(k => k.word)
+        keywords: extractKeywords(text, 10).map(k => k.word), // topN=10，与 text-processor.js 一致
+        words: segmentText(text).slice(0, 20) // 只保留前20个词
+    };
+}
+
+/**
+ * 检测文本是否包含中括号标记
+ * @param {string} text - 输入文本
+ * @returns {Object} - { isBlacklisted: boolean, matchedPatterns: string[] }
+ */
+function detectBlacklistContent(text) {
+    const matchedPatterns = [];
+
+    // 检查中括号格式的内容
+    const bracketMatches = text.match(/\[[^\]]+\]/g);
+    if (bracketMatches) {
+        bracketMatches.forEach(match => {
+            matchedPatterns.push(`标记: ${match}`);
+        });
+    }
+
+    return {
+        isBlacklisted: matchedPatterns.length > 0,
+        matchedPatterns
     };
 }
 
 /**
  * 批量处理消息
  * @param {Array} messages - 消息数组
+ * @param {Function} onProgress - 进度回调
  * @returns {Array} - 处理后的消息数组
  */
-function processMessages(messages) {
-    return messages.map(processMessage);
+function processMessages(messages, onProgress) {
+    const results = [];
+
+    for (let i = 0; i < messages.length; i++) {
+        const processedMsg = processMessage(messages[i], i);
+        results.push(processedMsg);
+
+        // 报告进度（每处理100条报告一次）
+        if (onProgress && (i + 1) % 100 === 0) {
+            onProgress(i + 1, messages.length);
+        }
+    }
+
+    return results;
 }
 
 // ========== 消息监听 ==========
@@ -422,7 +340,24 @@ self.onmessage = function(e) {
     switch (type) {
         case 'process':
             try {
-                const processedMessages = processMessages(data.messages);
+                console.log(`[Worker] Processing ${data.messages.length} messages with text-processor.js algorithm...`);
+
+                const processedMessages = processMessages(
+                    data.messages,
+                    (current, total) => {
+                        // 发送进度更新
+                        self.postMessage({
+                            type: 'progress',
+                            data: {
+                                current: current,
+                                total: total,
+                                percent: Math.round((current / total) * 100)
+                            }
+                        });
+                    }
+                );
+
+                console.log(`[Worker] Completed processing ${processedMessages.length} messages`);
 
                 // 发送结果
                 self.postMessage({
@@ -436,17 +371,8 @@ self.onmessage = function(e) {
                     }
                 });
 
-                // 发送进度完成
-                self.postMessage({
-                    type: 'progress',
-                    data: {
-                        current: processedMessages.length,
-                        total: data.messages.length,
-                        percent: 100
-                    }
-                });
-
             } catch (error) {
+                console.error('[Worker] Error:', error);
                 self.postMessage({
                     type: 'error',
                     data: {
@@ -477,9 +403,15 @@ self.onmessage = function(e) {
 
 // ========== Worker初始化 ==========
 
+console.log('[Worker] ImportWorker v2.1 initialized');
+console.log('[Worker] Using text-processor.js algorithm:');
+console.log('[Worker] - Chinese segmentation: Intl.Segmenter');
+console.log('[Worker] - Sentiment analysis: Rule engine (threshold: >1 positive, <-1 negative)');
+console.log('[Worker] - Keyword extraction: Simplified TF-IDF (topN=10)');
+
 self.postMessage({
     type: 'ready',
     data: {
-        message: 'ImportWorker initialized'
+        message: 'ImportWorker v2.1 initialized with text-processor.js algorithm'
     }
 });

@@ -200,6 +200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 switchToDataset(datasetId);
             } else if (btn.classList.contains('btn-edit')) {
                 editDataset(datasetId);
+            } else if (btn.classList.contains('btn-share')) {
+                shareDataset(datasetId);
             } else if (btn.classList.contains('btn-export')) {
                 exportDataset(datasetId);
             } else if (btn.classList.contains('btn-delete')) {
@@ -213,6 +215,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 初始化黑名单设置
     initializeBlacklistSettings();
+
+    // 🔧 监听数据集更新事件，自动刷新列表
+    document.addEventListener('datasetUpdated', async () => {
+        Log.info('DataManagerUI', 'Dataset updated, refreshing list...');
+        await loadDatasetList();
+    });
 
     Log.info('Init', 'DataManager UI initialized');
 });
@@ -535,12 +543,16 @@ async function loadDatasetList() {
         container.innerHTML = datasets.map(dataset => {
             const isActive = dataset.id === currentId;
             const date = new Date(dataset.createdAt).toLocaleDateString('zh-CN');
+            const isReadonly = dataset.readonly || false; // 🔧 检查是否为只读数据集
 
             return `
-                <div class="dataset-card ${isActive ? 'active' : ''}" style="border-left-color: ${dataset.color};">
+                <div class="dataset-card ${isActive ? 'active' : ''} ${isReadonly ? 'readonly' : ''}" style="border-left-color: ${dataset.color};">
                     <div class="dataset-card-header">
                         <div>
-                            <div class="dataset-name">${dataset.name}</div>
+                            <div class="dataset-name">
+                                ${dataset.name}
+                                ${isReadonly ? '<i class="ri-lock-line" title="只读数据集（来自分享）" style="margin-left: 4px; color: #f59e0b;"></i>' : ''}
+                            </div>
                             <div class="dataset-date">创建于 ${date}</div>
                         </div>
                         ${isActive ? '<span class="dataset-badge">当前使用中</span>' : ''}
@@ -567,12 +579,17 @@ async function loadDatasetList() {
                         <button type="button" class="dataset-action-btn btn-switch" data-id="${dataset.id}">
                             ${isActive ? '✓ 当前使用' : '切换到此数据集'}
                         </button>
-                        <button type="button" class="dataset-action-btn btn-edit" data-id="${dataset.id}">
-                            <i class="ri-edit-line"></i> 编辑
-                        </button>
-                        <button type="button" class="dataset-action-btn btn-export" data-id="${dataset.id}">
-                            <i class="ri-download-line"></i> 导出
-                        </button>
+                        ${!isReadonly ? `
+                            <button type="button" class="dataset-action-btn btn-edit" data-id="${dataset.id}">
+                                <i class="ri-edit-line"></i> 编辑
+                            </button>
+                            <button type="button" class="dataset-action-btn btn-share" data-id="${dataset.id}">
+                                <i class="ri-share-line"></i> 分享
+                            </button>
+                            <button type="button" class="dataset-action-btn btn-export" data-id="${dataset.id}">
+                                <i class="ri-download-line"></i> 导出
+                            </button>
+                        ` : ''}
                         <button type="button" class="dataset-action-btn btn-delete danger" data-id="${dataset.id}">
                             <i class="ri-delete-bin-line"></i> 删除
                         </button>
@@ -616,6 +633,9 @@ async function deleteDataset(datasetId) {
         return;
     }
 
+    // 🔧 检查数据集是否为只读
+    // 🔧 只读数据集也可以删除（用户可能不需要这个分享）
+
     if (!confirm(`确定要删除数据集 "${dataset.name}" 吗？\n\n此操作将删除所有相关消息，且无法恢复！`)) {
         return;
     }
@@ -649,10 +669,33 @@ async function exportDataset(datasetId) {
     }
 }
 
+async function shareDataset(datasetId) {
+    try {
+        if (!datasetId) {
+            throw new Error('数据集ID为空');
+        }
+
+        // 触发分享事件，由 share-modal 组件处理
+        document.dispatchEvent(new CustomEvent('shareDataset', {
+            detail: { datasetId }
+        }));
+
+    } catch (error) {
+        showToast('error', '打开分享失败: ' + error.message);
+    }
+}
+
 async function editDataset(datasetId) {
     try {
         if (!datasetId) {
             throw new Error('数据集ID为空');
+        }
+
+        // 🔧 检查数据集是否为只读
+        const dataset = await window.DatasetManagerV3.getDataset(datasetId);
+        if (dataset && dataset.readonly) {
+            showToast('error', '❌ 只读数据集无法编辑！');
+            return;
         }
 
         // 🔧 使用 Session Storage 存储数据集ID，绕过 URL 参数传递
@@ -705,6 +748,7 @@ window.loadDemoDataset = loadDemoDataset;
 window.refreshDatasetList = refreshDatasetList;
 window.switchToDataset = switchToDataset;
 window.deleteDataset = deleteDataset;
+window.shareDataset = shareDataset;
 window.exportDataset = exportDataset;
 window.toggleTag = toggleTag;
 window.selectColor = selectColor;
