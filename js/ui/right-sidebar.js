@@ -269,10 +269,12 @@ export class SettingsSidebar extends SidebarBase {
         super.onShow();
 
         // 重新渲染主题选项（可能有更新）
-        this._renderThemeOptions();
+        // ⚠️ 已禁用 - 控件在 index.html 中管理
+        //         this._renderThemeOptions();
 
         // 重新加载透明度
-        this._loadTransparency();
+        // ⚠️ 已禁用 - 控件在 index.html 中管理
+        //         this._loadTransparency();
     }
 
     /**
@@ -284,7 +286,8 @@ export class SettingsSidebar extends SidebarBase {
         super.onThemeChange(data);
 
         // 更新主题选择状态
-        this._updateThemeSelection(data.newTheme);
+        // ⚠️ 已禁用 - 控件在 index.html 中管理
+        //         this._updateThemeSelection(data.newTheme);
     }
 }
 
