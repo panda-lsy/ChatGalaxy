@@ -87,14 +87,6 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-body.transparent-ui .modal-body::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.12);
-}
-
-body.transparent-ui .modal-body::-webkit-scrollbar-thumb {
-    background: rgba(255, 154, 158, 0.9);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
 
 .setting-group {
     margin-bottom: 20px;
@@ -186,19 +178,6 @@ body.transparent-ui .modal-body::-webkit-scrollbar-thumb {
     box-shadow: 0 0 14px rgba(255, 154, 158, 0.9);
 }
 
-/* Transparent UI Mode for Settings */
-body.transparent-ui .setting-item input[type="range"],
-body.transparent-ui #settings-modal input[type="range"] {
-    background: rgba(255, 255, 255, 0.18);
-}
-
-body.transparent-ui .setting-item input[type="range"]::-webkit-slider-thumb,
-body.transparent-ui #settings-modal input[type="range"]::-webkit-slider-thumb,
-body.transparent-ui .setting-item input[type="range"]::-moz-range-thumb,
-body.transparent-ui #settings-modal input[type="range"]::-moz-range-thumb {
-    box-shadow: 0 0 12px rgba(255, 154, 158, 0.9);
-    background: #ff9a9e;
-}
 
 /* Layout buttons inside settings */
 #settings-modal .setting-item button {
@@ -216,19 +195,6 @@ body.transparent-ui #settings-modal input[type="range"]::-moz-range-thumb {
     background: #fff0f3;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 117, 140, 0.25);
-}
-
-body.transparent-ui #settings-modal .setting-item button {
-    background: rgba(30,30,40,0.85);
-    border-color: rgba(255,255,255,0.2);
-    color: #ff9a9e;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-}
-
-body.transparent-ui #settings-modal .setting-item button:hover {
-    background: rgba(255,255,255,0.08);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.45);
-}
 
 .setting-item input[type="text"] {
     width: 100%;

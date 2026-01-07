@@ -53,27 +53,3 @@
     background: #f0f0f0;
 }
 
-/* Transparent UI Inversion */
-body.transparent-ui .emoji-btn,
-body.transparent-ui #settings-modal .emoji-btn {
-    background: rgba(30, 30, 40, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ff9a9e;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
-
-body.transparent-ui .emoji-btn:hover,
-body.transparent-ui #settings-modal .emoji-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-body.transparent-ui .emoji-picker-popover {
-    background: rgba(30, 30, 40, 0.92);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-    color: #fff;
-}
-
-body.transparent-ui .emoji-item:hover {
-    background: rgba(255, 255, 255, 0.12);
-}
