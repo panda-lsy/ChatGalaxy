@@ -152,8 +152,9 @@ export class TransparencySlider {
 
         // 更新显示值
         this._updateValueDisplay();
+
+        console.log(`✅ [TransparencySlider] Loaded current value: ${this.currentValue}%`);
     }
-n        console.log(`✅ [TransparencySlider] Loaded current value: ${this.currentValue}%`);
 
     /**
      * 输入事件处理（实时）
