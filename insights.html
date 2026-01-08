@@ -123,11 +123,18 @@
             font-size: 48px;
             font-weight: bold;
             margin-bottom: 10px;
+            /* 🔧 使用主题渐变色，增强可见性 */
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
         .stat-label {
             font-size: 18px;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-main);
             opacity: 0.9;
         }
 
