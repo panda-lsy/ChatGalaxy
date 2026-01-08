@@ -302,7 +302,7 @@ input:checked + .toggle-slider:before {
     top: 0;
     width: var(--sidebar-width-left);
     height: 100vh;
-    z-index: 2000;
+    z-index: var(--z-overlay);
     transform: translateX(0);
     transition: transform var(--transition-base);
 }
@@ -320,13 +320,13 @@ input:checked + .toggle-slider:before {
     top: 0;
     width: var(--sidebar-width-right);
     height: 100vh;
-    z-index: 2000;
+    z-index: var(--z-overlay);
     transition: right var(--transition-base);
     /* 🔧 背景和其他样式从通用样式（第 19-31 行）继承 */
 }
 
 .sidebar.active {
-    right: 0 !important;
+    right: 0;
 }
 
 /* ========== 侧边栏切换按钮 ========== */
@@ -346,7 +346,7 @@ input:checked + .toggle-slider:before {
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all var(--transition-base);
-    z-index: 1999;
+    z-index: var(--z-sidebar-toggle);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -358,7 +358,7 @@ input:checked + .toggle-slider:before {
 }
 
 .sidebar.active ~ .sidebar-toggle {
-    display: none !important;
+    display: none;
 }
 
 /* ========== 关键词列表 ========== */
@@ -588,7 +588,7 @@ input:checked + .toggle-slider:before {
         top: auto;
         bottom: 80px;
         transform: none;
-        z-index: 1600;
+        z-index: var(--z-above-timeline);
     }
 }
 

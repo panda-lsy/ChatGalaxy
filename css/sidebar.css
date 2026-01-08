@@ -19,7 +19,7 @@
     background: var(--sidebar-bg);
     border-left: 1px solid var(--sidebar-border);
     box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
-    z-index: 5000 !important; /* 高于所有覆盖层 (intro-overlay: 4000) */
+    z-index: var(--z-sidebar);
     transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
     overflow-x: hidden;
@@ -30,10 +30,10 @@
 }
 
 .sidebar.active {
-    right: 0 !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    right: 0;
+    display: block;
+    visibility: visible;
+    opacity: 1;
 }
 
 /* 侧边栏切换按钮 */
@@ -52,7 +52,7 @@
     cursor: pointer;
     box-shadow: 0 4px 20px var(--primary-color);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1999;
+    z-index: var(--z-sidebar-toggle);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -64,7 +64,7 @@
 }
 
 .sidebar.active ~ .sidebar-toggle {
-    display: none !important;  /* 🔧 当侧边栏打开时，隐藏功能按钮 */
+    display: none;
 }
 
 /* 侧边栏头部 */
@@ -116,7 +116,7 @@
     padding: 0 16px;
     /* 确保可见 */
     position: relative;
-    z-index: 1;
+    z-index: var(--z-content);
 }
 
 .sidebar-section-title {
@@ -302,8 +302,8 @@ input:checked + .toggle-slider:before {
 
 /* 遮罩层 - 🔧 已禁用，不再使用半透明遮罩 */
 .sidebar-overlay {
-    opacity: 0 !important;
-    visibility: hidden !important;
+    opacity: 0;
+    visibility: hidden;
     pointer-events: none;
 }
 
@@ -315,7 +315,7 @@ input:checked + .toggle-slider:before {
     width: 100%;
     height: 100%;
     background: var(--card-bg);
-    z-index: 3000;
+    z-index: var(--z-modal);
     display: none;
 }
 
@@ -341,7 +341,7 @@ input:checked + .toggle-slider:before {
     color: white;
     font-size: 24px;
     cursor: pointer;
-    z-index: 3001;
+    z-index: var(--z-modal-close);
     box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
     transition: all 0.3s;
     display: flex;
@@ -367,11 +367,11 @@ input:checked + .toggle-slider:before {
         top: auto;
         bottom: 80px; /* 🔧 上移避免与时间轴（40px高度 + 20px padding + 20px margin = 80px）重叠 */
         transform: none;
-        z-index: 1600; /* 🔧 确保在时间轴（z-index: 1500）之上 */
+        z-index: var(--z-above-timeline); /* 🔧 确保在时间轴之上 */
     }
 
     .sidebar.active ~ .sidebar-toggle {
-        display: none !important;  /* 🔧 移动端也隐藏功能按钮 */
+        display: none;
     }
 
     /* 侧边栏头部 */
@@ -478,7 +478,7 @@ input:checked + .toggle-slider:before {
     /* 侧边栏 */
     .sidebar {
         width: 100%;
-        right: -100% !important; /* 🔧 确保完全隐藏 */
+        right: -100%;
         border-radius: 0;
     }
 
@@ -495,7 +495,7 @@ input:checked + .toggle-slider:before {
         width: 52px;
         height: 52px;
         font-size: 22px;
-        z-index: 1600; /* 🔧 确保在时间轴之上 */
+        z-index: var(--z-above-timeline); /* 🔧 确保在时间轴之上 */
     }
 
     /* 侧边栏头部 */
@@ -723,7 +723,7 @@ input:checked + .toggle-slider:before {
 /* 闲置模式下的侧边栏样式 */
 body.idle-mode .sidebar {
     /* 保持可见性，不随body透明度变化 */
-    opacity: 1 !important;
+    opacity: 1;
     transition: opacity 0.3s ease-in-out;
 }
 

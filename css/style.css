@@ -46,7 +46,7 @@ body {
     background: radial-gradient(circle at 20% 20%, rgba(255, 154, 158, 0.15), transparent 40%),
                 radial-gradient(circle at 80% 30%, rgba(120, 122, 255, 0.18), transparent 42%),
                 linear-gradient(135deg, rgba(10, 8, 30, 0.92), rgba(15, 10, 25, 0.9));
-    z-index: 4000;
+    z-index: var(--z-intro);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.6s ease;
@@ -82,10 +82,10 @@ body {
     background: radial-gradient(circle at 30% 20%, rgba(255, 154, 158, 0.14), transparent 40%),
                 radial-gradient(circle at 80% 80%, rgba(132, 250, 176, 0.12), transparent 35%);
     pointer-events: none;
-    z-index: 0;
+    z-index: var(--z-base);
 }
 
-.experience-overlay .overlay-inner > * { position: relative; z-index: 1; }
+.experience-overlay .overlay-inner > * { position: relative; z-index: var(--z-content); }
 
 .experience-overlay .eyebrow {
     font-size: 12px;
@@ -172,7 +172,7 @@ body {
     flex-direction: column;
     /* 🔧 使用主题阴影，支持主题切换 */
     box-shadow: 0 0 20px var(--accent-color, rgba(255, 117, 140, 0.2));
-    z-index: 10;
+    z-index: var(--z-dropdown);
     backdrop-filter: blur(10px);
     position: relative;
     transition: transform 0.3s ease, background 0.3s;
@@ -204,7 +204,7 @@ body {
     color: var(--primary-color);
     font-size: 16px;
     transition: all 0.2s;
-    z-index: 100;
+    z-index: var(--z-sticky);
     box-shadow: var(--shadow-sm);
 }
 
@@ -240,7 +240,7 @@ body {
     justify-content: center;
     color: var(--primary-color);
     font-size: 16px;
-    z-index: 2001; /* 高于侧边栏的 z-index (2000) */
+    z-index: var(--z-modal); /* 高于侧边栏 */
     transition: all 0.2s;
     box-shadow: var(--shadow-sm);
 }
@@ -449,7 +449,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
 }
 
 .tab-content { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-.tab-content.active { display: flex !important; }
+.tab-content.active { display: flex; }
 
 /* Keyword Ranking */
 #keyword-ranking-list { padding: 20px; }
@@ -609,7 +609,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     display: none; pointer-events: none; backdrop-filter: blur(15px); 
     border: 1px solid rgba(255, 117, 140, 0.3);
     color: white;
-    z-index: 10; /* Ensure above graph but below controls if needed */
+    z-index: var(--z-dropdown); /* Ensure above graph but below controls if needed */
 }
 #info-overlay h3 { margin: 0 0 10px 0; font-size: 20px; color: #ff9a9e; display: flex; align-items: center; gap: 10px; font-family: 'Georgia', serif; }
 #info-overlay p { margin: 0; font-size: 14px; color: #e0e0e0; line-height: 1.6; }
@@ -627,7 +627,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     text-align: center;
     pointer-events: none;
     opacity: 0;
-    z-index: 100;
+    z-index: var(--z-sticky);
     max-width: 70%;
     padding: 15px 30px;
     background: rgba(0, 0, 0, 0.2);
@@ -641,7 +641,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 2000;
+    z-index: var(--z-overlay);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -725,7 +725,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     display: flex;
     align-items: center;
     gap: 20px;
-    z-index: 1500; /* Lower than sidebar (2000) but above graph */
+    z-index: var(--z-timeline); /* Lower than sidebar (2000) but above graph */
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
 }
@@ -737,7 +737,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     right: 30px;
     display: flex;
     gap: 15px;
-    z-index: 2000; /* Increased z-index to ensure visibility above everything */
+    z-index: var(--z-overlay); /* Increased z-index to ensure visibility above everything */
     pointer-events: auto; /* Ensure clickable */
 }
 
@@ -876,7 +876,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
 #loading { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
     background: radial-gradient(circle at center, #2b1055 0%, #000000 100%); 
-    display: flex; justify-content: center; align-items: center; z-index: 1000; flex-direction: column; 
+    display: flex; justify-content: center; align-items: center; z-index: var(--z-fixed); flex-direction: column; 
     color: #ff9a9e;
 }
 .spinner { 
@@ -961,7 +961,7 @@ body.idle-mode #message-sidebar-toggle-fixed {
     /* 确保折叠按钮在闲置模式下也能正确显示 */
     opacity: 0.7;
     transition: opacity 1s ease-in-out;
-    z-index: 9999; /* 确保在所有元素之上 */
+    z-index: var(--z-top); /* 确保在所有元素之上 */
 }
 
 /* 闲置模式指示器（可选） */
@@ -975,7 +975,7 @@ body.idle-mode::after {
     color: white;
     border-radius: 20px;
     font-size: 14px;
-    z-index: 1000;
+    z-index: var(--z-fixed);
     animation: fadeIn 0.5s ease-out;
     pointer-events: none;
 }
@@ -1083,12 +1083,12 @@ body:not(.idle-mode) #time-travel-container {
     body.idle-mode #message-sidebar-toggle-fixed {
         /* 平板闲置模式下，折叠按钮保持可见性 */
         opacity: 0.7;
-        z-index: 9999;
+        z-index: var(--z-top);
     }
 
     body.message-sidebar-collapsed #message-sidebar-toggle-fixed {
         /* 确保折叠按钮在侧边栏折叠时正确显示 */
-        display: flex !important;
+        display: flex;
         opacity: 0.9;
     }
 }
@@ -1103,7 +1103,7 @@ body:not(.idle-mode) #time-travel-container {
         position: fixed;
         left: 0;
         top: 0;
-        z-index: 3000;
+        z-index: var(--z-modal);
         transform: translateX(-100%);
         transition: transform 0.3s ease;
     }
@@ -1346,12 +1346,12 @@ body:not(.idle-mode) #time-travel-container {
         font-size: 12px;
         top: 15px; /* 调整位置避免与其他元素重叠 */
         opacity: 0.6;
-        z-index: 9999; /* 确保在所有元素之上 */
+        z-index: var(--z-top); /* 确保在所有元素之上 */
     }
 
     /* 移动端闲置模式下，固定按钮的位置不受影响 */
     body.message-sidebar-collapsed #message-sidebar-toggle-fixed {
-        display: flex !important; /* 强制显示 */
+        display: flex;
         opacity: 0.8;
     }
 }

@@ -48,7 +48,7 @@
     border-radius: 8px;
     margin-bottom: 8px;
     position: relative;
-    z-index: 1;
+    z-index: var(--z-content);
 }
 
 .theme-preview::after {
@@ -60,7 +60,7 @@
     bottom: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%);
     border-radius: 8px;
-    z-index: 1;
+    z-index: var(--z-content);
 }
 
 .theme-info {
@@ -97,7 +97,7 @@
     font-size: 12px;
     font-weight: bold;
     box-shadow: var(--shadow-sm);
-    z-index: 10; /* 确保在 theme-preview 之上 */
+    z-index: var(--z-dropdown); /* 确保在 theme-preview 之上 */
 }
 
 /* ========== 透明度滑块 ========== */
@@ -126,7 +126,7 @@
     align-items: center;
     gap: 12px;
     position: relative;
-    z-index: 10;
+    z-index: var(--z-dropdown);
 }
 
 .transparency-slider {
@@ -140,7 +140,7 @@
     outline: none;
     cursor: pointer;
     position: relative;
-    z-index: 1;
+    z-index: var(--z-content);
 }
 
 /* 滑块轨道 */
@@ -177,7 +177,7 @@
     transition: transform var(--transition-fast);
     margin-top: -6px; /* 垂直居中：轨道高度6px，滑块头18px，(18-6)/2 = 6 */
     position: relative;
-    z-index: 2;
+    z-index: var(--z-above-content);
 }
 
 .transparency-slider::-moz-range-thumb {

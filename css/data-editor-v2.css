@@ -125,7 +125,7 @@
 .message-table thead {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: var(--z-dropdown);
 
     background: var(--card-hover-bg);
 }
@@ -163,9 +163,9 @@
     transform: scale(1.002);
 }
 
-.message-table__row--selected {
-    /* 🔧 使用半透明主题色，在深色和浅色背景下都可见 */
-    background: var(--accent-color, rgba(102, 126, 234, 0.25)) !important;
+/* 选中行 - 增加特异性以确保覆盖悬停状态 */
+tbody tr.message-table__row--selected {
+    background: var(--accent-color, rgba(102, 126, 234, 0.25));
 }
 
 .message-table td {
@@ -302,7 +302,7 @@
 /* ========== 空状态 ========== */
 
 .message-table__empty-row {
-    background: transparent !important;
+    background: transparent;
 }
 
 .message-table__empty-state {
@@ -395,7 +395,7 @@
     right: 0;
     bottom: 0;
 
-    z-index: 1000;
+    z-index: var(--z-fixed);
 
     display: none;
 }

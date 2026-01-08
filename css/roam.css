@@ -16,7 +16,7 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 1s ease-in-out;
-    z-index: 2000;
+    z-index: var(--z-overlay);
     max-width: 80%;
     text-align: center;
     letter-spacing: 1px;

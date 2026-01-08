@@ -14,7 +14,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 9999;
+    z-index: var(--z-top);
 }
 
 .share-modal__overlay,
@@ -482,8 +482,8 @@
 .import-share-modal__btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
+    transform: none;
+    box-shadow: none;
 }
 
 /* ========== 提示文本 ========== */
