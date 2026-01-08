@@ -409,6 +409,28 @@ input:checked + .toggle-slider:before {
 
 /* ========== 消息列表 ========== */
 
+/* 🔧 修复：为 chat-list-container 添加滚动条样式 */
+/* 注意：滚动条实际出现在 #chat-list-container 上（因为它有 overflow-y: auto） */
+#chat-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-list-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+#chat-list-container::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    opacity: 0.5;
+    border-radius: 3px;
+}
+
+#chat-list-container::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+    opacity: 0.7;
+}
+
 #chat-list-content {
     padding: 20px;
 }
