@@ -10,7 +10,7 @@
     --text-secondary: #888888;
     --border-color: #ffd1d1;
 
-    --happy-color: #ff9a9e;
+    --happy-color: var(--happy-color, #ff9a9e);
     --sad-color: #a18cd1;
     --question-color: #fad0c4;
     --neutral-color: #d4fc79;
@@ -91,7 +91,7 @@ body {
     font-size: 12px;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: #ff9a9e;
+    color: var(--happy-color, #ff9a9e);
     margin-bottom: 12px;
 }
 
@@ -99,7 +99,7 @@ body {
     margin: 0 0 16px 0;
     font-size: 36px;
     line-height: 1.2;
-    color: #fff;
+    color: var(--text-on-primary, #fff);
     text-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
@@ -121,7 +121,7 @@ body {
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    color: var(--text-on-primary, #fff);
     cursor: pointer;
     font-size: 15px;
     transition: all 0.25s ease;
@@ -292,7 +292,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
 .app-title {
     font-size: 24px;
     font-weight: 300;
-    color: #d63384;
+    color: var(--code-text, #d63384);
     margin-bottom: 15px;
     display: flex; align-items: center; gap: 10px;
     font-family: 'Georgia', serif;
@@ -395,7 +395,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #aaa;
+    color: var(--text-muted, #aaa);
 }
 #search-input {
     width: 100%;
@@ -576,8 +576,8 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
 }
 
 .msg-body { flex: 1; max-width: 85%; }
-.msg-header { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-bottom: 6px; align-items: baseline; }
-.sender-name { font-weight: 600; color: #d63384; }
+.msg-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted, #aaa); margin-bottom: 6px; align-items: baseline; }
+.sender-name { font-weight: 600; color: var(--code-text, #d63384); }
 
 .msg-bubble {
     padding: 12px 16px; border-radius: 18px; background: var(--card-bg); color: var(--text-main); font-size: 14px; line-height: 1.6;
@@ -611,7 +611,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     color: white;
     z-index: var(--z-dropdown); /* Ensure above graph but below controls if needed */
 }
-#info-overlay h3 { margin: 0 0 10px 0; font-size: 20px; color: #ff9a9e; display: flex; align-items: center; gap: 10px; font-family: 'Georgia', serif; }
+#info-overlay h3 { margin: 0 0 10px 0; font-size: 20px; color: var(--happy-color, #ff9a9e); display: flex; align-items: center; gap: 10px; font-family: 'Georgia', serif; }
 #info-overlay p { margin: 0; font-size: 14px; color: #e0e0e0; line-height: 1.6; }
 
 /* Subtitle Overlay */
@@ -877,7 +877,7 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
     background: radial-gradient(circle at center, #2b1055 0%, #000000 100%); 
     display: flex; justify-content: center; align-items: center; z-index: var(--z-fixed); flex-direction: column; 
-    color: #ff9a9e;
+    color: var(--happy-color, #ff9a9e);
 }
 .spinner { 
     width: 60px; height: 60px; 
