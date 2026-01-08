@@ -648,14 +648,24 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     pointer-events: none;
 }
 
+/* 🔧 修复：Toast 使用醒目的深色背景，确保在所有主题下可见 */
 .toast {
-    background: rgba(20, 10, 40, 0.9);
-    color: white;
+    /* 🔧 使用深色半透明背景，确保在任何主题下都清晰可见 */
+    background: rgba(30, 41, 59, 0.95);
+    color: #ffffff;
     padding: 15px 20px;
     border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    border-left: 4px solid #ff9a9e;
-    backdrop-filter: blur(10px);
+    /* 🔧 增强阴影，提升可见性 */
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    /* 🔧 使用主题色作为左边框，区分不同类型 */
+    border-left: 4px solid var(--primary-color, #667eea);
+    /* 🔧 添加外边框增强可见性 */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-left-width: 4px;
+    backdrop-filter: blur(12px);
     font-family: "Microsoft YaHei", sans-serif;
     font-size: 14px;
     min-width: 250px;
@@ -664,16 +674,29 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
     display: flex;
     align-items: center;
     gap: 10px;
+    /* 🔧 确保文字清晰可读 */
+    font-weight: 500;
 }
 
-.toast.success { border-left-color: #52c41a; }
-.toast.error { border-left-color: #ff4d4f; }
-.toast.info { border-left-color: #1890ff; }
+.toast.success {
+    border-left-color: var(--success-color, #10b981);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%);
+}
+
+.toast.error {
+    border-left-color: var(--error-color, #ef4444);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
+}
+
+.toast.info {
+    border-left-color: var(--info-color, #3b82f6);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(37, 99, 235, 0.95) 100%);
+}
 
 .toast i { font-size: 18px; }
-.toast.success i { color: #52c41a; }
-.toast.error i { color: #ff4d4f; }
-.toast.info i { color: #1890ff; }
+.toast.success i { color: #ffffff; }
+.toast.error i { color: #ffffff; }
+.toast.info i { color: #ffffff; }
 
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }

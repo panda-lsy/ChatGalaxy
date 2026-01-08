@@ -93,10 +93,18 @@ body.transparent-ui {
 }
 
 /* Toast 通知 */
+/* 🔧 修复：Toast 不再使用 card-bg，改用深色背景确保可见性 */
 .toast {
-    background: var(--card-bg);
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(8px);
+    /* 🔧 使用深色半透明背景，确保在任何主题下都清晰可见 */
+    background: rgba(30, 41, 59, 0.95);
+    /* 🔧 增强阴影，提升可见性 */
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    /* 🔧 添加边框增强可见性 */
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* ========== 特殊效果透明度 ========== */

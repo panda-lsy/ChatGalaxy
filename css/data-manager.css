@@ -757,8 +757,14 @@ body {
     display: none;
     align-items: center;
     gap: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
+    /* 🔧 增强阴影，提升可见性 */
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    /* 🔧 添加边框增强可见性 */
+    border: 1px solid rgba(255, 255, 255, 0.2);
     animation: slideInRight 0.3s ease-out;
 }
 
@@ -766,28 +772,29 @@ body {
     display: flex;
 }
 
+/* 🔧 修复：使用渐变色背景，增强可见性 */
 .toast-success {
-    /* 🔧 使用主题变量，支持主题切换 */
-    background: var(--success-color, rgba(16, 185, 129, 0.95));
-    color: var(--text-on-primary, #ffffff);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .toast-error {
-    /* 🔧 使用主题变量，支持主题切换 */
-    background: var(--error-color, rgba(239, 68, 68, 0.95));
-    color: var(--text-on-primary, #ffffff);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .toast-warning {
-    /* 🔧 使用主题变量，支持主题切换 */
-    background: var(--warning-color, rgba(245, 158, 11, 0.95));
-    color: var(--text-on-primary, #ffffff);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .toast-info {
-    /* 🔧 使用主题变量，支持主题切换 */
-    background: var(--info-color, rgba(59, 130, 246, 0.95));
-    color: var(--text-on-primary, #ffffff);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(37, 99, 235, 0.95) 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .toast i {
