@@ -601,19 +601,6 @@ function initSettings(showModal = false) {
     }
 }
 
-/**
- * Emoji Picker 功能已废弃
- * @param {HTMLElement} btn - 触发按钮（不再使用）
- * @param {HTMLInputElement} input - 目标输入框
- */
-function showEmojiPicker(btn, input) {
-    console.warn('⚠️ Emoji Picker 功能已废弃');
-    // 直接聚焦输入框，让用户手动输入 emoji
-    if (input) {
-        input.focus();
-    }
-}
-
 function applySettings() {
     // Save
     localStorage.setItem('appSettings', JSON.stringify(appSettings));
