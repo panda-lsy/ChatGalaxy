@@ -895,27 +895,31 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
 /* 侧边栏内容区域的滚动条 */
 #tab-content-messages::-webkit-scrollbar,
 #keyword-ranking-list::-webkit-scrollbar,
-#message-sidebar::-webkit-scrollbar {
+#message-sidebar::-webkit-scrollbar,
+#chat-list-content::-webkit-scrollbar {
     width: 6px;
 }
 
 #tab-content-messages::-webkit-scrollbar-track,
 #keyword-ranking-list::-webkit-scrollbar-track,
-#message-sidebar::-webkit-scrollbar-track {
+#message-sidebar::-webkit-scrollbar-track,
+#chat-list-content::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
 }
 
 #tab-content-messages::-webkit-scrollbar-thumb,
 #keyword-ranking-list::-webkit-scrollbar-thumb,
-#message-sidebar::-webkit-scrollbar-thumb {
+#message-sidebar::-webkit-scrollbar-thumb,
+#chat-list-content::-webkit-scrollbar-thumb {
     background: rgba(255, 117, 140, 0.3);
     border-radius: 3px;
 }
 
 #tab-content-messages::-webkit-scrollbar-thumb:hover,
 #keyword-ranking-list::-webkit-scrollbar-thumb:hover,
-#message-sidebar::-webkit-scrollbar-thumb:hover {
+#message-sidebar::-webkit-scrollbar-thumb:hover,
+#chat-list-content::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 117, 140, 0.5);
 }
 
