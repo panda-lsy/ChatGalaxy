@@ -771,10 +771,10 @@ function toggleBlacklist() {
 
     // 更新UI状态
     if (isEnabled) {
-        status.innerHTML = '<i class="ri-checkbox-circle-line" style="color: #10b981;"></i><span>黑名单过滤已启用</span>';
+        status.innerHTML = '<i class="ri-checkbox-circle-line" style="color: var(--success-color);"></i><span>黑名单过滤已启用</span>';
         showToast('success', '✅ 黑名单过滤已启用');
     } else {
-        status.innerHTML = '<i class="ri-close-circle-line" style="color: #ef4444;"></i><span>黑名单过滤已禁用</span>';
+        status.innerHTML = '<i class="ri-close-circle-line" style="color: var(--error-color);"></i><span>黑名单过滤已禁用</span>';
         showToast('info', 'ℹ️ 黑名单过滤已禁用');
     }
 
@@ -827,9 +827,9 @@ function initializeBlacklistSettings() {
     // 更新状态显示
     const status = document.getElementById('blacklist-status');
     if (window.ChatGalaxyConfig.ENABLE_BLACKLIST) {
-        status.innerHTML = '<i class="ri-checkbox-circle-line" style="color: #10b981;"></i><span>黑名单过滤已启用</span>';
+        status.innerHTML = '<i class="ri-checkbox-circle-line" style="color: var(--success-color);"></i><span>黑名单过滤已启用</span>';
     } else {
-        status.innerHTML = '<i class="ri-close-circle-line" style="color: #ef4444;"></i><span>黑名单过滤已禁用</span>';
+        status.innerHTML = '<i class="ri-close-circle-line" style="color: var(--error-color);"></i><span>黑名单过滤已禁用</span>';
     }
 
     console.log('[Blacklist] 设置已初始化:', {

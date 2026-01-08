@@ -38,6 +38,8 @@
             padding: 40px 20px;
             position: relative;
             overflow: hidden;
+            /* 🔧 添加深色背景覆盖层，确保白色文字可见 */
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         }
 
         .cover-section::before {
@@ -45,7 +47,8 @@
             position: absolute;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            /* 🔧 使用半透明白色点缀，增强深色背景 */
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
             background-size: 50px 50px;
             animation: moveBackground 20s linear infinite;
         }
@@ -161,10 +164,12 @@
         .section-title {
             font-size: 42px;
             font-weight: bold;
-            color: white;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-main);
             text-align: center;
             margin-bottom: 50px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            /* 🔧 增强阴影确保可见性 */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         .card {
@@ -256,7 +261,8 @@
         .keyword-item {
             /* 🔧 使用主题渐变色 */
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-on-primary, #ffffff);
             padding: 15px 20px;
             border-radius: 12px;
             display: flex;
@@ -380,7 +386,8 @@
         .tag-card {
             /* 🔧 使用主题渐变色 */
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-on-primary, #ffffff);
             padding: 30px;
             border-radius: 16px;
             text-align: center;
@@ -420,15 +427,20 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: white;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-on-primary, #ffffff);
+            /* 🔧 添加深色背景 */
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             font-size: 24px;
         }
 
         .loading-spinner {
             width: 50px;
             height: 50px;
+            /* 🔧 使用半透明白色边框 */
             border: 4px solid rgba(255,255,255,0.3);
-            border-top-color: white;
+            /* 🔧 使用主题变量 */
+            border-top-color: var(--text-on-primary, #ffffff);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-right: 20px;
@@ -463,7 +475,8 @@
         .share-btn:hover {
             /* 🔧 使用主题主色 */
             background: var(--primary-color);
-            color: white;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-on-primary, #ffffff);
             transform: translateY(-2px);
             /* 🔧 使用主题强调色阴影 */
             box-shadow: 0 5px 15px var(--accent-color);
@@ -991,7 +1004,7 @@
         </section>
 
         <!-- 页脚 -->
-        <footer style="text-align: center; padding: 40px; color: white; opacity: 0.8;">
+        <footer style="text-align: center; padding: 40px; /* 🔧 使用主题变量，确保文字可见性 */ color: var(--text-main); opacity: 0.8;">
             <p style="font-size: 18px; margin-bottom: 10px;">
                 🌲 深山有密林团队
             </p>
