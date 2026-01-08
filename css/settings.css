@@ -15,12 +15,13 @@
 }
 
 .modal-content {
-    background: rgba(255, 255, 255, var(--glass-opacity));
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
-    width: 400px;
+    width: 480px; /* 🔧 增加宽度从 400px 到 480px */
     max-width: 90%;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--card-border);
     overflow: hidden;
     transform: scale(0.9);
     animation: scaleIn 0.3s forwards;
@@ -77,20 +78,21 @@
 }
 
 .modal-body::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--card-hover-bg);
     border-radius: 10px;
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-    background: #ffc2d1;
+    background: var(--primary-color);
+    opacity: 0.7;
     border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-sm);
 }
 
 
 .setting-group {
     margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--card-border);
     padding-bottom: 15px;
 }
 
@@ -125,7 +127,7 @@
     width: 100%;
     -webkit-appearance: none;
     height: 4px;
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--card-hover-bg);
     border-radius: 2px;
     outline: none;
     cursor: pointer;
@@ -139,8 +141,9 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #ff9a9e;
-    box-shadow: 0 0 10px rgba(255, 154, 158, 0.8);
+    background: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+    opacity: 0.8;
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.2s ease;
     border: 2px solid rgba(255, 255, 255, 0.6);
@@ -149,13 +152,14 @@
 .setting-item input[type="range"]::-webkit-slider-thumb:hover,
 #settings-modal input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.15);
-    box-shadow: 0 0 14px rgba(255, 154, 158, 0.9);
+    box-shadow: 0 0 14px var(--primary-color);
+    opacity: 0.9;
 }
 
 .setting-item input[type="range"]::-moz-range-track,
 #settings-modal input[type="range"]::-moz-range-track {
     height: 4px;
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--card-hover-bg);
     border-radius: 2px;
     box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08);
 }
@@ -165,8 +169,9 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #ff9a9e;
-    box-shadow: 0 0 10px rgba(255, 154, 158, 0.8);
+    background: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+    opacity: 0.8;
     border: 2px solid rgba(255, 255, 255, 0.6);
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.2s ease;
@@ -175,34 +180,38 @@
 .setting-item input[type="range"]::-moz-range-thumb:hover,
 #settings-modal input[type="range"]::-moz-range-thumb:hover {
     transform: scale(1.15);
-    box-shadow: 0 0 14px rgba(255, 154, 158, 0.9);
+    box-shadow: 0 0 14px var(--primary-color);
+    opacity: 0.9;
 }
 
 
 /* Layout buttons inside settings */
 #settings-modal .setting-item button {
-    background: #fff;
-    border: 1px solid #ffd6e7;
+    background: var(--card-bg);
+    border: 1px solid var(--primary-color);
     border-radius: 12px;
-    color: #ff758c;
+    color: var(--primary-color);
     padding: 8px 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
 }
 
 #settings-modal .setting-item button:hover {
-    background: #fff0f3;
+    background: var(--card-hover-bg);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 117, 140, 0.25);
+    box-shadow: var(--shadow-md);
+}
 
 .setting-item input[type="text"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--card-border);
     border-radius: 5px;
     font-family: inherit;
     box-sizing: border-box;
+    background: var(--card-bg);
+    color: var(--text-main);
 }
 
 .setting-item input[type="text"]:focus {

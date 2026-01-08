@@ -79,31 +79,37 @@ export class SidebarBase {
      * @private
      */
     _initToggleButton() {
-        // 右侧边栏不使用 toggle 按钮，只通过功能按钮打开
-        if (this.position === 'right') {
-            return;
+        // 左侧边栏：绑定到HTML中已存在的按钮
+        if (this.position === 'left') {
+            // 绑定到折叠按钮（侧边栏内的按钮）
+            const collapseBtn = document.getElementById('message-sidebar-toggle');
+            if (collapseBtn) {
+                this.toggleButton = collapseBtn;
+                collapseBtn.addEventListener('click', () => this.toggle());
+            }
+
+            // 绑定到展开按钮（屏幕边缘的固定按钮）
+            const fixedToggleBtn = document.getElementById('message-sidebar-toggle-fixed');
+            if (fixedToggleBtn) {
+                fixedToggleBtn.addEventListener('click', () => {
+                    this.show();
+                });
+            }
         }
 
-        const toggleClass = '.sidebar-toggle-open';
-        this.toggleButton = document.querySelector(toggleClass);
-
-        // 如果没有切换按钮，创建一个
-        if (!this.toggleButton && this.collapsible) {
-            this._createToggleButton();
-        }
-
-        // 绑定切换事件
-        if (this.toggleButton) {
-            this.toggleButton.addEventListener('click', () => this.toggle());
-        }
+        // 右侧边栏：不使用 toggle 按钮
     }
 
     /**
-     * 创建切换按钮（仅左侧边栏）
+     * 创建切换按钮（已禁用）
      * @private
+     * @deprecated 不再创建 toggle 按钮
      */
     _createToggleButton() {
-        // 只有左侧边栏需要 toggle 按钮
+        // ⚠️ 已废弃：不再创建 toggle 按钮
+        return;
+
+        /* 旧代码已禁用
         if (this.position !== 'left') {
             return;
         }
@@ -116,6 +122,7 @@ export class SidebarBase {
 
         document.body.appendChild(this.toggleButton);
         console.log(`📝 [SidebarBase] Created toggle button for: ${this.id}`);
+        */
     }
 
     /**
@@ -136,8 +143,10 @@ export class SidebarBase {
             }
         });
 
-        // 点击外部关闭（仅左侧边栏）
-        // 右侧边栏只通过叉号关闭，不支持点击外部关闭
+        // 点击外部关闭（已禁用）
+        // ⚠️ 两侧边栏都不再支持点击外部关闭
+        // 用户需要通过点击叉号或功能按钮来关闭侧边栏
+        /* 旧代码已禁用
         if (this.position === 'left') {
             document.addEventListener('click', (e) => {
                 if (this.visible && !this.element.contains(e.target) && !this.toggleButton?.contains(e.target)) {
@@ -145,6 +154,7 @@ export class SidebarBase {
                 }
             });
         }
+        */
 
         // 监听主题变更
         if (window.ThemeManager) {
@@ -180,10 +190,10 @@ export class SidebarBase {
         this.element.classList.add('active');
         this.visible = true;
 
-        // 隐藏切换按钮
-        if (this.toggleButton) {
-            this.toggleButton.style.display = 'none';
-        }
+        // ⚠️ 已移除：不再控制 toggle 按钮的显示/隐藏
+        // if (this.toggleButton) {
+        //     this.toggleButton.style.display = 'none';
+        // }
 
         // 触发回调
         this.onShow();
@@ -204,10 +214,10 @@ export class SidebarBase {
         this.element.classList.remove('active');
         this.visible = false;
 
-        // 显示切换按钮
-        if (this.toggleButton) {
-            this.toggleButton.style.display = '';
-        }
+        // ⚠️ 已移除：不再控制 toggle 按钮的显示/隐藏
+        // if (this.toggleButton) {
+        //     this.toggleButton.style.display = '';
+        // }
 
         // 触发回调
         this.onHide();

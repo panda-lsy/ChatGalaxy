@@ -52,6 +52,8 @@ export class TransparencySlider {
      * 渲染滑块
      */
     render() {
+        console.log(`🔍 [TransparencySlider] render() called for container: ${this.containerId}`);
+
         const container = document.getElementById(this.containerId);
         if (!container) {
             console.warn(`⚠️ [TransparencySlider] Container not found: ${this.containerId}`);
@@ -61,9 +63,9 @@ export class TransparencySlider {
         // 清空容器
         container.innerHTML = '';
 
-        // 创建滑块包装器
-        const wrapper = document.createElement('div');
-        wrapper.className = 'transparency-wrapper';
+        // ⚠️ 不再创建 wrapper，容器本身已经是 transparency-wrapper
+        // const wrapper = document.createElement('div');
+        // wrapper.className = 'transparency-wrapper';
 
         // 创建标签
         const label = document.createElement('label');
@@ -85,9 +87,19 @@ export class TransparencySlider {
         slider.step = this.step;
         slider.value = this.currentValue;
 
+        console.log(`🔍 [TransparencySlider] Created slider: min=${slider.min}, max=${slider.max}, step=${slider.step}, value=${slider.value}`);
+
         // 绑定事件
-        slider.addEventListener('input', (e) => this._onInput(e.target.value));
-        slider.addEventListener('change', (e) => this._onChange(e.target.value));
+        slider.addEventListener('input', (e) => {
+            console.log(`🎚️ [TransparencySlider] input event: ${e.target.value}`);
+            this._onInput(e.target.value);
+        });
+        slider.addEventListener('change', (e) => {
+            console.log(`🎚️ [TransparencySlider] change event: ${e.target.value}`);
+            this._onChange(e.target.value);
+        });
+
+        console.log(`✅ [TransparencySlider] Event listeners bound to slider`);
 
         // 创建值显示
         const valueDisplay = this.showValue ? this._createValueDisplay() : null;
@@ -100,14 +112,16 @@ export class TransparencySlider {
             sliderContainer.appendChild(slider);
         }
 
-        wrapper.appendChild(label);
-        wrapper.appendChild(sliderContainer);
-        container.appendChild(wrapper);
+        // 直接添加到容器（不创建额外的 wrapper）
+        container.appendChild(label);
+        container.appendChild(sliderContainer);
+
+        console.log(`✅ [TransparencySlider] DOM assembled`);
 
         // 加载当前透明度
         this._loadCurrentValue();
 
-        console.log('✅ [TransparencySlider] Rendered');
+        console.log('✅ [TransparencySlider] Rendered completely');
     }
 
     /**
@@ -128,6 +142,8 @@ export class TransparencySlider {
      * @private
      */
     _loadCurrentValue() {
+        console.log(`🔍 [TransparencySlider] _loadCurrentValue called`);
+
         if (!window.ThemeManager) {
             console.warn('⚠️ [TransparencySlider] ThemeManager not found');
             return;
@@ -144,16 +160,19 @@ export class TransparencySlider {
         const transparency = window.ThemeManager.currentTransparency;
         this.currentValue = Math.round(transparency * 100);
 
+        console.log(`✅ [TransparencySlider] Loaded from ThemeManager: ${transparency} → ${this.currentValue}%`);
+
         // 更新滑块
         const slider = document.getElementById('slider-input');
         if (slider) {
             slider.value = this.currentValue;
+            console.log(`✅ [TransparencySlider] Slider value updated: ${slider.value}`);
+        } else {
+            console.error('❌ [TransparencySlider] Slider element not found!');
         }
 
         // 更新显示值
         this._updateValueDisplay();
-
-        console.log(`✅ [TransparencySlider] Loaded current value: ${this.currentValue}%`);
     }
 
     /**
@@ -167,14 +186,8 @@ export class TransparencySlider {
         // 更新显示值
         this._updateValueDisplay();
 
-        // 实时预览（减少防抖延迟到 10ms，更实时）
-        if (this.debounceTimer) {
-            clearTimeout(this.debounceTimer);
-        }
-
-        this.debounceTimer = setTimeout(() => {
-            this._applyTransparency();
-        }, 10);
+        // 实时预览（立即应用，不使用防抖）
+        this._applyTransparency();
     }
 
     /**
@@ -192,12 +205,20 @@ export class TransparencySlider {
      * @private
      */
     _applyTransparency() {
-        if (!window.ThemeManager) return;
+        console.log(`🔍 [TransparencySlider] _applyTransparency called: ${this.currentValue}%`);
+
+        if (!window.ThemeManager) {
+            console.error('❌ [TransparencySlider] ThemeManager not found, cannot apply transparency');
+            console.error('   window.ThemeManager =', window.ThemeManager);
+            return;
+        }
 
         const transparency = this.currentValue / 100;
+        console.log(`✅ [TransparencySlider] Calling ThemeManager.setTransparency(${transparency})`);
+
         window.ThemeManager.setTransparency(transparency);
 
-        console.log(`🔍 [TransparencySlider] Applied: ${this.currentValue}%`);
+        console.log(`🔍 [TransparencySlider] Applied: ${this.currentValue}% (transparency: ${transparency})`);
     }
 
     /**

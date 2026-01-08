@@ -13,8 +13,9 @@
 
 /* 覆盖 Tabulator 默认样式 */
 .tabulator {
-    background-color: var(--bg-card, #252b3d);
-    color: var(--text-primary, #e8eaf0);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background-color: var(--card-bg);
+    color: var(--text-main);
     font-size: 14px;
     width: 100%;
 }
@@ -62,25 +63,29 @@
 
 /* 表格行 */
 .tabulator .tabulator-row {
-    background-color: var(--bg-card, #252b3d);
-    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-    color: var(--text-primary, #e8eaf0);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    color: var(--text-main);
     min-height: 48px;
 }
 
 .tabulator .tabulator-row:hover {
-    background-color: var(--bg-hover, #2d3447);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background-color: var(--card-hover-bg);
     cursor: pointer;
 }
 
 /* 选中行 */
 .tabulator .tabulator-row.tabulator-selectable:hover {
-    background-color: var(--bg-hover, #2d3447);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background-color: var(--card-hover-bg);
 }
 
 .tabulator .tabulator-row.tabulator-selected {
-    background-color: var(--accent-light, rgba(102, 126, 234, 0.15)) !important;
-    border-left: 3px solid var(--accent-color, #667eea);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background-color: var(--accent-color, rgba(102, 126, 234, 0.15)) !important;
+    border-left: 3px solid var(--primary-color);
 }
 
 .tabulator .tabulator-row.tabulator-selected:hover {
@@ -146,8 +151,9 @@
 
 /* 分页控件 */
 .tabulator .tabulator-footer {
-    background-color: var(--bg-card, #252b3d);
-    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    /* 🔧 使用主题变量，支持主题切换 */
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--card-border);
     padding: 10px;
 }
 

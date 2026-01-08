@@ -1,8 +1,17 @@
+/**
+ * ChatGalaxy Emoji Picker 样式
+ * 遵循 SOLID 原则：使用 CSS 变量支持主题切换
+ * @version 1.0.0
+ * @updated 2026-01-07
+ * @author 深山有密林团队
+ */
 
-/* Input with Button */
+/* ========== 输入框和按钮容器 ========== */
+
 .input-with-btn {
     display: flex;
     gap: 10px;
+    position: relative; /* 🔧 为绝对定位的 emoji picker 提供定位上下文 */
 }
 
 .input-with-btn input {
@@ -10,46 +19,74 @@
 }
 
 .emoji-btn {
-    background: #f0f0f0;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 6px;
     cursor: pointer;
     padding: 0 10px;
     font-size: 16px;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-main);
 }
 
 .emoji-btn:hover {
-    background: #e0e0e0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    background: var(--card-hover-bg);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
 }
 
-/* Emoji Picker Popover */
+/* ========== Emoji Picker 弹出框 ========== */
+
 .emoji-picker-popover {
-    position: fixed; /* 🔧 改为fixed定位，独立于父元素的层叠上下文 */
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    padding: 10px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 5px;
-    z-index: 99999 !important; /* 🔧 确保在所有元素之上（侧边栏: 5000, modal: 3000） */
-    width: 200px;
+    position: absolute; /* 🔧 改为 absolute，跟随父容器滚动 */
+    top: calc(100% + 8px); /* 🔧 在按钮下方 8px */
+    left: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    padding: 12px;
+    z-index: 10001; /* 🔧 在设置模态框 (3000) 之上 */
+    max-width: 320px; /* 🔧 增加宽度 */
+    animation: fadeInDown 0.2s ease-out;
 }
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== Emoji 网格 ========== */
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 🔧 增加到 6 列 */
+    gap: 6px;
+}
+
+/* ========== Emoji 选项 ========== */
 
 .emoji-item {
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     text-align: center;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background 0.2s;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1; /* 🔧 保持正方形 */
 }
 
 .emoji-item:hover {
-    background: #f0f0f0;
+    background: var(--card-hover-bg);
+    transform: scale(1.1);
 }
-

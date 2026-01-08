@@ -11,63 +11,27 @@
     <!-- RemixIcon -->
     <link href="js/lib/remixicon/remixicon.css" rel="stylesheet">
 
+    <!-- 🔧 主题系统 -->
+    <link rel="stylesheet" href="css/theme/variables.css">
+    <link rel="stylesheet" href="css/theme/schemes.css">
+
     <!-- 样式 -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/data-manager.css">
-    <link rel="stylesheet" href="css/batch-toolbar.css">
     <link rel="stylesheet" href="css/data-editor-v2.css">
+    <link rel="stylesheet" href="css/batch-toolbar.css">
 
     <style>
-        :root {
-            /* 🎨 现代渐变配色方案 */
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-
-            /* 背景色 */
-            --bg-color: #0f1419;
-            --bg-secondary: #1a1f2e;
-            --bg-card: #252b3d;
-            --bg-hover: #2d3447;
-
-            /* 文字颜色 */
-            --text-primary: #e8eaf0;
-            --text-secondary: #a0a4b8;
-            --text-muted: #6b7280;
-
-            /* 主题色 */
-            --accent-color: #667eea;
-            --accent-hover: #7c3aed;
-            --accent-light: rgba(102, 126, 234, 0.15);
-
-            /* 功能色 */
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --info-color: #3b82f6;
-
-            /* 边框 */
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-focus: rgba(102, 126, 234, 0.5);
-
-            /* 阴影 */
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-            --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.3);
-        }
-
         body {
             margin: 0;
             padding: 0;
-
-            background: var(--bg-color);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
         }
 
         .editor-page {
             min-height: 100vh;
-            background: var(--bg-color);
+            /* 🔧 使用主题背景渐变 */
+            background: linear-gradient(135deg, var(--bg-color-start) 0%, var(--bg-color-end) 100%);
         }
 
         .editor-header {
@@ -77,8 +41,8 @@
 
             padding: 20px 40px;
 
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
             box-shadow: var(--shadow-md);
 
             position: sticky;
@@ -102,8 +66,8 @@
 
             font-size: 20px;
             color: var(--text-secondary);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 10px;
 
             cursor: pointer;
@@ -111,18 +75,21 @@
         }
 
         .back-btn:hover {
-            background: var(--accent-light);
-            border-color: var(--accent-color);
-            color: var(--accent-color);
+            /* 🔧 使用 rgba 半透明背景 */
+            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
             transform: translateX(-4px);
-            box-shadow: var(--shadow-glow);
+            /* 🔧 使用标准阴影 */
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
         }
 
         .header-title h1 {
             margin: 0;
             font-size: 26px;
             font-weight: 700;
-            background: var(--gradient-primary);
+            /* 🔧 使用内联渐变，不依赖变量 */
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -148,9 +115,9 @@
 
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 10px;
 
             cursor: pointer;
@@ -158,21 +125,23 @@
         }
 
         .header-btn:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent-color);
+            background: var(--card-hover-bg);
+            border-color: var(--primary-color);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
 
         .header-btn.primary {
             color: #ffffff;
-            background: var(--gradient-primary);
+            /* 🔧 使用内联渐变 */
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             border: none;
             box-shadow: var(--shadow-md);
         }
 
         .header-btn.primary:hover {
-            box-shadow: var(--shadow-glow);
+            /* 🔧 使用发光阴影 */
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
             transform: translateY(-2px);
         }
 
@@ -221,8 +190,8 @@
 
             padding: 20px 24px;
 
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 16px;
             box-shadow: var(--shadow-sm);
 
@@ -247,7 +216,7 @@
             margin: 0 0 6px 0;
             font-size: 20px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-main);
         }
 
         .dataset-details p {
@@ -264,7 +233,7 @@
         .stat-item {
             text-align: center;
             padding: 0 16px;
-            border-left: 2px solid var(--border-color);
+            border-left: 2px solid var(--card-border);
         }
 
         .stat-item:first-child {
@@ -274,7 +243,7 @@
         .stat-value {
             font-size: 24px;
             font-weight: 700;
-            background: var(--gradient-success);
+            background: linear-gradient(135deg, var(--success-color) 0%, #34d399 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -303,7 +272,7 @@
             font-size: 56px;
             animation: spin 1.2s linear infinite;
             margin-bottom: 16px;
-            color: var(--accent-color);
+            color: var(--primary-color);
         }
 
         @keyframes spin {
@@ -329,14 +298,14 @@
             max-width: 450px;
 
             background: rgba(37, 43, 61, 0.98);
-            border-left: 4px solid var(--accent-color);
-            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
             box-shadow: var(--shadow-lg);
 
             font-size: 14px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--text-main);
 
             animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: auto;
@@ -435,6 +404,8 @@
     <!-- 脚本 -->
     <script src="js/config.js"></script>
     <script src="js/utils/logger.js"></script>
+    <!-- 🔧 修复：theme-manager.js 使用 ES6 模块，需要 type="module" -->
+    <script type="module" src="js/theme/theme-manager.js"></script>
     <script src="js/data-manager.js"></script>
     <script src="js/data-import.js"></script>
     <script src="js/processors/text-processor.js"></script>
@@ -579,9 +550,11 @@
 
             const content = document.createElement('div');
             content.style.cssText = `
-                background: var(--bg-secondary, #1a1f2e);
+                /* 🔧 使用主题变量，支持主题切换 */
+                background: var(--card-bg);
                 border-radius: 16px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                box-shadow: var(--shadow-lg);
+                border: 1px solid var(--card-border);
                 max-width: 600px;
                 width: 90%;
                 max-height: 80vh;
@@ -600,7 +573,7 @@
             content.innerHTML = `
                 <div style="padding: 24px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                        <h2 style="margin: 0; font-size: 24px; font-weight: 700; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                             📊 数据集统计
                         </h2>
                         <button id="close-stats-modal"
@@ -611,15 +584,15 @@
 
                     <!-- 总览卡片 -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                        <div style="background: var(--bg-card, #252b3d); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);">
                             <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">总消息数</div>
-                            <div style="font-size: 32px; font-weight: 700; background: var(--gradient-success); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            <div style="font-size: 32px; font-weight: 700; background: linear-gradient(135deg, var(--success-color) 0%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                                 ${totalMessages.toLocaleString()}
                             </div>
                         </div>
-                        <div style="background: var(--bg-card, #252b3d); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);">
                             <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">参与者数</div>
-                            <div style="font-size: 32px; font-weight: 700; background: var(--gradient-success); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            <div style="font-size: 32px; font-weight: 700; background: linear-gradient(135deg, var(--success-color) 0%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                                 ${participants.size.toLocaleString()}
                             </div>
                         </div>
@@ -627,10 +600,10 @@
 
                     <!-- 情感分布 -->
                     <div style="margin-bottom: 24px;">
-                        <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: var(--text-primary);">情感分布</h3>
+                        <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: var(--text-main);">情感分布</h3>
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
                             ${Object.entries(sentimentDist).map(([label, count]) => `
-                                <div style="background: var(--bg-card, #252b3d); padding: 16px; border-radius: 10px; border: 1px solid var(--border-color); text-align: center;">
+                                <div style="background: var(--card-bg); padding: 16px; border-radius: 10px; border: 1px solid var(--card-border); text-align: center;">
                                     <div style="font-size: 24px; font-weight: 700; color: ${sentimentColors[label]}; margin-bottom: 4px;">
                                         ${count.toLocaleString()}
                                     </div>
@@ -644,17 +617,17 @@
 
                     <!-- 活跃参与者 Top 10 -->
                     <div>
-                        <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: var(--text-primary);">活跃参与者 Top 10</h3>
-                        <div style="background: var(--bg-card, #252b3d); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
+                        <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: var(--text-main);">活跃参与者 Top 10</h3>
+                        <div style="background: var(--card-bg); border-radius: 12px; border: 1px solid var(--card-border); overflow: hidden;">
                             ${topParticipants.map((participant, index) => `
-                                <div style="display: flex; align-items: center; padding: 12px 16px; ${index > 0 ? 'border-top: 1px solid var(--border-color);' : ''}">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; margin-right: 12px;">
+                                <div style="display: flex; align-items: center; padding: 12px 16px; ${index > 0 ? 'border-top: 1px solid var(--card-border);' : ''}">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; margin-right: 12px;">
                                         ${index + 1}
                                     </div>
-                                    <div style="flex: 1; font-weight: 500; color: var(--text-primary);">
+                                    <div style="flex: 1; font-weight: 500; color: var(--text-main);">
                                         ${participant[0]}
                                     </div>
-                                    <div style="font-size: 16px; font-weight: 700; background: var(--gradient-success); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                    <div style="font-size: 16px; font-weight: 700; background: linear-gradient(135deg, var(--success-color) 0%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                                         ${participant[1].toLocaleString()} 条
                                     </div>
                                 </div>
@@ -740,6 +713,38 @@
                 }
             }
         });
+
+        // 🔧 主题系统初始化
+        // ⚠️ theme-manager.js 是 ES6 模块，需要等待加载完成
+        function initThemeSystem() {
+            if (window.ThemeManager) {
+                // ThemeManager 已自动初始化，只需监听事件
+                console.log('✅ [DatasetEditor] ThemeManager found');
+
+                // 监听主题变更
+                window.ThemeManager.on('themeChange', (data) => {
+                    console.log('🎨 [DatasetEditor] Theme changed:', data.newTheme);
+                    // 主题已自动切换，无需额外处理
+                });
+
+                // 监听透明度变更
+                window.ThemeManager.on('transparencyChange', (data) => {
+                    console.log('🔍 [DatasetEditor] Transparency changed:', data.newValue);
+                    // 透明度已自动应用，无需额外处理
+                });
+            } else {
+                console.warn('⚠️ [DatasetEditor] ThemeManager not found, retrying...');
+                // 如果还没加载完成，延迟重试
+                setTimeout(initThemeSystem, 100);
+            }
+        }
+
+        // 等待 DOM 加载完成后初始化主题系统
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initThemeSystem);
+        } else {
+            initThemeSystem();
+        }
     </script>
 </body>
 </html>

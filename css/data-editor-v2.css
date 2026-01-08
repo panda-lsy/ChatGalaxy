@@ -1,50 +1,18 @@
 /**
- * ChatGalaxy 数据编辑器样式 v2.0
+ * ChatGalaxy 数据编辑器样式 v2.1
  * 包括消息表格和编辑器模态框
  *
- * @version 2.0.0
- * @updated 2026-01-06
- * 🎨 现代化配色和布局优化
+ * @version 2.1.0
+ * @updated 2026-01-08
+ * @description 🔧 重构：使用主题系统 CSS 变量，支持动态主题切换
  */
 
-:root {
-    /* 🎨 现代渐变配色方案 */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-
-    /* 背景色 */
-    --bg-color: #0f1419;
-    --bg-secondary: #1a1f2e;
-    --bg-card: #252b3d;
-    --bg-hover: #2d3447;
-
-    /* 文字颜色 */
-    --text-primary: #e8eaf0;
-    --text-secondary: #a0a4b8;
-    --text-muted: #6b7280;
-
-    /* 主题色 */
-    --accent-color: #667eea;
-    --accent-hover: #7c3aed;
-    --accent-light: rgba(102, 126, 234, 0.15);
-
-    /* 功能色 */
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-    --info-color: #3b82f6;
-
-    /* 边框 */
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-focus: rgba(102, 126, 234, 0.5);
-
-    /* 阴影 */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.3);
-}
+/* ========== CSS 变量说明 ==========
+ * 🔧 此文件使用主题系统的变量：
+ * - 颜色变量：css/theme/schemes.css
+ * - 通用变量：css/style.css
+ * - 透明度：由 ThemeManager 动态控制
+ */
 
 /* ========== 消息表格容器 ========== */
 
@@ -52,10 +20,12 @@
     width: 100%;
     height: 100%;
 
-    background: var(--bg-color);
+    /* 🔧 使用主题卡片背景 */
+    background: var(--card-bg);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--card-border);
 }
 
 .message-table__wrapper {
@@ -75,8 +45,8 @@
 
     padding: 20px 24px;
 
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--card-hover-bg);
+    border-bottom: 1px solid var(--card-border);
 }
 
 .message-table__filters {
@@ -89,9 +59,9 @@
     padding: 10px 14px;
 
     font-size: 14px;
-    color: var(--text-primary);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
 
     outline: none;
@@ -100,9 +70,10 @@
 
 .message-table__filter:focus,
 .message-table__search:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px var(--accent-light);
-    background: var(--bg-hover);
+    border-color: var(--primary-color);
+    /* 🔧 使用主题色作为焦点阴影 */
+    box-shadow: 0 0 0 3px var(--accent-color);
+    background: var(--card-hover-bg);
 }
 
 .message-table__filter {
@@ -120,7 +91,7 @@
 }
 
 .message-table__stats strong {
-    color: var(--accent-color);
+    color: var(--primary-color);
     font-weight: 700;
 }
 
@@ -135,7 +106,8 @@
     /* 🔧 移除 overflow，改用分页，避免滚动条 */
     overflow: visible;
 
-    background: var(--bg-color);
+    /* 🔧 使用主题卡片背景 */
+    background: var(--card-bg);
 }
 
 /* ========== 表格 ========== */
@@ -145,12 +117,17 @@
     border-collapse: collapse;
 }
 
+.message-table tbody {
+    /* 🔧 确保表格主体使用主题卡片背景 */
+    background: var(--card-bg);
+}
+
 .message-table thead {
     position: sticky;
     top: 0;
     z-index: 10;
 
-    background: var(--bg-secondary);
+    background: var(--card-hover-bg);
 }
 
 .message-table th {
@@ -161,7 +138,7 @@
     color: var(--text-secondary);
     text-align: left;
 
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--card-border);
     white-space: nowrap;
     user-select: none;
     text-transform: uppercase;
@@ -169,7 +146,7 @@
 }
 
 .message-table th:hover {
-    background: var(--bg-hover);
+    background: var(--card-hover-bg);
 }
 
 /* ========== 表格行 ========== */
@@ -177,23 +154,25 @@
 .message-table__row {
     transition: all 0.2s ease;
     cursor: pointer;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--card-border);
 }
 
 .message-table__row:hover {
-    background: var(--accent-light);
+    /* 🔧 使用主题色作为悬停背景 */
+    background: var(--card-hover-bg);
     transform: scale(1.002);
 }
 
 .message-table__row--selected {
-    background: rgba(102, 126, 234, 0.2) !important;
+    /* 🔧 使用半透明主题色，在深色和浅色背景下都可见 */
+    background: var(--accent-color, rgba(102, 126, 234, 0.25)) !important;
 }
 
 .message-table td {
     padding: 14px 18px;
 
     font-size: 14px;
-    color: var(--text-primary);
+    color: var(--text-main);
 }
 
 /* ========== 复选框 ========== */
@@ -204,14 +183,14 @@
 
     cursor: pointer;
 
-    accent-color: var(--accent-color);
+    accent-color: var(--primary-color);
 }
 
 /* ========== 单元格样式 ========== */
 
 .message-table__sender {
     font-weight: 700;
-    color: var(--accent-color);
+    color: var(--primary-color);
 }
 
 .message-table__timestamp {
@@ -303,18 +282,21 @@
 }
 
 .message-table__action-btn:hover {
-    background: var(--bg-hover);
+    background: var(--card-hover-bg);
     transform: scale(1.15);
 }
 
 .message-table__action-btn--edit:hover {
-    color: var(--accent-color);
-    background: var(--accent-light);
+    color: var(--primary-color);
+    /* 🔧 使用主题卡片悬停背景 */
+    background: var(--card-hover-bg);
 }
 
 .message-table__action-btn--delete:hover {
     color: var(--danger-color);
-    background: rgba(239, 68, 68, 0.15);
+    /* 🔧 使用半透明危险色背景 */
+    background: var(--danger-color);
+    opacity: 0.15;
 }
 
 /* ========== 空状态 ========== */
@@ -338,7 +320,7 @@
 .message-table__empty-state i {
     font-size: 64px;
     margin-bottom: 16px;
-    color: var(--accent-color);
+    color: var(--primary-color);
 }
 
 .message-table__empty-state p {
@@ -356,8 +338,8 @@
 
     padding: 20px 24px;
 
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border-color);
+    background: var(--card-hover-bg);
+    border-top: 1px solid var(--card-border);
 }
 
 .message-table__page-btn {
@@ -369,9 +351,9 @@
     height: 38px;
 
     font-size: 18px;
-    color: var(--text-primary);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 10px;
 
     cursor: pointer;
@@ -379,11 +361,13 @@
 }
 
 .message-table__page-btn:hover:not(:disabled) {
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     border-color: transparent;
-    color: #ffffff;
+    /* 🔧 使用主题变量，支持深色主题 */
+    color: var(--text-on-primary, #ffffff);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-glow);
+    /* 🔧 使用主题色阴影，支持主题切换 */
+    box-shadow: 0 0 20px var(--accent-color);
 }
 
 .message-table__page-btn:disabled {
@@ -399,7 +383,7 @@
 }
 
 .message-table__page-info strong {
-    color: var(--accent-color);
+    color: var(--primary-color);
 }
 
 /* ========== 编辑器模态框 ========== */
@@ -424,7 +408,8 @@
     width: 100%;
     height: 100%;
 
-    background: rgba(0, 0, 0, 0.7);
+    /* 🔧 使用主题遮罩层背景，支持透明度切换 */
+    background: var(--overlay-bg, rgba(0, 0, 0, 0.7));
     backdrop-filter: blur(4px);
 
     padding: 20px;
@@ -437,8 +422,9 @@
     max-width: 600px;
     max-height: 90vh;
 
-    background: rgba(26, 31, 46, 0.98);
-    border: 1px solid var(--border-color);
+    /* 🔧 使用主题卡片背景，修复紫色背景问题 */
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 16px;
     box-shadow: var(--shadow-lg);
 
@@ -457,7 +443,7 @@
 
     padding: 24px;
 
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--card-border);
 }
 
 .editor-modal__title {
@@ -468,7 +454,7 @@
     margin: 0;
     font-size: 20px;
     font-weight: 700;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -493,7 +479,7 @@
 }
 
 .editor-modal__close:hover {
-    background: var(--bg-hover);
+    background: var(--card-hover-bg);
     color: var(--danger-color);
 }
 
@@ -521,7 +507,7 @@
 .editor-modal__label {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-main);
 }
 
 .editor-modal__label .required {
@@ -542,9 +528,9 @@
 
     font-size: 14px;
     font-family: inherit;
-    color: var(--text-primary);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
 
     outline: none;
@@ -554,9 +540,10 @@
 .editor-modal__input:focus,
 .editor-modal__textarea:focus,
 .editor-modal__select:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px var(--accent-light);
-    background: var(--bg-hover);
+    border-color: var(--primary-color);
+    /* 🔧 使用主题色作为焦点阴影 */
+    box-shadow: 0 0 0 3px var(--accent-color);
+    background: var(--card-hover-bg);
 }
 
 .editor-modal__input:disabled,
@@ -590,7 +577,7 @@
 
     padding: 24px;
 
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--card-border);
 }
 
 .editor-modal__btn {
@@ -611,25 +598,27 @@
 }
 
 .editor-modal__btn--primary {
-    color: #ffffff;
-    background: var(--gradient-primary);
+    /* 🔧 使用主题变量，支持深色主题 */
+    color: var(--text-on-primary, #ffffff);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     border: none;
     box-shadow: var(--shadow-md);
 }
 
 .editor-modal__btn--primary:hover:not(:disabled) {
-    box-shadow: var(--shadow-glow);
+    /* 🔧 使用主题色阴影，支持主题切换 */
+    box-shadow: 0 0 20px var(--accent-color);
     transform: translateY(-2px);
 }
 
 .editor-modal__btn--secondary {
-    color: var(--text-primary);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
 }
 
 .editor-modal__btn--secondary:hover {
-    background: var(--bg-hover);
+    background: var(--card-hover-bg);
     border-color: var(--text-secondary);
 }
 

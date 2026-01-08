@@ -2,11 +2,12 @@
  * ChatGalaxy 左侧边栏（消息侧边栏）
  * 显示关键词排名和聊天消息
  * @version 1.0.0
- * @updated 2026-01-07
+ * @updated 2026-01-08
  * @author 深山有密林团队
  */
 
-import { SidebarBase } from './sidebar-base.js';
+// 🔧 修复：使用默认导入（SidebarBase 是默认导出）
+import SidebarBase from './sidebar-base.js';
 
 /**
  * 左侧边栏类
@@ -239,10 +240,10 @@ export class MessageSidebar extends SidebarBase {
      */
     _loadMoreMessages() {
         if (this.isLoadingMore) return;
-        
+
         const startIndex = this.currentPage * this.pageSize;
         const endIndex = startIndex + this.pageSize;
-        
+
         if (startIndex >= this.filteredMessages.length) {
             return;  // 已全部加载
         }
@@ -270,6 +271,23 @@ export class MessageSidebar extends SidebarBase {
     }
 
     /**
+     * 渲染消息列表
+     * @private
+     */
+    _renderMessages() {
+        if (!this.messagesListElement) return;
+
+        // 清空现有消息
+        this.messagesListElement.innerHTML = '';
+
+        // 重置分页
+        this.currentPage = 0;
+
+        // 加载第一批消息
+        this._loadMoreMessages();
+    }
+
+    /**
      * 创建消息列表项
      * @private
      * @param {Object} message - 消息对象
@@ -280,21 +298,38 @@ export class MessageSidebar extends SidebarBase {
         item.className = 'message-item';
         item.dataset.messageId = message.id;
 
-        // 头像颜色
+        // 创建头像元素
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.dataset.senderId = message.senderId || 'unknown'; // 保存 senderId 用于主题切换
         const avatarColor = this._getAvatarColor(message.senderId);
+        avatar.style.background = avatarColor;
+        avatar.textContent = message.senderName ? message.senderName.charAt(0).toUpperCase() : '?';
 
-        item.innerHTML = `
-            <div class="avatar" style="background: ${avatarColor}">
-                ${message.senderName ? message.senderName.charAt(0).toUpperCase() : '?'}
-            </div>
-            <div class="msg-bubble">
-                <div class="msg-header">
-                    <span class="sender-name">${message.senderName || '未知'}</span>
-                    <span class="msg-time">${this._formatTime(message.timestamp)}</span>
-                </div>
-                <div class="msg-content">${message.text || ''}</div>
-            </div>
+        // 创建消息气泡
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+
+        // 创建消息头部
+        const header = document.createElement('div');
+        header.className = 'msg-header';
+        header.innerHTML = `
+            <span class="sender-name">${this._escapeHtml(message.senderName || '未知')}</span>
+            <span class="msg-time">${this._formatTime(message.timestamp)}</span>
         `;
+
+        // 创建消息内容
+        const content = document.createElement('div');
+        content.className = 'msg-content';
+        content.textContent = message.text || '';
+
+        // 组装消息气泡
+        bubble.appendChild(header);
+        bubble.appendChild(content);
+
+        // 组装消息项
+        item.appendChild(avatar);
+        item.appendChild(bubble);
 
         // 点击事件
         item.addEventListener('click', () => {
@@ -302,6 +337,18 @@ export class MessageSidebar extends SidebarBase {
         });
 
         return item;
+    }
+
+    /**
+     * 转义 HTML 特殊字符
+     * @private
+     * @param {string} text - 要转义的文本
+     * @returns {string}
+     */
+    _escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     /**
@@ -448,8 +495,28 @@ export class MessageSidebar extends SidebarBase {
     onThemeChange(data) {
         super.onThemeChange(data);
 
-        // 重新渲染头像颜色
-        this._renderMessages();
+        // 只更新头像颜色，不重新渲染整个列表
+        this._updateAvatarColors();
+    }
+
+    /**
+     * 更新所有头像颜色
+     * @private
+     */
+    _updateAvatarColors() {
+        if (!this.messagesListElement) return;
+
+        const avatarElements = this.messagesListElement.querySelectorAll('.avatar');
+        avatarElements.forEach(avatar => {
+            // 从 dataset 中获取 senderId
+            const senderId = avatar.dataset.senderId;
+            if (senderId) {
+                const newColor = this._getAvatarColor(senderId);
+                avatar.style.background = newColor;
+            }
+        });
+
+        console.log(`🎨 [MessageSidebar] Updated ${avatarElements.length} avatar colors`);
     }
 
     /**

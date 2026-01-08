@@ -1,33 +1,17 @@
 /**
  * ChatGalaxy 数据管理器样式
  * 与主页面保持一致的玻璃态设计风格
- * @version 3.0.0
- * @updated 2026-01-06
+ * @version 3.1.0
+ * @updated 2026-01-08
+ * @description 🔧 重构：使用主题系统 CSS 变量，移除硬编码颜色
  */
 
-/* ========== CSS 变量 ========== */
-:root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --error-color: #ef4444;
-    --info-color: #3b82f6;
-
-    --bg-gradient-start: #2b1055;
-    --bg-gradient-end: #7597de;
-
-    --glass-bg: rgba(255, 255, 255, 0.95);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-
-    --border-color: #e5e7eb;
-    --hover-bg: #f3f4f6;
-}
+/* ========== CSS 变量说明 ==========
+ * 🔧 此文件不再定义 CSS 变量，全部使用主题系统的变量：
+ * - 颜色变量：css/theme/schemes.css
+ * - 通用变量：css/style.css
+ * - 透明度：由 ThemeManager 动态控制
+ */
 
 /* ========== 基础样式 ========== */
 * {
@@ -44,8 +28,8 @@ html, body {
 }
 
 body {
-    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--bg-color-start) 0%, var(--bg-color-end) 100%);
+    color: var(--text-main);
     min-height: 100vh;
     position: relative;
 }
@@ -65,7 +49,8 @@ body {
 .bg-circle {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
+    /* 🔧 使用主题变量，支持深色主题 */
+    background: radial-gradient(circle, var(--text-on-bg, rgba(255, 255, 255, 0.1)), transparent 70%);
     animation: float 20s infinite ease-in-out;
 }
 
@@ -116,13 +101,13 @@ body {
 
 /* ========== 头部 ========== */
 .manager-header {
-    background: var(--glass-bg);
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 24px;
-    box-shadow: var(--glass-shadow);
-    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--card-border);
 }
 
 .header-content {
@@ -144,25 +129,28 @@ body {
     border-radius: 12px;
     border: none;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
+    /* 🔧 使用主题变量，支持深色主题 */
+    color: var(--text-on-primary, #ffffff);
     font-size: 20px;
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    /* 🔧 使用主题阴影颜色 */
+    box-shadow: 0 4px 12px var(--accent-color, rgba(102, 126, 234, 0.3));
 }
 
 .back-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    /* 🔧 使用主题阴影颜色 */
+    box-shadow: 0 6px 16px var(--accent-color, rgba(102, 126, 234, 0.4));
 }
 
 .header-title h1 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-main);
     margin-bottom: 4px;
 }
 
@@ -191,12 +179,14 @@ body {
 }
 
 .action-btn.secondary {
-    background: rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--card-hover-bg);
     color: var(--primary-color);
 }
 
 .action-btn.secondary:hover {
-    background: rgba(102, 126, 234, 0.2);
+    /* 🔧 使用更高的透明度 */
+    background: var(--accent-color, rgba(102, 126, 234, 0.2));
     transform: translateY(-1px);
 }
 
@@ -210,12 +200,12 @@ body {
 /* ========== 区块通用样式 ========== */
 .import-section,
 .datasets-section {
-    background: var(--glass-bg);
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 24px;
-    box-shadow: var(--glass-shadow);
-    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--card-border);
 }
 
 .section-header {
@@ -224,7 +214,7 @@ body {
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 16px;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--card-border);
     cursor: pointer;
     user-select: none;
 }
@@ -232,7 +222,7 @@ body {
 .section-header h2 {
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-main);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -247,7 +237,8 @@ body {
     height: 32px;
     border-radius: 8px;
     border: none;
-    background: rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     color: var(--primary-color);
     font-size: 20px;
     cursor: pointer;
@@ -258,7 +249,8 @@ body {
 }
 
 .collapse-btn:hover {
-    background: rgba(102, 126, 234, 0.2);
+    /* 🔧 使用更高的透明度 */
+    background: var(--accent-color, rgba(102, 126, 234, 0.2));
 }
 
 .section-header.collapsed .collapse-btn i {
@@ -284,19 +276,21 @@ body {
 
 /* 上传区域 */
 .upload-zone {
-    border: 2px dashed var(--border-color);
+    border: 2px dashed var(--card-border);
     border-radius: 12px;
     padding: 48px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
-    background: rgba(102, 126, 234, 0.03);
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
 }
 
 .upload-zone:hover,
 .upload-zone.dragover {
     border-color: var(--primary-color);
-    background: rgba(102, 126, 234, 0.08);
+    /* 🔧 使用主题悬停背景 */
+    background: var(--card-hover-bg);
 }
 
 .upload-icon {
@@ -308,7 +302,7 @@ body {
 .upload-text {
     font-size: 16px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-main);
     margin-bottom: 8px;
 }
 
@@ -319,8 +313,9 @@ body {
 
 /* 文件信息 */
 .file-info {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--info-bg, rgba(59, 130, 246, 0.1));
+    border: 1px solid var(--info-border, rgba(59, 130, 246, 0.3));
     border-radius: 10px;
     padding: 12px 16px;
     margin-bottom: 20px;
@@ -337,8 +332,9 @@ body {
 
 /* 验证警告 */
 .validation-warnings {
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--warning-bg, rgba(245, 158, 11, 0.1));
+    border: 1px solid var(--warning-border, rgba(245, 158, 11, 0.3));
     border-radius: 10px;
     padding: 16px;
     margin-bottom: 20px;
@@ -366,22 +362,25 @@ body {
     margin-bottom: 8px;
     padding: 8px 12px;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.5);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
 }
 
 /* 🔧 新增：信息提示（绿色，表示可以继续） */
 .validation-warnings li.warning-info {
-    background: rgba(16, 185, 129, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--success-bg, rgba(16, 185, 129, 0.1));
     border-left: 3px solid var(--success-color);
-    color: #065f46;
+    color: var(--success-text, #065f46);
     font-weight: 500;
 }
 
 /* 🔧 新增：警告提示（黄色，需要注意但可以继续） */
 .validation-warnings li.warning-caution {
-    background: rgba(245, 158, 11, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--warning-bg, rgba(245, 158, 11, 0.1));
     border-left: 3px solid var(--warning-color);
-    color: #92400e;
+    color: var(--warning-text, #92400e);
 }
 
 /* ========== 表单样式 ========== */
@@ -404,7 +403,7 @@ body {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-main);
     margin-bottom: 8px;
 }
 
@@ -416,10 +415,10 @@ body {
 .form-textarea {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--card-border);
     border-radius: 10px;
     font-size: 14px;
-    color: var(--text-primary);
+    color: var(--text-main);
     background: white;
     transition: all 0.3s;
     font-family: inherit;
@@ -429,7 +428,8 @@ body {
 .form-textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题焦点阴影 */
+    box-shadow: 0 0 0 3px var(--accent-color, rgba(102, 126, 234, 0.1));
 }
 
 .form-textarea {
@@ -458,8 +458,9 @@ body {
 }
 
 .color-option.selected {
-    border-color: var(--text-primary);
-    box-shadow: 0 0 0 2px white, 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-color: var(--text-main);
+    /* 🔧 使用主题变量 */
+    box-shadow: 0 0 0 2px var(--text-on-primary, #ffffff), 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* 标签选择器 */
@@ -471,7 +472,7 @@ body {
 
 .tag-option {
     padding: 8px 16px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--card-border);
     border-radius: 20px;
     font-size: 14px;
     color: var(--text-secondary);
@@ -488,7 +489,8 @@ body {
 .tag-option.selected {
     background: var(--primary-color);
     border-color: var(--primary-color);
-    color: white;
+    /* 🔧 使用主题变量 */
+    color: var(--text-on-primary, #ffffff);
 }
 
 /* 进度条 */
@@ -498,7 +500,8 @@ body {
 
 .progress-bar-bg {
     height: 8px;
-    background: rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -538,13 +541,16 @@ body {
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    /* 🔧 使用主题变量 */
+    color: var(--text-on-primary, #ffffff);
+    /* 🔧 使用主题阴影颜色 */
+    box-shadow: 0 4px 12px var(--accent-color, rgba(102, 126, 234, 0.3));
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    /* 🔧 使用主题阴影颜色 */
+    box-shadow: 0 6px 16px var(--accent-color, rgba(102, 126, 234, 0.4));
 }
 
 .btn-primary:disabled {
@@ -554,12 +560,14 @@ body {
 }
 
 .btn-secondary {
-    background: rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     color: var(--primary-color);
 }
 
 .btn-secondary:hover {
-    background: rgba(102, 126, 234, 0.2);
+    /* 🔧 使用更高的透明度 */
+    background: var(--accent-color, rgba(102, 126, 234, 0.2));
 }
 
 /* ========== 数据集列表 ========== */
@@ -573,9 +581,10 @@ body {
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    background: rgba(102, 126, 234, 0.05);
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
     border-radius: 12px;
-    border: 2px dashed var(--border-color);
+    border: 2px dashed var(--card-border);
 }
 
 .empty-state-icon {
@@ -586,7 +595,7 @@ body {
 .empty-state-text {
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-main);
     margin-bottom: 12px;
 }
 
@@ -602,7 +611,8 @@ body {
 
 /* 数据集卡片 */
 .dataset-card {
-    background: white;
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 20px;
     border-left: 4px solid;
@@ -616,7 +626,8 @@ body {
 }
 
 .dataset-card.active {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     border-left-width: 6px;
 }
 
@@ -630,7 +641,7 @@ body {
 .dataset-name {
     font-size: 18px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-main);
     margin-bottom: 6px;
 }
 
@@ -681,7 +692,8 @@ body {
 
 .dataset-tag {
     padding: 4px 10px;
-    background: rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     color: var(--primary-color);
     font-size: 12px;
     border-radius: 12px;
@@ -704,22 +716,26 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     color: var(--primary-color);
 }
 
 .dataset-action-btn:hover {
-    background: rgba(102, 126, 234, 0.2);
+    /* 🔧 使用更高的透明度 */
+    background: var(--accent-color, rgba(102, 126, 234, 0.2));
     transform: translateY(-1px);
 }
 
 .dataset-action-btn.danger {
-    background: rgba(239, 68, 68, 0.1);
+    /* 🔧 使用主题变量 */
+    background: var(--danger-bg, rgba(239, 68, 68, 0.1));
     color: var(--error-color);
 }
 
 .dataset-action-btn.danger:hover {
-    background: rgba(239, 68, 68, 0.2);
+    /* 🔧 使用更高的透明度 */
+    background: var(--danger-hover-bg, rgba(239, 68, 68, 0.2));
 }
 
 /* ========== Toast 提示 ========== */
@@ -751,23 +767,27 @@ body {
 }
 
 .toast-success {
-    background: rgba(16, 185, 129, 0.95);
-    color: white;
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--success-color, rgba(16, 185, 129, 0.95));
+    color: var(--text-on-primary, #ffffff);
 }
 
 .toast-error {
-    background: rgba(239, 68, 68, 0.95);
-    color: white;
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--error-color, rgba(239, 68, 68, 0.95));
+    color: var(--text-on-primary, #ffffff);
 }
 
 .toast-warning {
-    background: rgba(245, 158, 11, 0.95);
-    color: white;
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--warning-color, rgba(245, 158, 11, 0.95));
+    color: var(--text-on-primary, #ffffff);
 }
 
 .toast-info {
-    background: rgba(59, 130, 246, 0.95);
-    color: white;
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--info-color, rgba(59, 130, 246, 0.95));
+    color: var(--text-on-primary, #ffffff);
 }
 
 .toast i {
@@ -828,27 +848,31 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(102, 126, 234, 0.5);
+    /* 🔧 使用主题色作为滚动条 */
+    background: var(--primary-color);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(102, 126, 234, 0.7);
+    /* 🔧 使用主题强调色作为悬停效果 */
+    background: var(--secondary-color);
 }
 
 /* ========== 黑名单设置 ========== */
 .settings-section {
-    background: rgba(255, 255, 255, 0.8);
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--card-border);
 }
 
 .settings-content {
@@ -858,10 +882,11 @@ body {
 }
 
 .setting-item {
-    background: rgba(255, 255, 255, 0.6);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
     border-radius: 12px;
     padding: 20px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--card-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -875,7 +900,7 @@ body {
 .setting-info h3 {
     font-size: 16px;
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-main);
     margin-bottom: 8px;
     display: flex;
     align-items: center;
@@ -895,7 +920,8 @@ body {
 }
 
 .setting-example {
-    background: rgba(102, 126, 234, 0.05);
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
     border-radius: 8px;
     padding: 12px;
     display: flex;
@@ -909,13 +935,15 @@ body {
 }
 
 .setting-example code {
-    background: white;
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
     padding: 6px 10px;
     border-radius: 4px;
     font-family: 'Consolas', 'Monaco', monospace;
     font-size: 13px;
-    color: #d63384;
-    border: 1px solid rgba(214, 51, 132, 0.2);
+    /* 🔧 使用代码文字颜色变量 */
+    color: var(--code-text, #d63384);
+    border: 1px solid var(--code-border, rgba(214, 51, 132, 0.2));
 }
 
 .example-arrow {
@@ -931,11 +959,12 @@ body {
 .form-select {
     width: 100%;
     padding: 10px 14px;
-    background: white;
-    border: 2px solid var(--border-color);
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
     border-radius: 8px;
     font-size: 14px;
-    color: var(--text-color);
+    color: var(--text-main);
     transition: all 0.2s;
     cursor: pointer;
 }
@@ -943,12 +972,14 @@ body {
 .form-select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    /* 🔧 使用主题焦点阴影 */
+    box-shadow: 0 0 0 3px var(--accent-color, rgba(102, 126, 234, 0.1));
 }
 
 .setting-status {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    /* 🔧 使用主题变量 */
+    background: var(--success-bg, rgba(16, 185, 129, 0.1));
+    border: 1px solid var(--success-border, rgba(16, 185, 129, 0.3));
     border-radius: 8px;
     padding: 12px 16px;
     display: flex;
@@ -956,7 +987,8 @@ body {
     gap: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: #065f46;
+    /* 🔧 使用成功文字颜色变量 */
+    color: var(--success-text, #065f46);
 }
 
 .setting-status i {
@@ -1011,7 +1043,8 @@ body {
 }
 
 .toggle-switch input:focus + .toggle-slider {
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    /* 🔧 使用主题焦点阴影 */
+    box-shadow: 0 0 0 3px var(--accent-color, rgba(102, 126, 234, 0.2));
 }
 
 /* ========== 响应式设计 ========== */

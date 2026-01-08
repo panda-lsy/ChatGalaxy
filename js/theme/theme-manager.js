@@ -168,6 +168,11 @@ class ThemeManager {
             root.style.setProperty(key, value);
         }
 
+        console.log('✅ [ThemeManager] Applied transparency vars to DOM');
+        console.log('   Current CSS vars on root:');
+        console.log('   --sidebar-bg:', getComputedStyle(root).getPropertyValue('--sidebar-bg'));
+        console.log('   --card-bg:', getComputedStyle(root).getPropertyValue('--card-bg'));
+
         // 3. 更新 body 类名（用于旧版兼容）
         document.body.classList.remove('theme-dawn', 'theme-forest', 'theme-ocean', 'theme-stardust');
         document.body.classList.add(`theme-${this.currentTheme}`);

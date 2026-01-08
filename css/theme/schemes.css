@@ -17,17 +17,14 @@ body.theme-dawn {
     --bg-color-start: #FFE5E5;
     --bg-color-end: #FFF5E6;
 
-    /* 侧边栏 */
-    --sidebar-bg: rgba(255, 250, 245, 0.95);
+    /* 🔧 侧边栏和卡片背景色由 ThemeManager 动态生成，不在 CSS 中硬编码 */
+    /* 其他样式 */
     --sidebar-text: #2D2D2D;
     --sidebar-border: rgba(255, 229, 220, 0.6);
     --sidebar-hover: #FF9A8B;
     --sidebar-hover-text: #FFFFFF;
 
-    /* 卡片 */
-    --card-bg: rgba(255, 255, 255, 0.8);
     --card-border: rgba(255, 229, 220, 0.5);
-    --card-hover-bg: rgba(255, 245, 240, 0.9);
 
     /* 文本 */
     --text-main: #3D3D3D;
@@ -46,17 +43,14 @@ body.theme-forest {
     --bg-color-start: #F0F9FF;
     --bg-color-end: #E6FFFB;
 
-    /* 侧边栏 */
-    --sidebar-bg: rgba(245, 255, 245, 0.95);
+    /* 🔧 侧边栏和卡片背景色由 ThemeManager 动态生成，不在 CSS 中硬编码 */
+    /* 其他样式 */
     --sidebar-text: #1C2E1A;
     --sidebar-border: rgba(217, 247, 190, 0.6);
     --sidebar-hover: #52C41A;
     --sidebar-hover-text: #FFFFFF;
 
-    /* 卡片 */
-    --card-bg: rgba(255, 255, 255, 0.8);
     --card-border: rgba(217, 247, 190, 0.5);
-    --card-hover-bg: rgba(246, 255, 237, 0.9);
 
     /* 文本 */
     --text-main: #2F3F2D;
@@ -75,17 +69,14 @@ body.theme-ocean {
     --bg-color-start: #F0F5FF;
     --bg-color-end: #E6F7FF;
 
-    /* 侧边栏 */
-    --sidebar-bg: rgba(240, 245, 255, 0.95);
+    /* 🔧 侧边栏和卡片背景色由 ThemeManager 动态生成，不在 CSS 中硬编码 */
+    /* 其他样式 */
     --sidebar-text: #1A2332;
     --sidebar-border: rgba(186, 231, 255, 0.6);
     --sidebar-hover: #177DDC;
     --sidebar-hover-text: #FFFFFF;
 
-    /* 卡片 */
-    --card-bg: rgba(255, 255, 255, 0.8);
     --card-border: rgba(186, 231, 255, 0.5);
-    --card-hover-bg: rgba(230, 247, 255, 0.9);
 
     /* 文本 */
     --text-main: #1D2B3A;
@@ -104,17 +95,14 @@ body.theme-stardust {
     --bg-color-start: #F9F0FF;
     --bg-color-end: #F0F5FF;
 
-    /* 侧边栏 */
-    --sidebar-bg: rgba(249, 240, 255, 0.95);
+    /* 🔧 侧边栏和卡片背景色由 ThemeManager 动态生成，不在 CSS 中硬编码 */
+    /* 其他样式 */
     --sidebar-text: #22075E;
     --sidebar-border: rgba(239, 219, 255, 0.6);
     --sidebar-hover: #722ED1;
     --sidebar-hover-text: #FFFFFF;
 
-    /* 卡片 */
-    --card-bg: rgba(255, 255, 255, 0.8);
     --card-border: rgba(239, 219, 255, 0.5);
-    --card-hover-bg: rgba(249, 240, 255, 0.9);
 
     /* 文本 */
     --text-main: #1C1435;

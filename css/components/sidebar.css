@@ -137,8 +137,14 @@
 
 .sidebar-btn.active {
     background: var(--primary-color);
-    color: #ffffff;
+    /* 🔧 使用主题变量，确保在所有主题下都可见 */
+    color: var(--text-on-primary, #ffffff);
     border-color: var(--primary-color);
+}
+
+/* 🔧 修复：确保选中状态下的图标也是白色 */
+.sidebar-btn.active i {
+    color: var(--text-on-primary, #ffffff);
 }
 
 /* ========== 主题选择器 ========== */
@@ -301,8 +307,9 @@ input:checked + .toggle-slider:before {
     transition: transform var(--transition-base);
 }
 
+/* 侧边栏折叠时完全隐藏 */
 #message-sidebar.collapsed {
-    transform: translateX(calc(-100% + 28px));
+    transform: translateX(-100%);
 }
 
 /* ========== 右侧边栏特有样式 ========== */
@@ -315,6 +322,7 @@ input:checked + .toggle-slider:before {
     height: 100vh;
     z-index: 2000;
     transition: right var(--transition-base);
+    /* 🔧 背景和其他样式从通用样式（第 19-31 行）继承 */
 }
 
 .sidebar.active {
@@ -411,6 +419,8 @@ input:checked + .toggle-slider:before {
     margin-bottom: 20px;
     cursor: pointer;
     transition: all var(--transition-fast);
+    border-radius: 12px; /* 整个消息项圆角 */
+    padding: 4px; /* 添加内边距让圆角不贴边 */
 }
 
 .message-item:hover {
@@ -435,7 +445,7 @@ input:checked + .toggle-slider:before {
     padding: 12px 16px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 18px;
+    border-radius: 12px; /* 更圆润的圆角 */
     border-top-left-radius: 4px;
 }
 

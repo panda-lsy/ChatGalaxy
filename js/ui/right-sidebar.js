@@ -2,11 +2,12 @@
  * ChatGalaxy 右侧边栏（设置侧边栏）
  * 提供主题切换、透明度调节等功能
  * @version 1.0.0
- * @updated 2026-01-07
+ * @updated 2026-01-08
  * @author 深山有密林团队
  */
 
-import { SidebarBase } from './sidebar-base.js';
+// 🔧 修复：使用默认导入（SidebarBase 是默认导出）
+import SidebarBase from './sidebar-base.js';
 
 /**
  * 右侧边栏类

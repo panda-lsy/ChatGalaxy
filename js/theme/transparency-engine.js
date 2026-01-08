@@ -55,17 +55,21 @@ export class TransparencyEngine {
     generateTransparencyVars(themeColors, globalTransparency) {
         const vars = {};
 
+        console.log(`🔍 [TransparencyEngine] Generating vars with transparency: ${globalTransparency}`);
+
         // 1. 侧边栏透明度（全局透明度）
         vars['--sidebar-bg'] = this.calculateAlpha(
             themeColors.sidebarBg,
             globalTransparency
         );
+        console.log(`   --sidebar-bg: ${vars['--sidebar-bg']}`);
 
         // 2. 卡片透明度（比侧边栏稍高，增强可读性）
         vars['--card-bg'] = this.calculateAlpha(
             themeColors.cardBg,
             Math.min(globalTransparency + 0.05, 1.0)
         );
+        console.log(`   --card-bg: ${vars['--card-bg']}`);
 
         // 3. 悬停状态透明度（不透明或接近不透明）
         vars['--hover-bg'] = this.calculateAlpha(
@@ -77,17 +81,20 @@ export class TransparencyEngine {
             themeColors.cardHover,
             Math.min(globalTransparency + 0.1, 1.0)
         );
+        console.log(`   --card-hover-bg: ${vars['--card-hover-bg']}`);
 
         // 4. 边框透明度（较低透明度）
         vars['--sidebar-border'] = this.calculateAlpha(
             themeColors.sidebarBorder,
             globalTransparency * 0.6
         );
+        console.log(`   --sidebar-border: ${vars['--sidebar-border']}`);
 
         vars['--card-border'] = this.calculateAlpha(
             themeColors.cardBorder,
             globalTransparency * 0.5
         );
+        console.log(`   --card-border: ${vars['--card-border']}`);
 
         // 5. 背景渐变透明度
         vars['--bg-start-alpha'] = this.calculateAlpha(

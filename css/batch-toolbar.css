@@ -12,11 +12,12 @@
     top: 0;
     z-index: 100;
 
-    background: linear-gradient(135deg, var(--bg-color, #1a1a2e) 0%, var(--bg-secondary, #16213e) 100%);
+    /* 🔧 使用主题变量，支持主题切换 */
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-bottom: 1px solid var(--card-border);
 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-md);
 
     padding: 12px 24px;
     margin: 0;
@@ -38,7 +39,8 @@
     align-items: center;
 
     font-size: 14px;
-    color: var(--text-color, #b8c1ec);
+    /* 🔧 使用主题变量 */
+    color: var(--text-main);
 }
 
 .batch-toolbar__count {
@@ -51,7 +53,8 @@
     font-size: 18px;
     font-weight: 600;
 
-    color: var(--accent-color, #667eea);
+    /* 🔧 使用主题变量 */
+    color: var(--primary-color);
 }
 
 /* ========== 右侧操作按钮区域 ========== */
@@ -73,9 +76,10 @@
 
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-color, #b8c1ec);
-    background: var(--button-bg, rgba(255, 255, 255, 0.05));
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    /* 🔧 使用主题变量，增强对比度 */
+    color: var(--text-main);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
 
     cursor: pointer;
@@ -85,27 +89,32 @@
 }
 
 .batch-toolbar__btn:hover:not(:disabled) {
-    background: var(--button-hover, rgba(255, 255, 255, 0.1));
-    border-color: var(--accent-color, #667eea);
+    /* 🔧 优化：悬停时改变背景和文字颜色，增强视觉反馈 */
+    background: var(--card-hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: var(--shadow-md);
 }
 
 .batch-toolbar__btn:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+    box-shadow: var(--shadow-sm);
 }
 
 .batch-toolbar__btn:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
-
-    filter: grayscale(1);
+    /* 🔧 优化：禁用状态更明显 */
+    filter: grayscale(0.8);
+    color: var(--text-muted);
 }
 
 .batch-toolbar__btn i {
     font-size: 16px;
+    /* 🔧 图标颜色与文字保持一致 */
+    color: inherit;
 }
 
 .batch-toolbar__btn--active {
@@ -148,29 +157,34 @@
 
 /* 更新按钮 */
 .batch-toolbar__btn--update {
-    color: var(--warning-color, #ffc107);
+    /* 🔧 使用主文字颜色，确保对比度 */
+    color: var(--text-main);
 }
 
 .batch-toolbar__btn--update:hover:not(:disabled) {
-    background: rgba(255, 193, 7, 0.15);
-    border-color: var(--warning-color, #ffc107);
-    color: var(--warning-color, #ffc107);
+    /* 🔧 悬停时才使用主题色，增强视觉反馈 */
+    background: var(--card-hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* 导出按钮 */
 .batch-toolbar__btn--export {
-    color: var(--success-color, #51cf66);
+    /* 🔧 使用主文字颜色，确保对比度 */
+    color: var(--text-main);
 }
 
 .batch-toolbar__btn--export:hover:not(:disabled) {
-    background: rgba(81, 207, 102, 0.15);
-    border-color: var(--success-color, #51cf66);
-    color: var(--success-color, #51cf66);
+    /* 🔧 悬停时才使用主题色，增强视觉反馈 */
+    background: var(--card-hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* 清除按钮 */
 .batch-toolbar__btn--clear {
-    color: var(--text-color, #b8c1ec);
+    /* 🔧 使用主题标准变量 */
+    color: var(--text-secondary);
 }
 
 /* ========== 下拉菜单 ========== */
@@ -187,11 +201,12 @@
 
     min-width: 180px;
 
-    background: var(--bg-secondary, #16213e);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    /* 🔧 使用主题变量 */
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
 
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--shadow-lg);
 
     opacity: 0;
     visibility: hidden;
@@ -221,7 +236,8 @@
 
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-color, #b8c1ec);
+    /* 🔧 使用主题变量 */
+    color: var(--text-main);
     background: transparent;
     border: none;
     text-align: left;
@@ -233,42 +249,49 @@
 }
 
 .batch-toolbar__dropdown-menu button:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--accent-color, #667eea);
+    /* 🔧 使用主题变量 */
+    background: var(--card-hover-bg);
+    color: var(--primary-color);
 }
 
 .batch-toolbar__dropdown-menu button i {
     font-size: 16px;
+    /* 🔧 图标颜色继承，与文字保持一致 */
+    color: inherit;
 }
 
 /* ========== 情感选项颜色 ========== */
 
 .sentiment-option[data-sentiment="0"] {
-    color: var(--danger-color, #f64a4a);
+    /* 🔧 使用主题变量 */
+    color: var(--danger-color);
 }
 
 .sentiment-option[data-sentiment="0"]:hover {
-    background: rgba(246, 74, 74, 0.1);
+    background: var(--danger-bg, rgba(246, 74, 74, 0.1));
 }
 
 .sentiment-option[data-sentiment="1"] {
-    color: var(--text-color, #b8c1ec);
+    /* 🔧 使用主题变量 */
+    color: var(--text-main);
 }
 
 .sentiment-option[data-sentiment="2"] {
-    color: var(--success-color, #51cf66);
+    /* 🔧 使用主题变量 */
+    color: var(--success-color);
 }
 
 .sentiment-option[data-sentiment="2"]:hover {
-    background: rgba(81, 207, 102, 0.1);
+    background: var(--success-bg, rgba(81, 207, 102, 0.1));
 }
 
 .sentiment-option[data-sentiment="3"] {
-    color: var(--warning-color, #ffc107);
+    /* 🔧 使用主题变量 */
+    color: var(--warning-color);
 }
 
 .sentiment-option[data-sentiment="3"]:hover {
-    background: rgba(255, 193, 7, 0.1);
+    background: var(--warning-bg, rgba(255, 193, 7, 0.1));
 }
 
 /* ========== 响应式设计 ========== */

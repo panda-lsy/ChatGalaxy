@@ -426,15 +426,6 @@ function initSettings(showModal = false) {
             }
     });
 
-    // 🔧 始终绑定表情选择器按钮
-    document.querySelectorAll('.emoji-btn').forEach(emojiBtn => {
-        emojiBtn.addEventListener('click', (e) => {
-            const targetId = e.target.dataset.target;
-            const input = document.getElementById(targetId);
-            showEmojiPicker(e.target, input);
-        });
-    });
-
     // 🔧 始终绑定所有输入框的事件监听器
     document.getElementById('bgm-vol').addEventListener('input', (e) => {
         appSettings.bgmVolume = parseInt(e.target.value);
@@ -610,45 +601,17 @@ function initSettings(showModal = false) {
     }
 }
 
+/**
+ * Emoji Picker 功能已废弃
+ * @param {HTMLElement} btn - 触发按钮（不再使用）
+ * @param {HTMLInputElement} input - 目标输入框
+ */
 function showEmojiPicker(btn, input) {
-    // Remove existing
-    const existing = document.querySelector('.emoji-picker-popover');
-    if (existing) existing.remove();
-    
-    const picker = document.createElement('div');
-    picker.className = 'emoji-picker-popover';
-    
-    const emojis = ['🌌', '✨', '🌟', '🌙', '🪐', '💫', '🚀', '🛸', '💬', '📱', '💭', '🎨', '🎮', '📷', '🎵']; // 🔧 改为通用emoji，去除情侣相关
-    
-    emojis.forEach(emoji => {
-        const item = document.createElement('div');
-        item.className = 'emoji-item';
-        item.innerText = emoji;
-        item.onclick = () => {
-            input.value = emoji;
-            input.dispatchEvent(new Event('input')); // Trigger change
-            picker.remove();
-        };
-        picker.appendChild(item);
-    });
-    
-    // Position
-    const rect = btn.getBoundingClientRect();
-    picker.style.position = 'fixed'; // 🔧 显式设置为fixed定位
-    picker.style.top = (rect.bottom + 5) + 'px';
-    picker.style.left = rect.left + 'px';
-    picker.style.zIndex = '99999'; // 🔧 确保在所有元素之上（包括侧边栏和modal）
-
-    document.body.appendChild(picker);
-    
-    // Close on click outside
-    const closeHandler = (e) => {
-        if (!picker.contains(e.target) && e.target !== btn) {
-            picker.remove();
-            document.removeEventListener('click', closeHandler);
-        }
-    };
-    setTimeout(() => document.addEventListener('click', closeHandler), 0);
+    console.warn('⚠️ Emoji Picker 功能已废弃');
+    // 直接聚焦输入框，让用户手动输入 emoji
+    if (input) {
+        input.focus();
+    }
 }
 
 function applySettings() {
