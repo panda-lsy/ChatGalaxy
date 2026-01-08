@@ -532,7 +532,11 @@ input:checked + .toggle-slider:before {
 }
 
 .tab-content.active {
-    display: block;
+    /* 🔧 修复：恢复 flex 布局，确保子元素正确计算高度 */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
 /* ========== 搜索框 ========== */
