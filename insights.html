@@ -6,6 +6,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#667eea">
+    <!-- 🔧 添加 favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <title>聊天洞察报告 - ChatGalaxy</title>
     <script src="js/lib/chart.umd.min.js"></script>
     <style>
@@ -288,7 +290,8 @@
 
         .heatmap-label {
             font-size: 14px;
-            color: #666;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-secondary);
             text-align: right;
         }
 
@@ -357,11 +360,14 @@
         }
 
         .topic-keyword {
-            background: rgba(255, 255, 255, 0.6);
+            /* 🔧 使用主题变量，确保背景可见性 */
+            background: var(--card-hover-bg);
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 500;
+            /* 🔧 使用主题变量，确保文字可见性 */
+            color: var(--text-main);
         }
 
         /* 标签 */

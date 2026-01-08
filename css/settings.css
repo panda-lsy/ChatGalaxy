@@ -15,13 +15,15 @@
 }
 
 .modal-content {
+    /* 🔧 使用主题变量，确保在浅色主题下也有足够对比度 */
     background: var(--card-bg);
+    /* 🔧 添加额外的边框以确保可见性 */
+    border: 1px solid var(--card-border);
     backdrop-filter: blur(10px);
-    width: 480px; /* 🔧 增加宽度从 400px 到 480px */
+    width: 480px;
     max-width: 90%;
     border-radius: 15px;
     box-shadow: var(--shadow-lg);
-    border: 1px solid var(--card-border);
     overflow: hidden;
     transform: scale(0.9);
     animation: scaleIn 0.3s forwards;
@@ -43,13 +45,14 @@
     margin: 0;
     font-size: 18px;
     font-weight: 500;
-    color: #ffffff;  /* 🔧 纯白色文字 */
-    font-weight: 700;  /* 🔧 更粗的字体 */
+    /* 🔧 使用主题变量，确保在所有主题下都可见 */
+    color: var(--text-on-primary, #ffffff);
+    font-weight: 700;
+    /* 🔧 增强文字阴影以确保可读性 */
     text-shadow:
-        0 0 1px rgba(0, 0, 0, 0.5),     /* 🔧 清晰度增强 */
-        0 2px 4px rgba(0, 0, 0, 0.4),     /* 🔧 加强阴影 */
-        0 0 8px rgba(0, 0, 0, 0.3);      /* 🔧 发光效果 */
-    -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.3);  /* 🔧 文字描边 */
+        0 1px 2px rgba(0, 0, 0, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header .icon-btn {
@@ -70,6 +73,8 @@
 .modal-body {
     padding: 20px;
     overflow-y: auto;
+    /* 🔧 确保文字颜色在浅色背景下可见 */
+    color: var(--text-main);
 }
 
 /* Settings modal scrollbar styling */
@@ -104,9 +109,11 @@
 .setting-group h3 {
     margin: 0 0 15px 0;
     font-size: 14px;
+    /* 🔧 使用主题变量，确保在所有主题下可见 */
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-weight: 600;
 }
 
 .setting-item {
@@ -117,7 +124,9 @@
     display: block;
     margin-bottom: 5px;
     font-size: 14px;
+    /* 🔧 使用主题变量，确保文字可见性 */
     color: var(--text-main);
+    font-weight: 500;
     display: flex;
     justify-content: space-between;
 }
