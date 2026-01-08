@@ -36,7 +36,6 @@ export class MessageSidebar extends SidebarBase {
         this.pageSize = 50;  // 每次加载50条
         this.currentPage = 0;
         this.isLoadingMore = false;
-        this.dataLoaded = false;  // 标志：数据是否已加载
 
         // UI 元素
         this.tabsElement = null;
@@ -525,15 +524,7 @@ export class MessageSidebar extends SidebarBase {
      */
     onShow() {
         super.onShow();
-
-        // 只在首次显示时加载数据，避免重复加载导致卡顿
-        if (!this.dataLoaded && window.CHAT_DATA) {
-            this.updateContent({
-                keywords: window.CHAT_DATA.meta?.ranking || [],
-                messages: window.CHAT_DATA.messages || []
-            });
-            this.dataLoaded = true;
-        }
+        // 🔧 修复：数据加载已移到 getMessageSidebar() 中，避免重复加载
     }
 }
 
@@ -551,6 +542,15 @@ export function getMessageSidebar() {
         // 注册到侧边栏管理器
         if (window.SidebarManager) {
             window.SidebarManager.register('message-sidebar', messageSidebarInstance);
+        }
+
+        // 🔧 修复：在初始化时加载数据，确保只加载一次
+        if (window.CHAT_DATA) {
+            messageSidebarInstance.updateContent({
+                keywords: window.CHAT_DATA.meta?.ranking || [],
+                messages: window.CHAT_DATA.messages || []
+            });
+            console.log('✅ [getMessageSidebar] Data loaded on initialization');
         }
     }
 

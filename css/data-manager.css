@@ -850,23 +850,24 @@ body {
 }
 
 /* ========== 滚动条样式 ========== */
-::-webkit-scrollbar {
+/* 🔧 修复：只应用于数据管理器容器，避免影响其他页面 */
+.manager-container ::-webkit-scrollbar {
     width: 10px;
 }
 
-::-webkit-scrollbar-track {
+.manager-container ::-webkit-scrollbar-track {
     /* 🔧 使用主题变量 */
     background: var(--card-hover-bg);
     border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+.manager-container ::-webkit-scrollbar-thumb {
     /* 🔧 使用主题色作为滚动条 */
     background: var(--primary-color);
     border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.manager-container ::-webkit-scrollbar-thumb:hover {
     /* 🔧 使用主题强调色作为悬停效果 */
     background: var(--secondary-color);
 }
