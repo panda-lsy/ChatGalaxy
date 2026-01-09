@@ -234,10 +234,37 @@ function waitForData(timeout = 5000) {
     });
 }
 
+/**
+ * 更新Demo指示器状态
+ */
+async function updateDemoIndicator() {
+    try {
+        const currentDatasetId = localStorage.getItem('chatgalaxy_currentDataset');
+        if (!currentDatasetId) return;
+
+        const datasetList = await window.DatasetManagerV3.getAllDatasets();
+        const currentDataset = datasetList.find(d => d.id === currentDatasetId);
+
+        const demoIndicator = document.getElementById('demo-indicator');
+        if (demoIndicator) {
+            if (currentDataset && currentDataset.tags && currentDataset.tags.includes('演示')) {
+                demoIndicator.classList.remove('hidden');
+            } else {
+                demoIndicator.classList.add('hidden');
+            }
+        }
+    } catch (error) {
+        console.error('Failed to update demo indicator:', error);
+    }
+}
+
 function initApp(data) {
     // Decompress data
     metaData = data.meta;
     graphData = data.graph;
+
+    // 🔧 更新Demo指示器
+    updateDemoIndicator();
     
     // Transform compact messages back to objects for easier handling (or handle on fly)
     // [id, sender_id, timestamp, text, sentiment, keywords]
@@ -2222,7 +2249,16 @@ function renderChatList(reset = false) {
             <div class="msg-body">
                 <div class="msg-header">
                     <span class="sender-name">${msg.sender}</span>
-                    <span>${new Date(msg.timestamp).toLocaleDateString()}</span>
+                    <span>${(() => {
+                        // 🔧 修复：智能判断时间戳格式（秒级 vs 毫秒级）
+                        let timestampMs;
+                        if (msg.timestamp < 10000000000) {
+                            timestampMs = msg.timestamp * 1000;
+                        } else {
+                            timestampMs = msg.timestamp;
+                        }
+                        return new Date(timestampMs).toLocaleDateString();
+                    })()}</span>
                 </div>
                 <div class="msg-bubble">${text}</div>
             </div>

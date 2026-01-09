@@ -22,7 +22,7 @@
 const CONFIG = {
     BATCH_SIZE: 100,              // 每批处理的消息数量
     PROGRESS_INTERVAL: 10,        // 进度更新频率（每N批更新一次）
-    MAX_FILE_SIZE: 10 * 1024 * 1024, // 最大文件大小 10MB
+    MAX_FILE_SIZE: 200 * 1024 * 1024, // 最大文件大小 200MB
     TOP_KEYWORDS: 5                // 提取前N个关键词
 };
 

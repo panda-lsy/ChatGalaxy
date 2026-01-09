@@ -266,10 +266,36 @@
         }
 
         .keyword-item {
-            /* 🔧 使用主题渐变色 */
+            /* 🔧 使用深色背景，确保在所有主题下都清晰可见 */
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.65) 100%);
+            /* 🔧 叠加主题色渐变，让背景更有层次 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 🔧 使用伪元素添加主题色渐变叠加层 */
+        .keyword-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* 🔧 淡淡的主题色渐变 */
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* 🔧 确保内容在渐变层之上 */
+        .keyword-item > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .keyword-item {
             /* 🔧 使用主题变量，确保文字可见性 */
-            color: var(--text-on-primary, #ffffff);
+            color: #ffffff;
             padding: 15px 20px;
             border-radius: 12px;
             display: flex;
@@ -277,10 +303,23 @@
             align-items: center;
             transition: transform 0.3s;
             cursor: pointer;
+            /* 🔧 添加文字阴影增强可见性 */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            /* 🔧 添加盒子阴影增强立体感 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            /* 🔧 添加边框增强对比度 */
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .keyword-item:hover {
             transform: scale(1.05);
+            /* 🔧 hover时增强阴影和主题色 */
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .keyword-item:hover::before {
+            /* 🔧 hover时增强主题色 */
+            opacity: 0.5;
         }
 
         .keyword-word {
@@ -852,6 +891,35 @@
             .card {
                 margin-bottom: 20px;
             }
+        }
+
+        /* ========== 滚动条样式 ========== */
+        /* 🔧 使用主题色滚动条，适配所有主题 */
+        ::-webkit-scrollbar {
+            width: 8px !important;
+            height: 8px !important;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            /* 🔧 使用主题主色 */
+            background: var(--primary-color) !important;
+            border-radius: 4px !important;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            /* 🔧 hover时使用主题强调色 */
+            background: var(--accent-color) !important;
+        }
+
+        /* Firefox 滚动条 */
+        * {
+            scrollbar-width: thin !important;
+            /* 🔧 使用主题色 */
+            scrollbar-color: var(--primary-color) transparent !important;
         }
     </style>
 

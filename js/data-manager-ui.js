@@ -61,8 +61,9 @@ async function loadDemoDataset() {
             { id: 'sophia', name: 'Sophia' }, { id: 'thomas', name: 'Thomas' }
         ];
 
-        // 扩大主题范围
+        // 扩大主题范围 - 增加更多不相关的主题
         const demoTopics = [
+            // 技术类（分散在不同领域）
             '人工智能', '机器学习', '深度学习', '神经网络', '自然语言处理',
             '计算机视觉', '强化学习', '数据科学', 'Python', 'JavaScript',
             '算法', '大数据', '云计算', '区块链', '前端开发',
@@ -72,7 +73,29 @@ async function loadDemoDataset() {
             'TensorFlow', 'PyTorch', 'OpenCV', 'Pandas', 'NumPy',
             'Web开发', '移动开发', 'iOS', 'Android', 'Flutter',
             '产品设计', 'UI/UX', '项目管理', '敏捷开发', 'Scrum',
-            'LeetCode', '系统设计', '架构设计', '性能优化', '安全测试'
+            'LeetCode', '系统设计', '架构设计', '性能优化', '安全测试',
+            // 生活类（与科技无关）
+            '美食', '旅游', '摄影', '音乐', '电影',
+            '阅读', '运动', '健身', '瑜伽', '跑步',
+            '烹饪', '烘焙', '园艺', '宠物', '猫咪',
+            '狗狗', '徒步', '露营', '滑雪', '游泳',
+            // 兴趣爱好
+            '游戏', '动漫', '漫画', '小说', '诗歌',
+            '绘画', '手工艺', '编织', '陶艺', '书法',
+            '钢琴', '吉他', '唱歌', '舞蹈', '戏剧',
+            '棋类', '扑克', '麻将', '桌游', '密室逃脱',
+            // 职场发展
+            '求职', '面试', '简历', '薪资', '升职',
+            '转行', '创业', '投资', '理财', '股票',
+            '基金', '保险', '房产', '装修', '搬家',
+            // 学习成长
+            '英语', '日语', '韩语', '法语', '德语',
+            '在线课程', '证书', '考试', '考研', '留学',
+            '写作', '演讲', '沟通', '领导力', '时间管理',
+            // 社交娱乐
+            '聚会', '派对', '婚礼', '生日', '节日',
+            '购物', '打折', '双十一', '黑五', '促销',
+            '直播', '短视频', '播客', '博客', 'Vlog'
         ];
 
         const demoSentences = [
@@ -95,17 +118,33 @@ async function loadDemoDataset() {
             '我刚完成了一个项目',
             '遇到了性能问题，怎么办？',
             '这个设计模式怎么用？',
-            '如何优化这段代码？'
+            '如何优化这段代码？',
+            // 生活化句子
+            '今天吃什么好呢？',
+            '周末有什么安排？',
+            '推荐一家好吃的餐厅',
+            '最近在看什么剧？',
+            '一起去运动吧！',
+            '学到新技能了',
+            '分享一张照片',
+            '今天心情不错',
+            '遇到有趣的事',
+            '讨论一下计划'
         ];
 
-        const now = Math.floor(Date.now() / 1000);  // 转换为秒级时间戳
-        const daySec = 24 * 60 * 60;  // 一天的秒数
-        const timeSpan = window.ChatGalaxyConfig.DEMO_TIME_SPAN_DAYS * daySec;  // 时间跨度
+        const now = Date.now();  // 🔧 使用毫秒级时间戳（与系统其他部分保持一致）
+        const dayMs = 24 * 60 * 60 * 1000;  // 一天的毫秒数
+        const timeSpan = window.ChatGalaxyConfig.DEMO_TIME_SPAN_DAYS * dayMs;  // 时间跨度（毫秒）
+
+        // 🔧 生成均匀分布的时间戳，确保时间连续性
+        const timeStep = timeSpan / window.ChatGalaxyConfig.DEMO_MESSAGE_COUNT;  // 每条消息的时间间隔
 
         // 生成演示消息
         for (let i = 0; i < window.ChatGalaxyConfig.DEMO_MESSAGE_COUNT; i++) {
             const sender = demoSenders[Math.floor(Math.random() * demoSenders.length)];
-            const topicCount = Math.floor(Math.random() * 3) + 1;  // 每条消息1-3个关键词
+
+            // 🔧 降低关键词共现概率：70%的消息只有1个关键词，30%有2个关键词
+            const topicCount = Math.random() < 0.7 ? 1 : 2;
             const topics = [];
             for (let j = 0; j < topicCount; j++) {
                 const topic = demoTopics[Math.floor(Math.random() * demoTopics.length)];
@@ -115,20 +154,24 @@ async function loadDemoDataset() {
             }
 
             const sentence = demoSentences[Math.floor(Math.random() * demoSentences.length)];
-            const timestamp = now - Math.floor(Math.random() * timeSpan);  // 时间跨度内
+
+            // 🔧 使用均匀分布 + 小幅随机偏移，让时间更自然
+            const baseOffset = i * timeStep;  // 基础偏移
+            const randomOffset = Math.random() * timeStep * 0.5;  // 添加小幅随机偏移（±25%）
+            const timestamp = Math.floor(now - timeSpan + baseOffset + randomOffset);  // 从过去到现在
 
             demoMessages.push({
                 id: `demo_msg_${Date.now()}_${i}`, // 添加时间戳确保消息ID唯一
                 senderId: sender.id,
                 senderName: sender.name,
-                timestamp: timestamp,  // 秒级时间戳
+                timestamp: timestamp,  // 🔧 毫秒级时间戳，均匀分布
                 text: `${sentence} ${topics.join('、')}相关的讨论。`,
                 sentiment: Math.floor(Math.random() * 4), // 0-3: 情感
                 keywords: topics
             });
         }
 
-        // 按时间排序
+        // 🔧 再次按时间排序（确保顺序正确）
         demoMessages.sort((a, b) => a.timestamp - b.timestamp);
 
         // 创建演示数据集（添加时间戳确保唯一性）
@@ -155,6 +198,9 @@ async function loadDemoDataset() {
         showToast('success', `✅ 演示数据集 "${dataset.name}" 创建成功！共${demoMessages.length}条消息，${demoSenders.length}位参与者`);
         await loadDatasetList();
 
+        // 返回创建的数据集ID，用于自动切换
+        return dataset.id;
+
     } catch (error) {
         console.error('Load demo dataset failed:', error);
 
@@ -170,6 +216,7 @@ async function loadDemoDataset() {
         }
 
         showToast('error', '加载演示数据失败: ' + error.message);
+        return undefined; // 返回 undefined 表示失败
     } finally {
         isLoadingDemo = false; // 重置加载状态
     }
@@ -178,6 +225,37 @@ async function loadDemoDataset() {
 // ========== 初始化 ==========
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // 🔧 检查是否需要自动生成演示数据（从 intro 页面跳转）
+    const autoGenerateDemo = sessionStorage.getItem('chatgalaxy_auto_generate_demo') === 'true';
+    if (autoGenerateDemo) {
+        console.log('🎬 检测到自动生成 Demo 标记，开始生成演示数据...');
+
+        // 清除标记（避免重复生成）
+        sessionStorage.removeItem('chatgalaxy_auto_generate_demo');
+
+        // 自动生成演示数据
+        try {
+            const datasetId = await loadDemoDataset();
+
+            if (datasetId) {
+                // 自动切换到刚创建的数据集
+                console.log('🔄 自动切换到演示数据集:', datasetId);
+                await window.DatasetManagerV3.switchDataset(datasetId);
+
+                // 生成成功后，延迟跳转到主页
+                setTimeout(() => {
+                    console.log('✅ 演示数据生成完成，跳转到主页...');
+                    window.location.href = 'index.html?refresh=' + Date.now();
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('❌ 自动生成演示数据失败:', error);
+            showToast('error', '生成演示数据失败: ' + error.message);
+        }
+
+        return; // 不执行后续初始化
+    }
+
     Log.info('Init', 'DataManager UI initializing...');
 
     // 初始化上传区域

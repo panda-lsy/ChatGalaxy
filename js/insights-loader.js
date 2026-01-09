@@ -325,8 +325,13 @@ function generateInsights(chatData) {
     const timestamps = messages.map(m => m[2]);
     const minTime = Math.min(...timestamps);
     const maxTime = Math.max(...timestamps);
-    const startDate = new Date(minTime).toISOString().split('T')[0];
-    const endDate = new Date(maxTime).toISOString().split('T')[0];
+
+    // 🔧 修复：智能判断时间戳格式（秒级 vs 毫秒级）
+    const minTimeMs = minTime < 10000000000 ? minTime * 1000 : minTime;
+    const maxTimeMs = maxTime < 10000000000 ? maxTime * 1000 : maxTime;
+
+    const startDate = new Date(minTimeMs).toISOString().split('T')[0];
+    const endDate = new Date(maxTimeMs).toISOString().split('T')[0];
 
     let dialogTurns = 0;
     for (let i = 1; i < messages.length; i++) {
@@ -351,7 +356,9 @@ function generateInsights(chatData) {
     for (let i = 0; i < 24; i++) hourly[i] = 0;
 
     messages.forEach(msg => {
-        const date = new Date(msg[2]);
+        // 🔧 修复：智能判断时间戳格式（秒级 vs 毫秒级）
+        const timestampMs = msg[2] < 10000000000 ? msg[2] * 1000 : msg[2];
+        const date = new Date(timestampMs);
         hourly[date.getHours()]++;
         daily[weekdayNames[date.getDay()]]++;
         const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -384,8 +391,10 @@ function generateInsights(chatData) {
         sample.forEach(m => counts[m[4]]++);
 
         const st = sample.length || 1;
+        // 🔧 修复：智能判断时间戳格式（秒级 vs 毫秒级）
+        const sampleTimestampMs = sample[0][2] < 10000000000 ? sample[0][2] * 1000 : sample[0][2];
         dailyTrend.push({
-            date: new Date(sample[0][2]).toISOString().split('T')[0],
+            date: new Date(sampleTimestampMs).toISOString().split('T')[0],
             happy: (counts[1] / st * 100).toFixed(1),
             neutral: (counts[0] / st * 100).toFixed(1),
             question: (counts[2] / st * 100).toFixed(1),
@@ -417,7 +426,9 @@ function generateInsights(chatData) {
     // 6. 活动模式 - 计算最活跃的一天
     const dailyMessageCounts = {};
     messages.forEach(msg => {
-        const date = new Date(msg[2]).toISOString().split('T')[0];
+        // 🔧 修复：智能判断时间戳格式（秒级 vs 毫秒级）
+        const timestampMs = msg[2] < 10000000000 ? msg[2] * 1000 : msg[2];
+        const date = new Date(timestampMs).toISOString().split('T')[0];
         dailyMessageCounts[date] = (dailyMessageCounts[date] || 0) + 1;
     });
 

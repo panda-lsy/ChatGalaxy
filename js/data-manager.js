@@ -555,6 +555,9 @@ async function updateDatasetStatistics(datasetId, messageCount, participantCount
  * @returns {Object} CHAT_DATA结构
  */
 function buildChatDataStructure(messages, senders, senderList, sentimentMap, keywordRanking, nodes, links) {
+    // 🔧 确保消息按时间戳排序（升序）
+    const sortedMessages = messages.sort((a, b) => a.timestamp - b.timestamp);
+
     return {
         meta: {
             senders: senderList.map(s => ({ id: s.id, name: s.name, count: s.count })),
@@ -562,7 +565,7 @@ function buildChatDataStructure(messages, senders, senderList, sentimentMap, key
             layout: {},
             ranking: keywordRanking
         },
-        messages: messages.map(msg => [
+        messages: sortedMessages.map(msg => [
             msg.id,
             senders.get(msg.senderId).index,
             msg.timestamp,

@@ -576,24 +576,32 @@ class StarfieldAnimation {
         const startBtn = document.getElementById('startBtn');
         if (startBtn) {
             startBtn.addEventListener('click', () => {
-                console.log('🖱️ 点击了开始探索按钮');
                 soundManager.playClick();
                 this.triggerConverge();
             });
-        } else {
-            console.warn('⚠️ 未找到开始按钮 #startBtn');
         }
 
         // 加载数据集按钮
         const loadDatasetBtn = document.getElementById('loadDatasetBtn');
         if (loadDatasetBtn) {
             loadDatasetBtn.addEventListener('click', () => {
-                console.log('🖱️ 点击了加载数据集按钮');
                 soundManager.playClick();
                 this.triggerConverge('data-manager.html');
             });
-        } else {
-            console.warn('⚠️ 未找到加载数据集按钮 #loadDatasetBtn');
+        }
+
+        // 🔧 运行 Demo 按钮
+        const runDemoBtn = document.getElementById('runDemoBtn');
+        if (runDemoBtn) {
+            runDemoBtn.addEventListener('click', () => {
+                soundManager.playClick();
+
+                // 标记需要自动生成演示数据
+                sessionStorage.setItem('chatgalaxy_auto_generate_demo', 'true');
+
+                // 跳转到数据管理页面
+                this.triggerConverge('data-manager.html');
+            });
         }
 
         // 音效控制按钮
@@ -619,11 +627,6 @@ class StarfieldAnimation {
     }
 
     update() {
-        // 每60帧输出一次状态（约1秒）
-        if (this.time % 60 === 0) {
-            console.log('⏰ 当前动画状态:', { phase: this.phase, time: this.time });
-        }
-
         // 平滑鼠标移动
         if (this.phase === 'idle') {
             this.mouseX += (this.targetMouseX - this.mouseX) * 0.05;
@@ -651,9 +654,6 @@ class StarfieldAnimation {
             this.stars.forEach(star => star.rotate());
         } else if (this.phase === 'converge') {
             // 凝聚阶段
-            if (this.time % 60 === 0) {
-                console.log('🔄 执行聚合动画...');
-            }
             let allConverged = true;
             this.stars.forEach(star => {
                 const converged = star.converge(this.centerX, this.centerY);
@@ -661,16 +661,12 @@ class StarfieldAnimation {
             });
 
             if (allConverged) {
-                console.log('✅ 所有星星已聚合，开始扩散');
                 soundManager.playConverge();
                 this.phase = 'expand';
                 this.stars.forEach(star => star.expand());
             }
         } else if (this.phase === 'expand') {
             // 扩散阶段
-            if (this.time % 60 === 0) {
-                console.log('💥 执行扩散动画...');
-            }
             let allFaded = true;
             this.stars.forEach(star => {
                 const faded = star.updateExpand();
@@ -717,14 +713,10 @@ class StarfieldAnimation {
     }
 
     triggerConverge(targetUrl = 'index.html') {
-        console.log('🎯 triggerConverge 被调用', { currentPhase: this.phase, targetUrl });
-
         if (this.phase !== 'idle') {
-            console.warn('⚠️ 当前不是 idle 状态，无法触发聚合');
             return;
         }
 
-        console.log('✅ 开始聚合动画');
         this.phase = 'converge';
         this.targetUrl = targetUrl;
 
@@ -733,12 +725,10 @@ class StarfieldAnimation {
         if (container) {
             container.style.opacity = '0';
             container.style.pointerEvents = 'none';
-            console.log('✅ 已隐藏按钮容器');
         }
     }
 
     onComplete() {
-        console.log('🎬 动画完成，准备跳转...');
         cancelAnimationFrame(this.animationId);
 
         // 标记已经看过 intro（避免 index.html 再次跳转回来）
@@ -755,15 +745,12 @@ class StarfieldAnimation {
 
         // 延迟后跳转
         setTimeout(() => {
-            console.log('🚀 跳转到', this.targetUrl);
             window.location.href = this.targetUrl;
         }, 500);
     }
 
     // 重置动画状态（用于浏览器返回键时重新开始）
     reset() {
-        console.log('🔄 重置动画状态');
-
         // 取消当前动画循环
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
@@ -780,7 +767,6 @@ class StarfieldAnimation {
         if (!soundManager.initialized) {
             soundManager.initialized = false;
             soundManager.audioContext = null;
-            console.log('🔊 音效系统已重置');
         }
 
         // 显示按钮容器
@@ -821,7 +807,6 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('pageshow', (event) => {
     // 如果页面是从缓存中恢复的（比如浏览器返回键）
     if (event.persisted || (window.performance && window.performance.getEntriesByType('navigation').length > 0)) {
-        console.log('🔄 页面从缓存恢复，重置动画');
         if (starfieldAnimation) {
             starfieldAnimation.reset();
         }
@@ -833,7 +818,6 @@ document.addEventListener('visibilitychange', () => {
     if (!document.hidden && starfieldAnimation) {
         // 页面重新可见时，如果动画已结束，则重置
         if (starfieldAnimation.phase === 'complete') {
-            console.log('🔄 页面重新可见且动画已结束，重置动画');
             starfieldAnimation.reset();
         }
     }

@@ -89,6 +89,15 @@
     <p>正在加载数据...</p>
 </div>
 
+<!-- 🔧 Demo 运行指示器 -->
+<div id="demo-indicator" class="demo-indicator hidden">
+    <div class="demo-indicator-content">
+        <i class="ri-play-circle-line demo-icon"></i>
+        <span class="demo-text">正在运行 Demo 数据</span>
+        <div class="demo-pulse"></div>
+    </div>
+</div>
+
 <!-- 左侧侧边栏展开按钮（折叠时显示） -->
 <button id="message-sidebar-toggle-fixed" title="展开侧边栏">
     <i class="ri-menu-unfold-line"></i>
@@ -324,6 +333,7 @@
 <script src="js/data-import.js" defer></script>
 <script src="js/processors/text-processor.js" defer></script>
 <!-- UI Components -->
+<script src="js/ui/draggable-button.js" defer></script>
 <script src="js/app.js" defer></script>
 
 <!-- Unified Sidebar -->
@@ -661,6 +671,7 @@ document.addEventListener('keydown', (e) => {
     import { getSettingsSidebar } from './js/ui/right-sidebar.js';
     import { createThemeSelector } from './js/ui/theme-selector.js';
     import { createTransparencySlider } from './js/ui/transparency-slider.js';
+    // initDraggableButton 已通过全局变量提供（在 draggable-button.js 中导出）
 
     // 等待 DOM 加载完成
     if (document.readyState === 'loading') {
@@ -674,7 +685,19 @@ document.addEventListener('keydown', (e) => {
         // 1. 自动迁移旧设置并初始化主题
         autoMigrateAndApply();
 
-        // 2. 初始化主题选择器
+        // 2. 🔧 初始化可拖动按钮
+        try {
+            initDraggableButton('.sidebar-toggle', {
+                snapEdge: 'right',      // 贴到右侧
+                snapThreshold: 50,      // 贴边阈值
+                edgePadding: 20         // 边缘内边距
+            });
+            console.log('✅ [index.html] Draggable button initialized');
+        } catch (error) {
+            console.error('❌ [index.html] Failed to initialize draggable button:', error);
+        }
+
+        // 3. 初始化主题选择器
         try {
             createThemeSelector({
                 containerId: 'theme-selector',

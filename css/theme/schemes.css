@@ -30,6 +30,10 @@ body.theme-dawn {
     --text-main: #3D3D3D;
     --text-secondary: #7A7A7A;
     --text-muted: #A0A0A0;
+
+    /* 🔧 深色背景上的文字颜色 */
+    --text-on-primary: #FFFFFF;
+    --text-on-gradient: #FFFFFF;
 }
 
 /* ========== 主题2: 森林 ========== */
@@ -56,6 +60,10 @@ body.theme-forest {
     --text-main: #2F3F2D;
     --text-secondary: #5D6E5B;
     --text-muted: #8B9B89;
+
+    /* 🔧 深色背景上的文字颜色 */
+    --text-on-primary: #FFFFFF;
+    --text-on-gradient: #FFFFFF;
 }
 
 /* ========== 主题3: 海洋 ========== */
@@ -82,6 +90,10 @@ body.theme-ocean {
     --text-main: #1D2B3A;
     --text-secondary: #4A5A6A;
     --text-muted: #788898;
+
+    /* 🔧 深色背景上的文字颜色 */
+    --text-on-primary: #FFFFFF;
+    --text-on-gradient: #FFFFFF;
 }
 
 /* ========== 主题4: 星尘 ========== */
@@ -108,6 +120,10 @@ body.theme-stardust {
     --text-main: #1C1435;
     --text-secondary: #392660;
     --text-muted: #66538C;
+
+    /* 🔧 深色背景上的文字颜色 */
+    --text-on-primary: #FFFFFF;
+    --text-on-gradient: #FFFFFF;
 }
 
 /* ========== 功能色（所有主题共享） ========== */

@@ -34,6 +34,16 @@ var Log = window.Log;
                 // 从IndexedDB加载数据
                 const chatData = await window.DatasetManagerV3.loadDatasetData(currentDatasetId);
 
+                // 🔧 检查是否是Demo数据集，显示指示器
+                const datasetList = await window.DatasetManagerV3.getAllDatasets();
+                const currentDataset = datasetList.find(d => d.id === currentDatasetId);
+                if (currentDataset && currentDataset.tags && currentDataset.tags.includes('演示')) {
+                    const demoIndicator = document.getElementById('demo-indicator');
+                    if (demoIndicator) {
+                        demoIndicator.classList.remove('hidden');
+                    }
+                }
+
                 // 更严格的数据验证
                 if (chatData &&
                     chatData.meta &&
@@ -124,9 +134,194 @@ var Log = window.Log;
             await loadScript('js/insights.js');
         } catch (e) {
             console.error('❌ Failed to load fallback data:', e);
+
+            // 🔧 数据加载失败，显示 Demo 提示
+            showDemoFallbackPrompt();
         }
     }
 })();
+
+/**
+ * 🔧 显示 Demo 降级提示
+ */
+function showDemoFallbackPrompt() {
+    console.log('⚠️ 数据加载失败，准备运行 Demo 模式');
+
+    // 创建提示界面
+    const prompt = document.createElement('div');
+    prompt.id = 'demo-fallback-prompt';
+    prompt.innerHTML = `
+        <div class="demo-fallback-content">
+            <div class="demo-fallback-icon">
+                <i class="ri-emotion-sad-line"></i>
+            </div>
+            <h2 class="demo-fallback-title">数据加载失败</h2>
+            <p class="demo-fallback-message">
+                无法加载您的聊天数据，将在 <span class="countdown">5</span> 秒后自动运行演示模式
+            </p>
+            <button id="run-demo-now" class="demo-fallback-button">
+                <i class="ri-play-circle-line"></i>
+                立即运行 Demo
+            </button>
+        </div>
+    `;
+
+    // 添加样式
+    const style = document.createElement('style');
+    style.textContent = `
+        #demo-fallback-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .demo-fallback-content {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            max-width: 500px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .demo-fallback-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .demo-fallback-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .demo-fallback-message {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .demo-fallback-message .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 0 4px;
+        }
+
+        .demo-fallback-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-color);
+            background: #ffffff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .demo-fallback-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .demo-fallback-button:active {
+            transform: translateY(0);
+        }
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(prompt);
+
+    // 倒计时
+    let countdown = 5;
+    const countdownElement = prompt.querySelector('.countdown');
+
+    const countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdownElement) {
+            countdownElement.textContent = countdown;
+        }
+
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            runDemoNow();
+        }
+    }, 1000);
+
+    // 立即运行按钮
+    const runNowBtn = document.getElementById('run-demo-now');
+    if (runNowBtn) {
+        runNowBtn.addEventListener('click', () => {
+            clearInterval(countdownInterval);
+            runDemoNow();
+        });
+    }
+
+    console.log('✅ Demo 降级提示已显示');
+}
+
+/**
+ * 🔧 立即运行 Demo
+ */
+function runDemoNow() {
+    console.log('🎬 准备运行 Demo...');
+
+    // 设置自动生成 Demo 标记
+    sessionStorage.setItem('chatgalaxy_auto_generate_demo', 'true');
+
+    // 移除提示界面
+    const prompt = document.getElementById('demo-fallback-prompt');
+    if (prompt) {
+        prompt.remove();
+    }
+
+    // 跳转到数据管理页面生成演示数据
+    setTimeout(() => {
+        console.log('🔄 跳转到数据管理页面生成 Demo...');
+        window.location.href = 'data-manager.html';
+    }, 500);
+}
 
 /**
  * 动态加载脚本

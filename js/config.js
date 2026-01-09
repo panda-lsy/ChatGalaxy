@@ -27,7 +27,7 @@ window.ChatGalaxyConfig.MAX_MESSAGES_FAST = 10000;
  * 最大文件大小（字节）
  * 限制上传文件大小，避免浏览器崩溃
  */
-window.ChatGalaxyConfig.MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+window.ChatGalaxyConfig.MAX_FILE_SIZE = 200 * 1024 * 1024; // 200MB
 
 // ========== 图数据生成配置 ==========
 
@@ -116,7 +116,7 @@ window.ChatGalaxyConfig.BLACKLIST_STRATEGY = 'filter_only';
  * 演示数据消息数量
  * 生成演示数据时的消息数量
  */
-window.ChatGalaxyConfig.DEMO_MESSAGE_COUNT = 1000;
+window.ChatGalaxyConfig.DEMO_MESSAGE_COUNT = 10000;
 
 /**
  * 演示数据参与者数量
@@ -128,13 +128,13 @@ window.ChatGalaxyConfig.DEMO_PARTICIPANT_COUNT = 20;
  * 演示数据关键词数量
  * 生成演示数据时的关键词池大小
  */
-window.ChatGalaxyConfig.DEMO_KEYWORD_POOL_SIZE = 50;
+window.ChatGalaxyConfig.DEMO_KEYWORD_POOL_SIZE = 100;
 
 /**
  * 演示数据时间跨度（天）
  * 生成演示数据时的时间跨度
  */
-window.ChatGalaxyConfig.DEMO_TIME_SPAN_DAYS = 365;
+window.ChatGalaxyConfig.DEMO_TIME_SPAN_DAYS = 730; // 2年
 
 // ========== 日志配置 ==========
 

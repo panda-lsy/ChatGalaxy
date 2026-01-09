@@ -890,6 +890,95 @@ body.message-sidebar-collapsed #message-sidebar .sidebar-collapse-btn {
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+/* ========== Demo 运行指示器 ========== */
+
+.demo-indicator {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-above-timeline);
+    pointer-events: none;
+}
+
+.demo-indicator.hidden {
+    display: none;
+}
+
+.demo-indicator-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    /* 🔧 使用主题渐变背景 */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    animation: demoBlink 2s ease-in-out infinite;
+}
+
+@keyframes demoBlink {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+}
+
+.demo-icon {
+    font-size: 20px;
+    color: #ffffff;
+    animation: demoPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes demoPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.demo-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.demo-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50px;
+    background: inherit;
+    opacity: 0.5;
+    animation: demoRipple 2s ease-out infinite;
+    z-index: -1;
+}
+
+@keyframes demoRipple {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
 /* ==================== 自定义滚动条样式 ==================== */
 
 /* 侧边栏内容区域的滚动条 */
@@ -975,13 +1064,17 @@ body.idle-mode::after {
     bottom: 20px;
     right: 20px;
     padding: 8px 16px;
-    background: rgba(255, 117, 140, 0.9);
-    color: white;
+    /* 🔧 使用主题渐变色背景 */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    /* 🔧 使用主题变量，确保文字可见性 */
+    color: var(--text-on-primary, #ffffff);
     border-radius: 20px;
     font-size: 14px;
     z-index: var(--z-fixed);
     animation: fadeIn 0.5s ease-out;
     pointer-events: none;
+    /* 🔧 添加阴影增强可见性 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* 恢复正常模式时的淡入效果 */
