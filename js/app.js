@@ -3152,6 +3152,31 @@ function toggleMusic() {
 }
 
 /**
+ * 切换粒子特效
+ * 由侧边栏开关直接调用
+ */
+function toggleParticles() {
+    const ps = window.particleSystem && window.particleSystem();
+    if (!ps) {
+        console.warn('Particle system not available');
+        return;
+    }
+
+    const toggle = document.getElementById('particle-toggle');
+    const isEnabled = toggle && toggle.checked;
+
+    if (isEnabled) {
+        // 开启粒子特效
+        ps.start();
+        showToast('粒子特效已开启', 'success');
+    } else {
+        // 关闭粒子特效
+        ps.stop();
+        showToast('粒子特效已关闭', 'info');
+    }
+}
+
+/**
  * 切换时间旅行播放
  * 由侧边栏按钮直接调用
  */
