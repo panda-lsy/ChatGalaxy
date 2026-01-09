@@ -1983,7 +1983,10 @@ function initGraph(graphData) {
     
     // Add Ambient Particles (Starfield)
     addStarField();
-    
+
+    // 🔧 初始化3D粒子系统
+    init3DParticleSystem();
+
     // Handle resize
     window.addEventListener('resize', () => {
         Graph.width(container.clientWidth);
@@ -2206,6 +2209,48 @@ function addStarField() {
     
     const points = new THREE.Points(geometry, material);
     scene.add(points);
+}
+
+// ========== 3D粒子系统 ==========
+
+let particleSystem3D = null;
+
+/**
+ * 初始化3D粒子系统
+ */
+function init3DParticleSystem() {
+    if (!Graph || !window.ParticleSystem3D) {
+        console.warn('Graph or ParticleSystem3D not available');
+        return;
+    }
+
+    try {
+        // 创建3D粒子系统实例
+        particleSystem3D = new window.ParticleSystem3D(Graph);
+        console.log('✅ 3D粒子系统已初始化');
+
+        // 添加到动画循环
+        Graph.onAfterRender(() => {
+            if (particleSystem3D) {
+                particleSystem3D.update();
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ 3D粒子系统初始化失败:', error);
+    }
+}
+
+/**
+ * 触发粒子爆炸效果
+ * @param {Object} position - 3D位置 {x, y, z}
+ * @param {number} count - 粒子数量
+ * @param {number} color - 颜色值
+ */
+function triggerExplosion(position, count = 50, color = 0xff6b6b) {
+    if (particleSystem3D) {
+        particleSystem3D.explode(position, count, color);
+    }
 }
 
 function renderChatList(reset = false) {
@@ -3156,9 +3201,8 @@ function toggleMusic() {
  * 由侧边栏开关直接调用
  */
 function toggleParticles() {
-    const ps = window.particleSystem && window.particleSystem();
-    if (!ps) {
-        console.warn('Particle system not available');
+    if (!particleSystem3D) {
+        console.warn('3D粒子系统未初始化');
         return;
     }
 
@@ -3167,11 +3211,11 @@ function toggleParticles() {
 
     if (isEnabled) {
         // 开启粒子特效
-        ps.start();
+        particleSystem3D.start();
         showToast('粒子特效已开启', 'success');
     } else {
         // 关闭粒子特效
-        ps.stop();
+        particleSystem3D.stop();
         showToast('粒子特效已关闭', 'info');
     }
 }
