@@ -1982,8 +1982,15 @@ function initGraph(graphData) {
     Graph.controls().autoRotateSpeed = 0.4; // Slower rotation
 
     // 🔧 限制相机缩放范围（避免看到球状星星边界）
-    Graph.controls().minDistance = 200;  // 最小距离（不能太近）
-    Graph.controls().maxDistance = 1500; // 最大距离（不能太远，避免看到边界）
+    Graph.controls().minDistance = 200;   // 最小距离（不能太近）
+    Graph.controls().maxDistance = 3000;  // 最大距离（允许更远的视野）
+
+    // 🔧 限制视角旋转范围（防止旋转到边缘）
+    Graph.controls().minPolarAngle = Math.PI / 6;  // 最小极角（30度，防止太靠上）
+    Graph.controls().maxPolarAngle = Math.PI * 5 / 6; // 最大极角（150度，防止太靠下）
+
+    // 🔧 禁用平移（防止右键移动到边界）
+    Graph.controls().enablePan = false;
 
     // Add Ambient Particles (Starfield)
     addStarField();
