@@ -1994,20 +1994,58 @@ function initGraph(graphData) {
     Graph.controls().panSpeed = 1.0;
 
     // 🔧 限制平移范围（防止移出粒子效果区域）
-    // 监听平移结束事件，限制target位置
+    // 监听平移结束事件，平滑限制target位置
     const controls = Graph.controls();
     const maxPanDistance = 500; // 最大平移距离
+    let panAnimationId = null;
 
     controls.addEventListener('end', () => {
         const target = controls.target;
         const distance = Math.sqrt(target.x ** 2 + target.y ** 2 + target.z ** 2);
 
-        // 如果超出范围，限制在边界内
+        // 如果超出范围，平滑限制在边界内
         if (distance > maxPanDistance) {
             const ratio = maxPanDistance / distance;
-            target.x *= ratio;
-            target.y *= ratio;
-            target.z *= ratio;
+            const targetX = target.x * ratio;
+            const targetY = target.y * ratio;
+            const targetZ = target.z * ratio;
+
+            // 记录起始位置和目标位置
+            const startX = target.x;
+            const startY = target.y;
+            const startZ = target.z;
+
+            // 取消之前的动画
+            if (panAnimationId) {
+                cancelAnimationFrame(panAnimationId);
+            }
+
+            // 动画参数
+            const duration = 500; // 500ms动画
+            const startTime = performance.now();
+
+            // 动画函数
+            function animatePan(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // 使用easeOutCubic缓动函数
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+                // 插值更新位置
+                target.x = startX + (targetX - startX) * easeProgress;
+                target.y = startY + (targetY - startY) * easeProgress;
+                target.z = startZ + (targetZ - startZ) * easeProgress;
+
+                if (progress < 1) {
+                    panAnimationId = requestAnimationFrame(animatePan);
+                } else {
+                    panAnimationId = null;
+                }
+            }
+
+            // 启动动画
+            panAnimationId = requestAnimationFrame(animatePan);
         }
     });
 
