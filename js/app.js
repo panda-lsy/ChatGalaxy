@@ -2214,6 +2214,7 @@ function addStarField() {
 // ========== 3D粒子系统 ==========
 
 let particleSystem3D = null;
+let particleAnimationId = null;
 
 /**
  * 初始化3D粒子系统
@@ -2229,12 +2230,16 @@ function init3DParticleSystem() {
         particleSystem3D = new window.ParticleSystem3D(Graph);
         console.log('✅ 3D粒子系统已初始化');
 
-        // 添加到动画循环
-        Graph.onAfterRender(() => {
+        // 创建独立的动画循环
+        function animateParticles() {
             if (particleSystem3D) {
                 particleSystem3D.update();
             }
-        });
+            particleAnimationId = requestAnimationFrame(animateParticles);
+        }
+
+        // 启动动画循环
+        animateParticles();
 
     } catch (error) {
         console.error('❌ 3D粒子系统初始化失败:', error);
