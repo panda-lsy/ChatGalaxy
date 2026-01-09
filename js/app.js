@@ -2147,58 +2147,48 @@ function addStarField() {
     // Add background stars using Three.js scene
     if (!Graph) return;
     const scene = Graph.scene();
-    
+
     const geometry = new THREE.BufferGeometry();
-    const count = 5000; // More stars
+    const count = 5000; // 星星数量
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
-    
-    // Get dynamic radius from meta or use defaults
-    const minR = metaData.layout?.star_min || 350;
-    const maxR = metaData.layout?.star_max || 950;
-    const rangeR = maxR - minR;
+
+    // 🔧 修改：分布在整个空间（半径2000的球形空间）
+    const maxRadius = 2000;
 
     for(let i = 0; i < count; i++) {
-        // Distribute stars in a larger sphere around the graph
-        // Match dispersion with the graph (radius ~300)
-        const r = minR + Math.random() * rangeR; // Radius closer to the graph
+        // 在整个球形空间内均匀分布
+        const r = Math.cbrt(Math.random()) * maxRadius; // 立方根保证均匀分布
         const theta = 2 * Math.PI * Math.random();
         const phi = Math.acos(2 * Math.random() - 1);
-        
+
         const x = r * Math.sin(phi) * Math.cos(theta);
         const y = r * Math.sin(phi) * Math.sin(theta);
         const z = r * Math.cos(phi);
-        
+
         positions[i*3] = x;
         positions[i*3+1] = y;
         positions[i*3+2] = z;
-        
-        // Random star colors (White, Blueish, Pinkish)
+
+        // 随机星星颜色（白色、蓝色、粉色）
         const colorType = Math.random();
         let color;
-        if (colorType > 0.9) color = new THREE.Color(0xff9a9e); // Pink
-        else if (colorType > 0.8) color = new THREE.Color(0x8fd3f4); // Blue
-        else color = new THREE.Color(0xffffff); // White
-        
+        if (colorType > 0.9) color = new THREE.Color(0xff9a9e); // 粉色
+        else if (colorType > 0.8) color = new THREE.Color(0x8fd3f4); // 蓝色
+        else color = new THREE.Color(0xffffff); // 白色
+
         colors[i*3] = color.r;
         colors[i*3+1] = color.g;
         colors[i*3+2] = color.b;
-        
-        sizes[i] = Math.random() * 3; // Varied sizes, slightly larger
+
+        sizes[i] = Math.random() * 3; // 不同大小
     }
-    
+
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    
-    // Use PointsMaterial but with size attenuation
-    // Note: standard PointsMaterial doesn't support per-vertex size in WebGL1 easily without shader, 
-    // but Three.js PointsMaterial 'size' is global. 
-    // To have variable size, we need ShaderMaterial or just accept uniform size.
-    // Let's stick to uniform size for simplicity but make them slightly bigger and transparent.
-    // Or use a texture for stars.
-    
+
     const material = new THREE.PointsMaterial({
         size: 3,
         vertexColors: true,
@@ -2206,7 +2196,7 @@ function addStarField() {
         opacity: 0.8,
         sizeAttenuation: true
     });
-    
+
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 }
@@ -2243,18 +2233,6 @@ function init3DParticleSystem() {
 
     } catch (error) {
         console.error('❌ 3D粒子系统初始化失败:', error);
-    }
-}
-
-/**
- * 触发粒子爆炸效果
- * @param {Object} position - 3D位置 {x, y, z}
- * @param {number} count - 粒子数量
- * @param {number} color - 颜色值
- */
-function triggerExplosion(position, count = 50, color = 0xff6b6b) {
-    if (particleSystem3D) {
-        particleSystem3D.explode(position, count, color);
     }
 }
 
