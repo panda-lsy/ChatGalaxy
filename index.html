@@ -300,23 +300,6 @@
                     <input type="range" id="link-width" min="0.05" max="3.0" step="0.05" value="0.2">
                 </div>
             </div>
-            <!-- Layout -->
-            <div class="setting-group">
-                <h3>星系分布 (Layout)</h3>
-                <div class="setting-item" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button id="layout-sphere-btn" style="padding: 5px 10px; cursor: pointer;">🔮 球体分布</button>
-                    <button id="layout-flower-btn" style="padding: 5px 10px; cursor: pointer;">🌸 花朵分布</button>
-                    <button id="layout-helix-btn" style="padding: 5px 10px; cursor: pointer;">🧬 螺旋分布</button>
-                    <button id="layout-grid-btn" style="padding: 5px 10px; cursor: pointer;">🧊 立方分布</button>
-                    <button id="layout-torus-btn" style="padding: 5px 10px; cursor: pointer;">🍩 环面分布</button>
-                    <button id="layout-reset-btn" style="padding: 5px 10px; cursor: pointer;">🌌 物理重置</button>
-                </div>
-                <div class="setting-item" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                    <button id="layout-export-btn" style="padding: 5px 10px; cursor: pointer;">💾 导出分布</button>
-                    <button id="layout-import-btn" style="padding: 5px 10px; cursor: pointer;">📂 导入模板</button>
-                    <input type="file" id="layout-file-input" style="display: none;" accept=".json">
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -352,17 +335,6 @@
     </div>
 
     <div class="sidebar-content">
-        <!-- 🆕 外观设置 -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">外观设置</div>
-
-            <!-- 主题选择器 -->
-            <div id="theme-selector" class="theme-selector"></div>
-
-            <!-- 透明度滑块 -->
-            <div id="transparency-slider-container" class="transparency-wrapper"></div>
-        </div>
-
         <!-- 3D控制 -->
         <div class="sidebar-section">
             <div class="sidebar-section-title">3D控制</div>
@@ -401,7 +373,7 @@
             </div>
         </div>
 
-        <!-- 分析功能 -->
+        <!-- 数据分析 -->
         <div class="sidebar-section">
             <div class="sidebar-section-title">数据分析</div>
             <div class="sidebar-list">
@@ -414,6 +386,57 @@
                     <span>数据管理</span>
                 </div>
             </div>
+        </div>
+
+        <!-- 星系分布 -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">星系分布</div>
+            <div class="sidebar-grid">
+                <button class="sidebar-btn" id="layout-sphere-btn" title="球体分布">
+                    <i class="ri-planet-line"></i>
+                    <span>球体</span>
+                </button>
+                <button class="sidebar-btn" id="layout-flower-btn" title="花朵分布">
+                    <i class="ri-flower-line"></i>
+                    <span>花朵</span>
+                </button>
+                <button class="sidebar-btn" id="layout-helix-btn" title="螺旋分布">
+                    <i class="ri-dna-line"></i>
+                    <span>螺旋</span>
+                </button>
+                <button class="sidebar-btn" id="layout-grid-btn" title="立方分布">
+                    <i class="ri-grid-line"></i>
+                    <span>立方</span>
+                </button>
+                <button class="sidebar-btn" id="layout-torus-btn" title="环面分布">
+                    <i class="ri-donut-chart-line"></i>
+                    <span>环面</span>
+                </button>
+                <button class="sidebar-btn" id="layout-reset-btn" title="物理重置">
+                    <i class="ri-refresh-line"></i>
+                    <span>重置</span>
+                </button>
+                <button class="sidebar-btn" id="layout-export-btn" title="导出分布">
+                    <i class="ri-download-line"></i>
+                    <span>导出</span>
+                </button>
+                <button class="sidebar-btn" id="layout-import-btn" title="导入模板">
+                    <i class="ri-upload-line"></i>
+                    <span>导入</span>
+                </button>
+            </div>
+            <input type="file" id="layout-file-input" style="display: none;" accept=".json">
+        </div>
+
+        <!-- 外观设置 -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">外观设置</div>
+
+            <!-- 主题选择器 -->
+            <div id="theme-selector" class="theme-selector"></div>
+
+            <!-- 透明度滑块 -->
+            <div id="transparency-slider-container" class="transparency-wrapper"></div>
         </div>
 
         <!-- 视图设置 -->
