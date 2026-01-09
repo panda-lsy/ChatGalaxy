@@ -1980,10 +1980,81 @@ function initGraph(graphData) {
     // Auto-rotate
     Graph.controls().autoRotate = true;
     Graph.controls().autoRotateSpeed = 0.4; // Slower rotation
-    
+
+    // 🔧 限制相机缩放范围（避免看到球状星星边界）
+    Graph.controls().minDistance = 200;   // 最小距离（不能太近）
+    Graph.controls().maxDistance = 3000;  // 最大距离（允许更远的视野）
+
+    // 🔧 限制视角旋转范围（防止旋转到边缘）
+    Graph.controls().minPolarAngle = Math.PI / 6;  // 最小极角（30度，防止太靠上）
+    Graph.controls().maxPolarAngle = Math.PI * 5 / 6; // 最大极角（150度，防止太靠下）
+
+    // 🔧 启用平移并限制范围
+    Graph.controls().enablePan = true;
+    Graph.controls().panSpeed = 1.0;
+
+    // 🔧 限制平移范围（防止移出粒子效果区域）
+    // 监听平移结束事件，平滑限制target位置
+    const controls = Graph.controls();
+    const maxPanDistance = 500; // 最大平移距离
+    let panAnimationId = null;
+
+    controls.addEventListener('end', () => {
+        const target = controls.target;
+        const distance = Math.sqrt(target.x ** 2 + target.y ** 2 + target.z ** 2);
+
+        // 如果超出范围，平滑限制在边界内
+        if (distance > maxPanDistance) {
+            const ratio = maxPanDistance / distance;
+            const targetX = target.x * ratio;
+            const targetY = target.y * ratio;
+            const targetZ = target.z * ratio;
+
+            // 记录起始位置和目标位置
+            const startX = target.x;
+            const startY = target.y;
+            const startZ = target.z;
+
+            // 取消之前的动画
+            if (panAnimationId) {
+                cancelAnimationFrame(panAnimationId);
+            }
+
+            // 动画参数
+            const duration = 500; // 500ms动画
+            const startTime = performance.now();
+
+            // 动画函数
+            function animatePan(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // 使用easeOutCubic缓动函数
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+                // 插值更新位置
+                target.x = startX + (targetX - startX) * easeProgress;
+                target.y = startY + (targetY - startY) * easeProgress;
+                target.z = startZ + (targetZ - startZ) * easeProgress;
+
+                if (progress < 1) {
+                    panAnimationId = requestAnimationFrame(animatePan);
+                } else {
+                    panAnimationId = null;
+                }
+            }
+
+            // 启动动画
+            panAnimationId = requestAnimationFrame(animatePan);
+        }
+    });
+
     // Add Ambient Particles (Starfield)
     addStarField();
-    
+
+    // 🔧 初始化3D粒子系统
+    init3DParticleSystem();
+
     // Handle resize
     window.addEventListener('resize', () => {
         Graph.width(container.clientWidth);
@@ -2144,58 +2215,48 @@ function addStarField() {
     // Add background stars using Three.js scene
     if (!Graph) return;
     const scene = Graph.scene();
-    
+
     const geometry = new THREE.BufferGeometry();
-    const count = 5000; // More stars
+    const count = 5000; // 星星数量
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
-    
-    // Get dynamic radius from meta or use defaults
-    const minR = metaData.layout?.star_min || 350;
-    const maxR = metaData.layout?.star_max || 950;
-    const rangeR = maxR - minR;
+
+    // 🔧 修改：分布在整个空间（半径2000的球形空间）
+    const maxRadius = 2000;
 
     for(let i = 0; i < count; i++) {
-        // Distribute stars in a larger sphere around the graph
-        // Match dispersion with the graph (radius ~300)
-        const r = minR + Math.random() * rangeR; // Radius closer to the graph
+        // 在整个球形空间内均匀分布
+        const r = Math.cbrt(Math.random()) * maxRadius; // 立方根保证均匀分布
         const theta = 2 * Math.PI * Math.random();
         const phi = Math.acos(2 * Math.random() - 1);
-        
+
         const x = r * Math.sin(phi) * Math.cos(theta);
         const y = r * Math.sin(phi) * Math.sin(theta);
         const z = r * Math.cos(phi);
-        
+
         positions[i*3] = x;
         positions[i*3+1] = y;
         positions[i*3+2] = z;
-        
-        // Random star colors (White, Blueish, Pinkish)
+
+        // 随机星星颜色（白色、蓝色、粉色）
         const colorType = Math.random();
         let color;
-        if (colorType > 0.9) color = new THREE.Color(0xff9a9e); // Pink
-        else if (colorType > 0.8) color = new THREE.Color(0x8fd3f4); // Blue
-        else color = new THREE.Color(0xffffff); // White
-        
+        if (colorType > 0.9) color = new THREE.Color(0xff9a9e); // 粉色
+        else if (colorType > 0.8) color = new THREE.Color(0x8fd3f4); // 蓝色
+        else color = new THREE.Color(0xffffff); // 白色
+
         colors[i*3] = color.r;
         colors[i*3+1] = color.g;
         colors[i*3+2] = color.b;
-        
-        sizes[i] = Math.random() * 3; // Varied sizes, slightly larger
+
+        sizes[i] = Math.random() * 3; // 不同大小
     }
-    
+
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    
-    // Use PointsMaterial but with size attenuation
-    // Note: standard PointsMaterial doesn't support per-vertex size in WebGL1 easily without shader, 
-    // but Three.js PointsMaterial 'size' is global. 
-    // To have variable size, we need ShaderMaterial or just accept uniform size.
-    // Let's stick to uniform size for simplicity but make them slightly bigger and transparent.
-    // Or use a texture for stars.
-    
+
     const material = new THREE.PointsMaterial({
         size: 3,
         vertexColors: true,
@@ -2203,9 +2264,44 @@ function addStarField() {
         opacity: 0.8,
         sizeAttenuation: true
     });
-    
+
     const points = new THREE.Points(geometry, material);
     scene.add(points);
+}
+
+// ========== 3D粒子系统 ==========
+
+let particleSystem3D = null;
+let particleAnimationId = null;
+
+/**
+ * 初始化3D粒子系统
+ */
+function init3DParticleSystem() {
+    if (!Graph || !window.ParticleSystem3D) {
+        console.warn('Graph or ParticleSystem3D not available');
+        return;
+    }
+
+    try {
+        // 创建3D粒子系统实例
+        particleSystem3D = new window.ParticleSystem3D(Graph);
+        console.log('✅ 3D粒子系统已初始化');
+
+        // 创建独立的动画循环
+        function animateParticles() {
+            if (particleSystem3D) {
+                particleSystem3D.update();
+            }
+            particleAnimationId = requestAnimationFrame(animateParticles);
+        }
+
+        // 启动动画循环
+        animateParticles();
+
+    } catch (error) {
+        console.error('❌ 3D粒子系统初始化失败:', error);
+    }
 }
 
 function renderChatList(reset = false) {
@@ -3148,6 +3244,30 @@ function toggleMusic() {
         }
 
         showToast('音乐已静音', 'info');
+    }
+}
+
+/**
+ * 切换粒子特效
+ * 由侧边栏开关直接调用
+ */
+function toggleParticles() {
+    if (!particleSystem3D) {
+        console.warn('3D粒子系统未初始化');
+        return;
+    }
+
+    const toggle = document.getElementById('particle-toggle');
+    const isEnabled = toggle && toggle.checked;
+
+    if (isEnabled) {
+        // 开启粒子特效
+        particleSystem3D.start();
+        showToast('粒子特效已开启', 'success');
+    } else {
+        // 关闭粒子特效
+        particleSystem3D.stop();
+        showToast('粒子特效已关闭', 'info');
     }
 }
 

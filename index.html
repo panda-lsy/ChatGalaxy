@@ -317,6 +317,8 @@
 <script src="js/processors/text-processor.js" defer></script>
 <!-- UI Components -->
 <script src="js/ui/draggable-button.js" defer></script>
+<!-- 3D Particle System -->
+<script src="js/particle-system-3d.js" defer></script>
 <script src="js/app.js" defer></script>
 
 <!-- Unified Sidebar -->
@@ -449,6 +451,16 @@
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" id="music-toggle" checked onchange="toggleMusic()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="sidebar-switch">
+                <div class="switch-label">
+                    <i class="ri-sparkling-line"></i>
+                    <span>粒子特效</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="particle-toggle" checked onchange="toggleParticles()">
                     <span class="toggle-slider"></span>
                 </label>
             </div>
