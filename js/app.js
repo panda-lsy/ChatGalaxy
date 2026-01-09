@@ -1980,7 +1980,11 @@ function initGraph(graphData) {
     // Auto-rotate
     Graph.controls().autoRotate = true;
     Graph.controls().autoRotateSpeed = 0.4; // Slower rotation
-    
+
+    // 🔧 限制相机缩放范围（避免看到球状星星边界）
+    Graph.controls().minDistance = 200;  // 最小距离（不能太近）
+    Graph.controls().maxDistance = 1500; // 最大距离（不能太远，避免看到边界）
+
     // Add Ambient Particles (Starfield)
     addStarField();
 

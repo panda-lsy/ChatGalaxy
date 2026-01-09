@@ -103,7 +103,10 @@ class ParticleSystem3D {
                     vAlpha = alpha;
 
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-                    gl_PointSize = size * pixelRatio * (300.0 / -mvPosition.z);
+
+                    // 🔧 固定粒子大小，不随距离缩放
+                    gl_PointSize = size * pixelRatio;
+
                     gl_Position = projectionMatrix * mvPosition;
                 }
             `,
