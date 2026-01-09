@@ -1989,8 +1989,27 @@ function initGraph(graphData) {
     Graph.controls().minPolarAngle = Math.PI / 6;  // 最小极角（30度，防止太靠上）
     Graph.controls().maxPolarAngle = Math.PI * 5 / 6; // 最大极角（150度，防止太靠下）
 
-    // 🔧 禁用平移（防止右键移动到边界）
-    Graph.controls().enablePan = false;
+    // 🔧 启用平移并限制范围
+    Graph.controls().enablePan = true;
+    Graph.controls().panSpeed = 1.0;
+
+    // 🔧 限制平移范围（防止移出粒子效果区域）
+    // 监听平移结束事件，限制target位置
+    const controls = Graph.controls();
+    const maxPanDistance = 500; // 最大平移距离
+
+    controls.addEventListener('end', () => {
+        const target = controls.target;
+        const distance = Math.sqrt(target.x ** 2 + target.y ** 2 + target.z ** 2);
+
+        // 如果超出范围，限制在边界内
+        if (distance > maxPanDistance) {
+            const ratio = maxPanDistance / distance;
+            target.x *= ratio;
+            target.y *= ratio;
+            target.z *= ratio;
+        }
+    });
 
     // Add Ambient Particles (Starfield)
     addStarField();
